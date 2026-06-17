@@ -20,6 +20,7 @@
     let currentPanel   = 'hero';
     let isTransitioning = false;
     let gsapReady      = typeof gsap !== 'undefined';
+    const panelOrder   = ['hero', 'about', 'objectives', 'founders', 'scrim'];
 
     /* ═══════════════════════════════════════════
        1. PRELOADER — Simple setInterval counter
@@ -78,6 +79,7 @@
         initCardGlitch();
         initCardHover();
         animateCounters();
+        initNavControls();
     }
 
     /* ═══════════════════════════════════════════
@@ -110,6 +112,7 @@
                     oldPanel.style.cssText = '';
                     isTransitioning = false;
                     currentPanel = targetId;
+                    updateNavButtons();
                     // Glitch decode text in new panel
                     glitchPanelText(newPanel);
                 }
@@ -161,6 +164,7 @@
             newPanel.classList.add('panel--active');
             isTransitioning = false;
             currentPanel = targetId;
+            updateNavButtons();
         }
 
         // Reset scroll for scrollable panels
@@ -203,6 +207,42 @@
             }
         }
     });
+
+    /* ═══════════════════════════════════════════
+       3.5 NAV CONTROLS (Next/Prev)
+       ═══════════════════════════════════════════ */
+    function updateNavButtons() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        if (!prevBtn || !nextBtn) return;
+        
+        const currentIndex = panelOrder.indexOf(currentPanel);
+        prevBtn.disabled = currentIndex <= 0;
+        nextBtn.disabled = currentIndex >= panelOrder.length - 1;
+    }
+
+    function initNavControls() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        if (!prevBtn || !nextBtn) return;
+
+        prevBtn.addEventListener('click', function() {
+            const currentIndex = panelOrder.indexOf(currentPanel);
+            if (currentIndex > 0) {
+                switchPanel(panelOrder[currentIndex - 1]);
+            }
+        });
+
+        nextBtn.addEventListener('click', function() {
+            const currentIndex = panelOrder.indexOf(currentPanel);
+            if (currentIndex < panelOrder.length - 1) {
+                switchPanel(panelOrder[currentIndex + 1]);
+            }
+        });
+
+        // Set initial state
+        updateNavButtons();
+    }
 
     /* ═══════════════════════════════════════════
        4. GLITCH TEXT DECODE
