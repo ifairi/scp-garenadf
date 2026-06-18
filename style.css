@@ -69,6 +69,7 @@ html,
 body {
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
 }
 
@@ -576,6 +577,7 @@ h6 {
     left: 0;
     width: 100vw;
     height: calc(100vh - var(--header-height));
+    height: calc(100dvh - var(--header-height));
     overflow: hidden;
 }
 
@@ -652,12 +654,22 @@ h6 {
     background: linear-gradient(to bottom, rgba(6, 6, 10, 0.78) 0%, rgba(6, 6, 10, 0.6) 50%, rgba(6, 6, 10, 0.8) 100%);
 }
 
+#founders .panel-bg {
+    bottom: auto;
+    height: auto;
+}
+#founders .panel-bg img {
+    height: auto;
+    min-height: 100vh;
+}
+
+
 #founders .panel-bg::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(to bottom, rgba(6, 6, 10, 0.75) 0%, rgba(6, 6, 10, 0.58) 50%, rgba(6, 6, 10, 0.78) 100%);
+    background: linear-gradient(to bottom, rgba(25, 5, 5, 0.65) 0%, rgba(40, 10, 10, 0.45) 50%, rgba(25, 5, 5, 0.65) 100%);
 }
 
 #hero .panel-bg img {
@@ -1308,8 +1320,9 @@ h6 {
 .founder-card {
     padding: 1.5rem;
     text-align: center;
-    background: rgba(20, 20, 25, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, rgba(40, 40, 45, 0.75) 0%, rgba(20, 20, 25, 0.8) 50%, rgba(35, 25, 30, 0.75) 100%);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.08), inset 0 0 20px rgba(200, 16, 46, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(8px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
     position: relative;
@@ -1393,8 +1406,9 @@ h6 {
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: rgba(18, 18, 22, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(35, 35, 40, 0.8) 0%, rgba(15, 15, 18, 0.85) 50%, rgba(30, 20, 25, 0.8) 100%);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.05), inset 0 0 15px rgba(200, 16, 46, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(8px);
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
     position: relative;
@@ -1610,6 +1624,7 @@ h6 {
 .nav-controls {
     position: fixed;
     bottom: 25px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 25px);
     right: 30px;
     display: flex;
     gap: 1.5rem;
@@ -1726,5 +1741,20 @@ h6 {
     .footer-text span {
         display: block;
         margin-top: 0.3rem;
+    }
+
+    .panel {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        align-items: flex-start !important;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .panel-content {
+        margin: auto 0;
+        padding-top: 2rem;
+        padding-bottom: 15rem; /* Additional space for the navigation buttons */
+        width: 100%;
     }
 }
