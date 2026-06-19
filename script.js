@@ -80,6 +80,233 @@
         initCardHover();
         animateCounters();
         initNavControls();
+        initDossier();
+    }
+
+    /* ═══════════════════════════════════════════════
+       OPERATIVE DOSSIER — click a member to open file
+       ═══════════════════════════════════════════════ */
+    var DOSSIER = {
+        'SCP-013': {
+            name: '[ TXD | WMORI ]', role: 'Assault Squad', clearance: 'CLEARANCE: LEVEL Ω',
+            alias: '"The Phantom Strike"',
+            unique: 'Selalu mengeksekusi entry pertama tanpa menunggu info caller — gaya "silent breach" yang membuat lawan kehilangan tempo sejak ronde pertama.',
+            track: [
+                { clan: 'TXD Esports', role: 'Entry Fragger', year: '2021 – 2022' },
+                { clan: 'WMORI Division', role: 'Assault Lead', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Assault Squad', year: '2024 – Aktif' }
+            ],
+            strengths: ['Refleks tembak presisi tinggi', 'Penguasaan peta agresif', 'Konsistensi clutch 1vX', 'Spray control elite'],
+            stats: [['AIM', 95], ['GAME SENSE', 88], ['CLUTCH', 92], ['AGGRESSION', 97], ['SUPPORT', 70]]
+        },
+        'SCP-048': {
+            name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
+            alias: '"Iron Vanguard"',
+            unique: 'Mampu menahan tekanan tembakan beruntun sambil tetap menjaga formasi — dinding hidup di garis depan tim.',
+            track: [
+                { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
+                { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
+            ],
+            strengths: ['Daya tahan posisi luar biasa', 'Disiplin formasi', 'Peredam tekanan musuh', 'Trade-frag andal'],
+            stats: [['DEFENSE', 96], ['POSITIONING', 90], ['AIM', 78], ['TEAMPLAY', 93], ['MOBILITY', 64]]
+        },
+        'SCP-051': {
+            name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
+            alias: '"Silent Architect"',
+            unique: 'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi tim secara real-time.',
+            track: [
+                { clan: 'Apex Riders', role: 'Flex', year: '2021 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
+            ],
+            strengths: ['Adaptasi peran fleksibel', 'Pembacaan rotasi musuh', 'Eksekusi taktik cepat', 'Komunikasi jernih'],
+            stats: [['IQ', 92], ['FLEX', 89], ['AIM', 83], ['UTILITY', 88], ['CLUTCH', 80]]
+        },
+        'SCP-054': {
+            name: '[ NOTS 丶NaaSCP54 ]', role: 'Steel Keeper', clearance: 'CLEARANCE: LEVEL VII',
+            alias: '"The Bulwark"',
+            unique: 'Spesialis hold site — pernah mempertahankan bomb-site sendirian melawan serangan penuh tanpa kehilangan posisi.',
+            track: [
+                { clan: 'NOTS Squad', role: 'Anchor', year: '2020 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'Steel Keeper', year: '2023 – Aktif' }
+            ],
+            strengths: ['Anchor site tak tergoyahkan', 'Manajemen utility hebat', 'Tembakan defensif akurat', 'Tenang di bawah tekanan'],
+            stats: [['DEFENSE', 94], ['PATIENCE', 95], ['AIM', 80], ['UTILITY', 86], ['AGGRESSION', 58]]
+        },
+        'SCP-044': {
+            name: '[ NOTS 丶KoazyNXS ]', role: 'Tactical Tanker', clearance: 'CLEARANCE: LEVEL VI',
+            alias: '"Breach Hammer"',
+            unique: 'Membuka jalan masuk dengan timing utility yang sempurna — gerbang pembuka setiap eksekusi tim.',
+            track: [
+                { clan: 'NXS Gaming', role: 'Initiator', year: '2021 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'Tactical Tanker', year: '2023 – Aktif' }
+            ],
+            strengths: ['Timing utility presisi', 'Initiator agresif', 'Map control kuat', 'Koordinasi push'],
+            stats: [['INITIATE', 93], ['UTILITY', 91], ['AIM', 79], ['AGGRESSION', 88], ['SUPPORT', 75]]
+        },
+        'SCP-012': {
+            name: '[ NOTS 丶Ndan3NXS ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
+            alias: '"Twin Blade"',
+            unique: 'Bermain berpasangan dengan sinkronisasi nyaris telepatik — dua orang, satu gerakan.',
+            track: [
+                { clan: 'NXS Gaming', role: 'Duo Support', year: '2021 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
+            ],
+            strengths: ['Sinergi duo elite', 'Trade-kill cepat', 'Crossfire disiplin', 'Posisi suportif'],
+            stats: [['TEAMPLAY', 94], ['AIM', 82], ['SYNERGY', 96], ['CLUTCH', 78], ['UTILITY', 80]]
+        },
+        'SCP-022': {
+            name: '[ NOTSJessSCP22 ]', role: 'Engineer', clearance: 'CLEARANCE: LEVEL V',
+            alias: '"The Gadgeteer"',
+            unique: 'Menguasai setiap perangkat dan gadget di medan — mengubah peralatan biasa menjadi senjata taktis.',
+            track: [
+                { clan: 'NOTS Squad', role: 'Support Eng.', year: '2021 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'Engineer', year: '2023 – Aktif' }
+            ],
+            strengths: ['Penguasaan gadget total', 'Setup defensif kreatif', 'Info-gathering canggih', 'Efisiensi resource'],
+            stats: [['UTILITY', 95], ['IQ', 88], ['AIM', 74], ['SUPPORT', 90], ['AGGRESSION', 60]]
+        },
+        'SCP-018': {
+            name: '[ NOTS 丶FinzNXS ]', role: 'Engineer Support', clearance: 'CLEARANCE: LEVEL V',
+            alias: '"Lifeline"',
+            unique: 'Selalu hadir di momen kritis untuk menyokong rekan — penopang yang menjaga tim tetap hidup.',
+            track: [
+                { clan: 'NXS Gaming', role: 'Support', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Engineer Support', year: '2024 – Aktif' }
+            ],
+            strengths: ['Support timing sempurna', 'Resource management', 'Backup posisi solid', 'Disiplin tim'],
+            stats: [['SUPPORT', 93], ['UTILITY', 87], ['AIM', 72], ['TEAMPLAY', 91], ['CLUTCH', 68]]
+        },
+        'SCP-017': {
+            name: '[ NOTS 丶RimuNXS ]', role: 'Engineer Recon', clearance: 'CLEARANCE: LEVEL V',
+            alias: '"The Eye"',
+            unique: 'Membaca pergerakan musuh dari jejak sekecil apa pun — radar hidup yang jarang salah.',
+            track: [
+                { clan: 'NXS Gaming', role: 'Recon', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Engineer Recon', year: '2024 – Aktif' }
+            ],
+            strengths: ['Intel-gathering tajam', 'Pembacaan minimap', 'Info call akurat', 'Positioning cerdas'],
+            stats: [['RECON', 95], ['IQ', 90], ['AIM', 76], ['SUPPORT', 84], ['AGGRESSION', 62]]
+        },
+        'SCP-027': {
+            name: '[ ICE丨UrYuuVG ]', role: 'Anomaly Recon', clearance: 'CLEARANCE: LEVEL VI',
+            alias: '"Cold Specter"',
+            unique: 'Bergerak senyap di flank dan muncul dari sudut tak terduga — anomali yang sulit dilacak musuh.',
+            track: [
+                { clan: 'ICE Esports', role: 'Lurker', year: '2021 – 2023' },
+                { clan: 'S.C.P Alliance', role: 'Anomaly Recon', year: '2023 – Aktif' }
+            ],
+            strengths: ['Flank tak terdeteksi', 'Timing serangan brilian', 'Info denial musuh', 'Clutch lurker'],
+            stats: [['STEALTH', 94], ['AIM', 85], ['IQ', 87], ['CLUTCH', 83], ['TEAMPLAY', 70]]
+        },
+        'SCP-119': {
+            name: '[ SCP°119 ]', role: 'Tactical Mind', clearance: 'CLEARANCE: LEVEL VIII',
+            alias: '"The Strategist"',
+            unique: 'Otak taktik tim — merancang draft, mid-round call, dan adaptasi anti-strat yang menentukan kemenangan.',
+            track: [
+                { clan: 'Vanguard Tactics', role: 'In-Game Leader', year: '2019 – 2022' },
+                { clan: 'S.C.P Alliance', role: 'Tactical Mind', year: '2022 – Aktif' }
+            ],
+            strengths: ['Kepemimpinan in-game', 'Strategi & draft jitu', 'Mid-round adaptation', 'Manajemen mental tim'],
+            stats: [['IQ', 98], ['LEADERSHIP', 96], ['AIM', 80], ['UTILITY', 88], ['CLUTCH', 82]]
+        }
+    };
+
+    function buildDossier(d) {
+        var track = (d.track || []).map(function (t) {
+            return '<li><b>' + t.clan + '</b> — ' + t.role + ' <span>(' + t.year + ')</span></li>';
+        }).join('');
+        var strengths = (d.strengths || []).map(function (s) { return '<li>' + s + '</li>'; }).join('');
+        var stats = (d.stats || []).map(function (st) {
+            return '<div class="hud-stat">' +
+                '<div class="hud-stat-top"><span>' + st[0] + '</span><b>' + st[1] + '</b></div>' +
+                '<div class="hud-stat-bar"><span class="hud-stat-fill" data-val="' + st[1] + '"></span></div>' +
+                '</div>';
+        }).join('');
+        return { track: track, strengths: strengths, stats: stats };
+    }
+
+    function initDossier() {
+        var modal = document.getElementById('scpDossier');
+        if (!modal) return;
+        var lastFocus = null;
+
+        function openDossier(id) {
+            var d = DOSSIER[id];
+            if (!d) return;
+            var parts = buildDossier(d);
+
+            document.getElementById('dsFileId').textContent = id;
+            document.getElementById('dsIdTag').textContent = id;
+            document.getElementById('dsClearance').textContent = d.clearance || 'CLEARANCE: LEVEL V';
+            document.getElementById('dsName').textContent = d.name;
+            document.getElementById('dsRole').textContent = d.role;
+            document.getElementById('dsAlias').textContent = d.alias;
+            document.getElementById('dsUnique').textContent = d.unique;
+            document.getElementById('dsTrack').innerHTML = parts.track;
+            document.getElementById('dsStrength').innerHTML = parts.strengths;
+            document.getElementById('dsStats').innerHTML = parts.stats;
+
+            // portrait : use d.img if provided, else placeholder
+            var portrait = document.getElementById('dsPortrait');
+            var existingImg = portrait.querySelector('img');
+            if (existingImg) existingImg.remove();
+            var ph = portrait.querySelector('.portrait-placeholder');
+            if (d.img) {
+                if (ph) ph.style.display = 'none';
+                var im = document.createElement('img');
+                im.src = d.img; im.alt = id;
+                portrait.appendChild(im);
+            } else if (ph) {
+                ph.style.display = '';
+            }
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            // animate stat bars after open
+            setTimeout(function () {
+                modal.querySelectorAll('.hud-stat-fill').forEach(function (f) {
+                    f.style.right = (100 - parseInt(f.getAttribute('data-val'), 10)) + '%';
+                });
+            }, 250);
+
+            // glitch decode key text if available
+            if (typeof glitchDecode === 'function') {
+                setTimeout(function () { glitchDecode(document.getElementById('dsName'), 350); }, 120);
+                setTimeout(function () { glitchDecode(document.getElementById('dsIdTag'), 300); }, 60);
+            }
+        }
+
+        function closeDossier() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            modal.querySelectorAll('.hud-stat-fill').forEach(function (f) { f.style.right = '100%'; });
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
+
+        // bind member cards
+        document.querySelectorAll('.member-card').forEach(function (card) {
+            var idEl = card.querySelector('.member-id');
+            var id = idEl ? idEl.textContent.trim() : '';
+            if (!DOSSIER[id]) return;
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.addEventListener('click', function () { lastFocus = card; openDossier(id); });
+            card.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lastFocus = card; openDossier(id); }
+            });
+        });
+
+        // close handlers
+        modal.querySelectorAll('[data-dossier-close]').forEach(function (el) {
+            el.addEventListener('click', closeDossier);
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) closeDossier();
+        });
     }
 
     /* ═══════════════════════════════════════════

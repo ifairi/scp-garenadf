@@ -1758,3 +1758,484 @@ h6 {
         width: 100%;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   OPERATIVE DOSSIER OVERLAY — Futuristic tactical HUD modal
+   ═══════════════════════════════════════════════════════════ */
+
+/* Member cards become interactive */
+.member-card {
+    cursor: pointer;
+}
+
+.member-card .member-photo {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.member-card:hover .member-photo {
+    border-color: var(--accent-bright);
+    box-shadow: 0 0 14px var(--accent-glow);
+    transform: scale(1.05);
+}
+
+/* "ACCESS FILE" affordance */
+.member-card .member-info::after {
+    content: '▸ ACCESS FILE';
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.45rem;
+    letter-spacing: 2px;
+    color: var(--accent-cyan);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    margin-top: 0.3rem;
+    text-shadow: 0 0 6px var(--accent-cyan-glow);
+}
+
+.member-card:hover .member-info::after {
+    opacity: 0.9;
+    transform: translateY(0);
+}
+
+/* ─── Overlay shell ─── */
+.dossier {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.75rem, 3vw, 2.5rem);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease-smooth), visibility 0.35s;
+}
+
+.dossier.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.dossier-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(10, 8, 12, 0.78), rgba(3, 3, 6, 0.94));
+    backdrop-filter: blur(8px) saturate(120%);
+}
+
+/* ─── Frame ─── */
+.dossier-frame {
+    position: relative;
+    width: min(1080px, 100%);
+    max-height: calc(100dvh - clamp(1.5rem, 6vw, 5rem));
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(150deg, rgba(20, 20, 26, 0.92) 0%, rgba(9, 9, 13, 0.96) 55%, rgba(24, 14, 18, 0.92) 100%);
+    border: 1px solid var(--border-accent);
+    box-shadow:
+        0 0 0 1px rgba(0, 240, 255, 0.04),
+        0 0 60px rgba(200, 16, 46, 0.12),
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        inset 0 0 60px rgba(0, 0, 0, 0.4);
+    clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+    transform: scale(0.94) translateY(12px);
+    opacity: 0;
+    transition: transform 0.45s var(--ease-smooth), opacity 0.45s var(--ease-smooth);
+    overflow: hidden;
+}
+
+.dossier.is-open .dossier-frame {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* moving scan sweep */
+.dossier-scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.05) 50%, transparent 100%);
+    height: 40%;
+    animation: dossierScan 5s linear infinite;
+    mix-blend-mode: screen;
+}
+
+@keyframes dossierScan {
+    0% { transform: translateY(-120%); }
+    100% { transform: translateY(320%); }
+}
+
+/* frame corner ticks */
+.dossier-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    z-index: 7;
+    pointer-events: none;
+    border: 1.5px solid var(--accent-bright);
+    opacity: 0.65;
+}
+.dossier-corner--tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
+.dossier-corner--tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; border-color: var(--accent-cyan); }
+.dossier-corner--bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; border-color: var(--accent-cyan); }
+.dossier-corner--br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
+
+/* ─── Top bar ─── */
+.dossier-topbar {
+    position: relative;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.4rem;
+    border-bottom: 1px solid var(--border-accent);
+    background: rgba(0, 0, 0, 0.35);
+    flex-wrap: wrap;
+}
+
+.dossier-topbar-left,
+.dossier-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.dossier-rec {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--accent-bright);
+    animation: recBlink 1.4s steps(1) infinite;
+}
+
+@keyframes recBlink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.25; } }
+
+.dossier-file {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+.dossier-file span { color: var(--accent-cyan); }
+
+.dossier-clearance {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--accent-gold);
+    border: 1px solid rgba(232, 168, 56, 0.3);
+    padding: 0.2rem 0.6rem;
+    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+}
+
+.dossier-close {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(200, 16, 46, 0.1);
+    border: 1px solid var(--border-accent);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.dossier-close svg { width: 16px; height: 16px; }
+.dossier-close:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: rotate(90deg);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+
+/* ─── Body grid ─── */
+.dossier-body {
+    position: relative;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 1fr;
+    gap: clamp(0.8rem, 2vw, 1.6rem);
+    padding: clamp(1rem, 2.5vw, 1.8rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+}
+.dossier-body::-webkit-scrollbar { width: 6px; }
+.dossier-body::-webkit-scrollbar-thumb { background: var(--accent-dim); }
+
+/* ─── HUD side panels ─── */
+.dossier-hud {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    min-width: 0;
+}
+
+.hud-block {
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-subtle);
+    border-left: 2px solid var(--accent);
+    padding: 0.9rem 1rem;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.dossier-hud--right .hud-block { border-left: 1px solid var(--border-subtle); border-right: 2px solid var(--accent-cyan); }
+
+.hud-block-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+    text-shadow: 0 0 8px var(--accent-glow);
+}
+.dossier-hud--right .hud-block-label { color: var(--accent-cyan); text-shadow: 0 0 8px var(--accent-cyan-glow); }
+
+/* Track record timeline */
+.hud-timeline {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+.hud-timeline li {
+    position: relative;
+    padding-left: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+.hud-timeline li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.35em;
+    width: 6px;
+    height: 6px;
+    background: var(--accent-bright);
+    box-shadow: 0 0 8px var(--accent-glow);
+    transform: rotate(45deg);
+}
+.hud-timeline li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 2.5px;
+    top: 1.1em;
+    bottom: -0.7rem;
+    width: 1px;
+    background: var(--border-accent);
+}
+.hud-timeline li b {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+.hud-timeline li span {
+    color: var(--accent-gold);
+    font-size: 0.58rem;
+}
+
+/* Alias / julukan */
+.hud-alias {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    line-height: 1.25;
+    text-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Strengths list */
+.hud-strengths {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+.hud-strengths li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+.hud-strengths li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    text-shadow: 0 0 6px var(--accent-cyan-glow);
+}
+
+/* Unique trait */
+.hud-unique {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Combat metric bars */
+.hud-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.hud-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.hud-stat-top {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+.hud-stat-top b { color: var(--accent-cyan); }
+.hud-stat-bar {
+    position: relative;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+.hud-stat-fill {
+    position: absolute;
+    inset: 0 100% 0 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    box-shadow: 0 0 8px var(--accent-glow);
+    transition: right 0.9s var(--ease-smooth);
+}
+
+/* ─── Center column ─── */
+.dossier-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.dossier-portrait {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 46vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(0, 240, 255, 0.04) 22px, rgba(0, 240, 255, 0.04) 23px),
+        repeating-linear-gradient(90deg, transparent, transparent 22px, rgba(0, 240, 255, 0.04) 22px, rgba(0, 240, 255, 0.04) 23px),
+        radial-gradient(circle at 50% 40%, rgba(200, 16, 46, 0.1), transparent 70%);
+    border: 1px solid var(--border-accent);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    overflow: hidden;
+}
+.dossier-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.portrait-placeholder {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 2;
+}
+.portrait-placeholder small { font-size: 0.5rem; letter-spacing: 2px; color: rgba(0, 240, 255, 0.4); }
+
+/* targeting reticle on portrait */
+.portrait-reticle {
+    position: absolute;
+    inset: 14px;
+    pointer-events: none;
+    border: 1px dashed rgba(0, 240, 255, 0.18);
+}
+.portrait-reticle::before,
+.portrait-reticle::after {
+    content: '';
+    position: absolute;
+    background: var(--accent-bright);
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+.portrait-reticle::before { left: 50%; top: 0; width: 1px; height: 14px; transform: translateX(-50%); }
+.portrait-reticle::after { top: 50%; left: 0; height: 1px; width: 14px; transform: translateY(-50%); }
+
+.dossier-nameplate {
+    text-align: center;
+    width: 100%;
+}
+.ds-id-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--accent-bright);
+    background: rgba(200, 16, 46, 0.1);
+    border: 1px solid var(--border-accent);
+    padding: 0.2rem 0.7rem;
+    margin-bottom: 0.5rem;
+    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+}
+.ds-name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+.ds-role {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    margin-top: 0.3rem;
+    text-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+.dossier-status-strip {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 0.5rem;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    text-transform: uppercase;
+}
+
+/* ─── Responsive : stack HUDs below portrait ─── */
+@media (max-width: 860px) {
+    .dossier-body {
+        grid-template-columns: 1fr;
+    }
+    .dossier-center { order: -1; }
+    .dossier-portrait { max-height: 38vh; }
+    .dossier-hud--right .hud-block { border-right: 1px solid var(--border-subtle); border-left: 2px solid var(--accent-cyan); }
+}

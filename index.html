@@ -418,6 +418,89 @@
         </button>
     </div>
 
+    <!-- ═══════════════════════════════════════════════
+         OPERATIVE DOSSIER OVERLAY (opens on member click)
+         ═══════════════════════════════════════════════ -->
+    <div class="dossier" id="scpDossier" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Operative Dossier">
+        <div class="dossier-backdrop" data-dossier-close></div>
+
+        <div class="dossier-frame glass-card">
+            <!-- decorative scan + grid -->
+            <div class="dossier-scan"></div>
+            <span class="dossier-corner dossier-corner--tl"></span>
+            <span class="dossier-corner dossier-corner--tr"></span>
+            <span class="dossier-corner dossier-corner--bl"></span>
+            <span class="dossier-corner dossier-corner--br"></span>
+
+            <!-- Top bar -->
+            <header class="dossier-topbar">
+                <div class="dossier-topbar-left">
+                    <span class="dossier-rec">● REC</span>
+                    <span class="dossier-file">PERSONNEL FILE // <span id="dsFileId">SCP-013</span></span>
+                </div>
+                <div class="dossier-topbar-right">
+                    <span class="dossier-clearance" id="dsClearance">CLEARANCE: LEVEL Ω</span>
+                    <button class="dossier-close" id="dossierClose" aria-label="Close" data-dossier-close>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Body : LEFT HUD | CENTER VISUAL | RIGHT HUD -->
+            <div class="dossier-body">
+
+                <!-- ── LEFT HUD ── -->
+                <aside class="dossier-hud dossier-hud--left">
+                    <div class="hud-block">
+                        <span class="hud-block-label">// TRACK RECORD</span>
+                        <ul class="hud-timeline" id="dsTrack"></ul>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// JULUKAN</span>
+                        <p class="hud-alias" id="dsAlias"></p>
+                    </div>
+                </aside>
+
+                <!-- ── CENTER VISUAL ── -->
+                <div class="dossier-center">
+                    <div class="dossier-portrait" id="dsPortrait">
+                        <span class="portrait-reticle"></span>
+                        <span class="portrait-placeholder">[ NO VISUAL FEED ]<br><small>INSERT OPERATIVE RENDER</small></span>
+                    </div>
+                    <div class="dossier-nameplate">
+                        <span class="ds-id-tag" id="dsIdTag">SCP-013</span>
+                        <h3 class="ds-name" id="dsName">[ TXD | WMORI ]</h3>
+                        <p class="ds-role" id="dsRole">Assault Squad</p>
+                    </div>
+                    <div class="dossier-status-strip" id="dsStatusStrip">
+                        BIO-SIGN: STABLE // LOADOUT: ARMED // STATUS: ACTIVE
+                    </div>
+                </div>
+
+                <!-- ── RIGHT HUD ── -->
+                <aside class="dossier-hud dossier-hud--right">
+                    <div class="hud-block">
+                        <span class="hud-block-label">// KELEBIHAN</span>
+                        <ul class="hud-strengths" id="dsStrength"></ul>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// KEUNIKAN</span>
+                        <p class="hud-unique" id="dsUnique"></p>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// COMBAT METRICS</span>
+                        <div class="hud-stats" id="dsStats"></div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+
     <!-- ═══ Scripts ═══ -->
     <script>
         window.__scpReady = false;
