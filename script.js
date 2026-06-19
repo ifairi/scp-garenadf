@@ -8,19 +8,19 @@
     'use strict';
 
     /* ─── DOM ─── */
-    const preloader = document.getElementById('preloader');
-    const progressBar = document.getElementById('preloaderProgress');
-    const percentText = document.getElementById('preloaderPercent');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const panels = document.querySelectorAll('.panel');
-    const hamburger = document.getElementById('hamburger');
-    const mainNav = document.getElementById('mainNav');
-    const logoLink = document.getElementById('logoLink');
+    const preloader    = document.getElementById('preloader');
+    const progressBar  = document.getElementById('preloaderProgress');
+    const percentText  = document.getElementById('preloaderPercent');
+    const navLinks     = document.querySelectorAll('.nav-link');
+    const panels       = document.querySelectorAll('.panel');
+    const hamburger    = document.getElementById('hamburger');
+    const mainNav      = document.getElementById('mainNav');
+    const logoLink     = document.getElementById('logoLink');
 
-    let currentPanel = 'hero';
+    let currentPanel   = 'hero';
     let isTransitioning = false;
-    let gsapReady = typeof gsap !== 'undefined';
-    const panelOrder = ['hero', 'about', 'objectives', 'founders', 'scrim'];
+    let gsapReady      = typeof gsap !== 'undefined';
+    const panelOrder   = ['hero', 'about', 'objectives', 'founders', 'scrim'];
 
     /* ═══════════════════════════════════════════
        1. PRELOADER — Simple setInterval counter
@@ -97,19 +97,19 @@
                 { clan: 'S.C.P Alliance', role: 'Assault Squad', year: '2024 – Aktif' }
             ],
             strengths: ['Refleks tembak presisi tinggi', 'Penguasaan peta agresif', 'Konsistensi clutch 1vX', 'Spray control elite'],
-            stats: [['AIM', 95], ['GAME SENSE', 88], ['CLUTCH', 92], ['AGGRESSION', 97], ['SUPPORT', 70]]
+            stats: [['VEHICLE', 72], ['SHOOTING', 95], ['SURVIVAL', 80], ['CO-OP', 78], ['OBJECTIVE', 85]]
         },
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"Tankerch Sankai"',
-            unique: 'Mampu menahan tekanan hantaman rudal ngawi dari depan maupun belakang ',
+            alias: '"Iron Vanguard"',
+            unique: 'Mampu menahan tekanan tembakan beruntun sambil tetap menjaga formasi — dinding hidup di garis depan tim.',
             track: [
                 { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
                 { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
                 { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
             ],
             strengths: ['Daya tahan posisi luar biasa', 'Disiplin formasi', 'Peredam tekanan musuh', 'Trade-frag andal'],
-            stats: [['DEFENSE', 96], ['POSITIONING', 90], ['AIM', 78], ['TEAMPLAY', 93], ['MOBILITY', 64]]
+            stats: [['VEHICLE', 80], ['SHOOTING', 78], ['SURVIVAL', 96], ['CO-OP', 88], ['OBJECTIVE', 90]]
         },
         'SCP-051': {
             name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
@@ -120,7 +120,7 @@
                 { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
             ],
             strengths: ['Adaptasi peran fleksibel', 'Pembacaan rotasi musuh', 'Eksekusi taktik cepat', 'Komunikasi jernih'],
-            stats: [['IQ', 92], ['FLEX', 89], ['AIM', 83], ['UTILITY', 88], ['CLUTCH', 80]]
+            stats: [['VEHICLE', 78], ['SHOOTING', 84], ['SURVIVAL', 82], ['CO-OP', 90], ['OBJECTIVE', 88]]
         },
         'SCP-054': {
             name: '[ NOTS 丶NaaSCP54 ]', role: 'Steel Keeper', clearance: 'CLEARANCE: LEVEL VII',
@@ -131,7 +131,7 @@
                 { clan: 'S.C.P Alliance', role: 'Steel Keeper', year: '2023 – Aktif' }
             ],
             strengths: ['Anchor site tak tergoyahkan', 'Manajemen utility hebat', 'Tembakan defensif akurat', 'Tenang di bawah tekanan'],
-            stats: [['DEFENSE', 94], ['PATIENCE', 95], ['AIM', 80], ['UTILITY', 86], ['AGGRESSION', 58]]
+            stats: [['VEHICLE', 70], ['SHOOTING', 82], ['SURVIVAL', 95], ['CO-OP', 85], ['OBJECTIVE', 92]]
         },
         'SCP-044': {
             name: '[ NOTS 丶KoazyNXS ]', role: 'Tactical Tanker', clearance: 'CLEARANCE: LEVEL VI',
@@ -142,7 +142,7 @@
                 { clan: 'S.C.P Alliance', role: 'Tactical Tanker', year: '2023 – Aktif' }
             ],
             strengths: ['Timing utility presisi', 'Initiator agresif', 'Map control kuat', 'Koordinasi push'],
-            stats: [['INITIATE', 93], ['UTILITY', 91], ['AIM', 79], ['AGGRESSION', 88], ['SUPPORT', 75]]
+            stats: [['VEHICLE', 85], ['SHOOTING', 80], ['SURVIVAL', 84], ['CO-OP', 88], ['OBJECTIVE', 90]]
         },
         'SCP-012': {
             name: '[ NOTS 丶Ndan3NXS ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
@@ -153,7 +153,7 @@
                 { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
             ],
             strengths: ['Sinergi duo elite', 'Trade-kill cepat', 'Crossfire disiplin', 'Posisi suportif'],
-            stats: [['TEAMPLAY', 94], ['AIM', 82], ['SYNERGY', 96], ['CLUTCH', 78], ['UTILITY', 80]]
+            stats: [['VEHICLE', 76], ['SHOOTING', 83], ['SURVIVAL', 80], ['CO-OP', 96], ['OBJECTIVE', 84]]
         },
         'SCP-022': {
             name: '[ NOTSJessSCP22 ]', role: 'Engineer', clearance: 'CLEARANCE: LEVEL V',
@@ -164,7 +164,7 @@
                 { clan: 'S.C.P Alliance', role: 'Engineer', year: '2023 – Aktif' }
             ],
             strengths: ['Penguasaan gadget total', 'Setup defensif kreatif', 'Info-gathering canggih', 'Efisiensi resource'],
-            stats: [['UTILITY', 95], ['IQ', 88], ['AIM', 74], ['SUPPORT', 90], ['AGGRESSION', 60]]
+            stats: [['VEHICLE', 88], ['SHOOTING', 75], ['SURVIVAL', 82], ['CO-OP', 90], ['OBJECTIVE', 86]]
         },
         'SCP-018': {
             name: '[ NOTS 丶FinzNXS ]', role: 'Engineer Support', clearance: 'CLEARANCE: LEVEL V',
@@ -175,7 +175,7 @@
                 { clan: 'S.C.P Alliance', role: 'Engineer Support', year: '2024 – Aktif' }
             ],
             strengths: ['Support timing sempurna', 'Resource management', 'Backup posisi solid', 'Disiplin tim'],
-            stats: [['SUPPORT', 93], ['UTILITY', 87], ['AIM', 72], ['TEAMPLAY', 91], ['CLUTCH', 68]]
+            stats: [['VEHICLE', 82], ['SHOOTING', 73], ['SURVIVAL', 84], ['CO-OP', 93], ['OBJECTIVE', 80]]
         },
         'SCP-017': {
             name: '[ NOTS 丶RimuNXS ]', role: 'Engineer Recon', clearance: 'CLEARANCE: LEVEL V',
@@ -186,7 +186,7 @@
                 { clan: 'S.C.P Alliance', role: 'Engineer Recon', year: '2024 – Aktif' }
             ],
             strengths: ['Intel-gathering tajam', 'Pembacaan minimap', 'Info call akurat', 'Positioning cerdas'],
-            stats: [['RECON', 95], ['IQ', 90], ['AIM', 76], ['SUPPORT', 84], ['AGGRESSION', 62]]
+            stats: [['VEHICLE', 84], ['SHOOTING', 78], ['SURVIVAL', 80], ['CO-OP', 88], ['OBJECTIVE', 90]]
         },
         'SCP-027': {
             name: '[ ICE丨UrYuuVG ]', role: 'Anomaly Recon', clearance: 'CLEARANCE: LEVEL VI',
@@ -197,7 +197,7 @@
                 { clan: 'S.C.P Alliance', role: 'Anomaly Recon', year: '2023 – Aktif' }
             ],
             strengths: ['Flank tak terdeteksi', 'Timing serangan brilian', 'Info denial musuh', 'Clutch lurker'],
-            stats: [['STEALTH', 94], ['AIM', 85], ['IQ', 87], ['CLUTCH', 83], ['TEAMPLAY', 70]]
+            stats: [['VEHICLE', 80], ['SHOOTING', 86], ['SURVIVAL', 88], ['CO-OP', 72], ['OBJECTIVE', 84]]
         },
         'SCP-119': {
             name: '[ SCP°119 ]', role: 'Tactical Mind', clearance: 'CLEARANCE: LEVEL VIII',
@@ -208,7 +208,7 @@
                 { clan: 'S.C.P Alliance', role: 'Tactical Mind', year: '2022 – Aktif' }
             ],
             strengths: ['Kepemimpinan in-game', 'Strategi & draft jitu', 'Mid-round adaptation', 'Manajemen mental tim'],
-            stats: [['IQ', 98], ['LEADERSHIP', 96], ['AIM', 80], ['UTILITY', 88], ['CLUTCH', 82]]
+            stats: [['VEHICLE', 78], ['SHOOTING', 82], ['SURVIVAL', 85], ['CO-OP', 92], ['OBJECTIVE', 96]]
         }
     };
 
@@ -353,10 +353,10 @@
                 duration: 0.15,
                 ease: 'power2.in'
             })
-                .to(oldPanel, {
-                    opacity: 0,
-                    duration: 0.05,
-                });
+            .to(oldPanel, {
+                opacity: 0,
+                duration: 0.05,
+            });
 
             // Prepare new panel
             tl.set(newPanel, {
@@ -442,7 +442,7 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
-
+        
         const currentIndex = panelOrder.indexOf(currentPanel);
         prevBtn.disabled = currentIndex <= 0;
         nextBtn.disabled = currentIndex >= panelOrder.length - 1;
@@ -453,14 +453,14 @@
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
 
-        prevBtn.addEventListener('click', function () {
+        prevBtn.addEventListener('click', function() {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex > 0) {
                 switchPanel(panelOrder[currentIndex - 1]);
             }
         });
 
-        nextBtn.addEventListener('click', function () {
+        nextBtn.addEventListener('click', function() {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex < panelOrder.length - 1) {
                 switchPanel(panelOrder[currentIndex + 1]);
@@ -517,9 +517,9 @@
 
         var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
         tl.from('#heroTag', { y: 20, opacity: 0, duration: 0.6 })
-            .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
-            .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
-            .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
+          .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
+          .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
+          .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
 
         setTimeout(function () {
             var tag = document.getElementById('heroTag');
