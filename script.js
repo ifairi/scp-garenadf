@@ -81,6 +81,53 @@
         animateCounters();
         initNavControls();
         initDossier();
+        initParallax();
+    }
+
+    /* ═══════════════════════════════════════════════
+       PARALLAX — keep each panel background anchored while
+       its content scrolls (no shifting / no cut-off edges)
+       ═══════════════════════════════════════════════ */
+    function initParallax() {
+        var FACTOR = 0.16;          // subtle drift strength
+        var ticking = false;
+        var pending = null;
+
+        function apply(panel) {
+            var bg = panel.querySelector('.panel-bg');
+            if (!bg) return;
+            var img = bg.querySelector('img');
+            var st = panel.scrollTop || 0;
+            if (st <= 0) {
+                bg.style.transform = 'translate3d(0,0,0)';
+                if (img) img.style.transform = 'scale(1.12)';
+                return;
+            }
+            // 1) pin the wrapper to the viewport (fully counter the scroll → never a gap)
+            bg.style.transform = 'translate3d(0,' + st + 'px,0)';
+            // 2) subtle parallax drift of the oversized image inside the pinned wrapper
+            if (img) {
+                var drift = st * FACTOR;
+                var maxDrift = bg.clientHeight * 0.045;   // stay within the 12% scale headroom
+                if (drift > maxDrift) drift = maxDrift;
+                img.style.transform = 'translate3d(0,' + (-drift) + 'px,0) scale(1.12)';
+            }
+        }
+
+        function onScroll(e) {
+            pending = e.currentTarget;
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(function () {
+                    if (pending) apply(pending);
+                    ticking = false;
+                });
+            }
+        }
+
+        document.querySelectorAll('.panel').forEach(function (panel) {
+            panel.addEventListener('scroll', onScroll, { passive: true });
+        });
     }
 
     /* ═══════════════════════════════════════════════
@@ -101,15 +148,15 @@
         },
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"Iron Vanguard"',
-            unique: 'Mampu menahan tekanan rudal ngawi depan maupun belakang',
+            alias: '"Iron Dome Vanguard"',
+            unique: 'Mampu menahan berbagai hantaman Rudal Balistik musuh',
             track: [
-                { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
-                { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
+                { clan: 'NOTS', role: 'Loyality III', year: '2025 – Now' },
+                { clan: 'NOTS REBORN DFNC S2', role: 'IGL Squad', year: '2026 – 2026' },
+                // { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
             ],
-            strengths: ['Daya tahan posisi luar biasa', 'Disiplin formasi', 'Peredam tekanan musuh', 'Trade-frag andal'],
-            stats: [['VEHICLE', 80], ['SHOOTING', 78], ['SURVIVAL', 96], ['CO-OP', 88], ['OBJECTIVE', 90]]
+            strengths: ['Mampu memaksimalkan kemampuan kendaraan tempur', 'Dapat memprediksi pergerakan kendaraan musuh', 'Siap menjadi badan utama infantry', 'Pelindung sektor vital fraksi'],
+            stats: [['VEHICLE', 100], ['SHOOTING', 73], ['SURVIVAL', 70], ['CO-OP', 73], ['OBJECTIVE', 51]]
         },
         'SCP-051': {
             name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
@@ -394,9 +441,19 @@
             updateNavButtons();
         }
 
-        // Reset scroll for scrollable panels
-        if (newPanel.classList.contains('panel--scrollable')) {
-            newPanel.scrollTop = 0;
+        // Reset scroll + parallax background for the incoming panel
+        newPanel.scrollTop = 0;
+        var _nbg = newPanel.querySelector('.panel-bg');
+        if (_nbg) {
+            _nbg.style.transform = 'translate3d(0,0,0)';
+            var _ni = _nbg.querySelector('img');
+            if (_ni) _ni.style.transform = 'scale(1.12)';
+        }
+        var _obg = oldPanel.querySelector('.panel-bg');
+        if (_obg) {
+            _obg.style.transform = 'translate3d(0,0,0)';
+            var _oi = _obg.querySelector('img');
+            if (_oi) _oi.style.transform = 'scale(1.12)';
         }
     }
 
