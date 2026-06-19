@@ -8,19 +8,19 @@
     'use strict';
 
     /* ─── DOM ─── */
-    const preloader    = document.getElementById('preloader');
-    const progressBar  = document.getElementById('preloaderProgress');
-    const percentText  = document.getElementById('preloaderPercent');
-    const navLinks     = document.querySelectorAll('.nav-link');
-    const panels       = document.querySelectorAll('.panel');
-    const hamburger    = document.getElementById('hamburger');
-    const mainNav      = document.getElementById('mainNav');
-    const logoLink     = document.getElementById('logoLink');
+    const preloader = document.getElementById('preloader');
+    const progressBar = document.getElementById('preloaderProgress');
+    const percentText = document.getElementById('preloaderPercent');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const panels = document.querySelectorAll('.panel');
+    const hamburger = document.getElementById('hamburger');
+    const mainNav = document.getElementById('mainNav');
+    const logoLink = document.getElementById('logoLink');
 
-    let currentPanel   = 'hero';
+    let currentPanel = 'hero';
     let isTransitioning = false;
-    let gsapReady      = typeof gsap !== 'undefined';
-    const panelOrder   = ['hero', 'about', 'objectives', 'founders', 'scrim'];
+    let gsapReady = typeof gsap !== 'undefined';
+    const panelOrder = ['hero', 'about', 'objectives', 'founders', 'scrim'];
 
     /* ═══════════════════════════════════════════
        1. PRELOADER — Simple setInterval counter
@@ -102,7 +102,7 @@
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
             alias: '"Iron Vanguard"',
-            unique: 'Mampu menahan tekanan tembakan beruntun sambil tetap menjaga formasi — dinding hidup di garis depan tim.',
+            unique: 'Mampu menahan tekanan rudal ngawi depan maupun belakang',
             track: [
                 { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
                 { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
@@ -353,10 +353,10 @@
                 duration: 0.15,
                 ease: 'power2.in'
             })
-            .to(oldPanel, {
-                opacity: 0,
-                duration: 0.05,
-            });
+                .to(oldPanel, {
+                    opacity: 0,
+                    duration: 0.05,
+                });
 
             // Prepare new panel
             tl.set(newPanel, {
@@ -442,7 +442,7 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
-        
+
         const currentIndex = panelOrder.indexOf(currentPanel);
         prevBtn.disabled = currentIndex <= 0;
         nextBtn.disabled = currentIndex >= panelOrder.length - 1;
@@ -453,14 +453,14 @@
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
 
-        prevBtn.addEventListener('click', function() {
+        prevBtn.addEventListener('click', function () {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex > 0) {
                 switchPanel(panelOrder[currentIndex - 1]);
             }
         });
 
-        nextBtn.addEventListener('click', function() {
+        nextBtn.addEventListener('click', function () {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex < panelOrder.length - 1) {
                 switchPanel(panelOrder[currentIndex + 1]);
@@ -517,9 +517,9 @@
 
         var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
         tl.from('#heroTag', { y: 20, opacity: 0, duration: 0.6 })
-          .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
-          .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
-          .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
+            .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
+            .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
+            .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
 
         setTimeout(function () {
             var tag = document.getElementById('heroTag');
