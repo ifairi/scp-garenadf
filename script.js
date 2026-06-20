@@ -8,19 +8,19 @@
     'use strict';
 
     /* ─── DOM ─── */
-    const preloader = document.getElementById('preloader');
-    const progressBar = document.getElementById('preloaderProgress');
-    const percentText = document.getElementById('preloaderPercent');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const panels = document.querySelectorAll('.panel');
-    const hamburger = document.getElementById('hamburger');
-    const mainNav = document.getElementById('mainNav');
-    const logoLink = document.getElementById('logoLink');
+    const preloader    = document.getElementById('preloader');
+    const progressBar  = document.getElementById('preloaderProgress');
+    const percentText  = document.getElementById('preloaderPercent');
+    const navLinks     = document.querySelectorAll('.nav-link');
+    const panels       = document.querySelectorAll('.panel');
+    const hamburger    = document.getElementById('hamburger');
+    const mainNav      = document.getElementById('mainNav');
+    const logoLink     = document.getElementById('logoLink');
 
-    let currentPanel = 'hero';
+    let currentPanel   = 'hero';
     let isTransitioning = false;
-    let gsapReady = typeof gsap !== 'undefined';
-    const panelOrder = ['hero', 'about', 'objectives', 'founders', 'scrim'];
+    let gsapReady      = typeof gsap !== 'undefined';
+    const panelOrder   = ['hero', 'about', 'founders', 'objectives', 'scrim'];
 
     /* ═══════════════════════════════════════════
        1. PRELOADER — Simple setInterval counter
@@ -81,53 +81,6 @@
         animateCounters();
         initNavControls();
         initDossier();
-        initParallax();
-    }
-
-    /* ═══════════════════════════════════════════════
-       PARALLAX — keep each panel background anchored while
-       its content scrolls (no shifting / no cut-off edges)
-       ═══════════════════════════════════════════════ */
-    function initParallax() {
-        var FACTOR = 0.16;          // subtle drift strength
-        var ticking = false;
-        var pending = null;
-
-        function apply(panel) {
-            var bg = panel.querySelector('.panel-bg');
-            if (!bg) return;
-            var img = bg.querySelector('img');
-            var st = panel.scrollTop || 0;
-            if (st <= 0) {
-                bg.style.transform = 'translate3d(0,0,0)';
-                if (img) img.style.transform = 'scale(1.12)';
-                return;
-            }
-            // 1) pin the wrapper to the viewport (fully counter the scroll → never a gap)
-            bg.style.transform = 'translate3d(0,' + st + 'px,0)';
-            // 2) subtle parallax drift of the oversized image inside the pinned wrapper
-            if (img) {
-                var drift = st * FACTOR;
-                var maxDrift = bg.clientHeight * 0.045;   // stay within the 12% scale headroom
-                if (drift > maxDrift) drift = maxDrift;
-                img.style.transform = 'translate3d(0,' + (-drift) + 'px,0) scale(1.12)';
-            }
-        }
-
-        function onScroll(e) {
-            pending = e.currentTarget;
-            if (!ticking) {
-                ticking = true;
-                requestAnimationFrame(function () {
-                    if (pending) apply(pending);
-                    ticking = false;
-                });
-            }
-        }
-
-        document.querySelectorAll('.panel').forEach(function (panel) {
-            panel.addEventListener('scroll', onScroll, { passive: true });
-        });
     }
 
     /* ═══════════════════════════════════════════════
@@ -148,15 +101,15 @@
         },
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"Iron Dome Vanguard"',
-            unique: 'Mampu menahan berbagai hantaman Rudal Balistik musuh',
+            alias: '"Iron Vanguard"',
+            unique: 'Mampu menahan tekanan tembakan beruntun sambil tetap menjaga formasi — dinding hidup di garis depan tim.',
             track: [
-                { clan: 'NOTS', role: 'Loyality III', year: '2025 – Now' },
-                { clan: 'NOTS REBORN DFNC S2', role: 'IGL Squad', year: '2026 – 2026' },
-                // { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
+                { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
+                { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
             ],
-            strengths: ['Mampu memaksimalkan kemampuan kendaraan tempur', 'Dapat memprediksi pergerakan kendaraan musuh', 'Siap menjadi badan utama infantry', 'Pelindung sektor vital fraksi'],
-            stats: [['VEHICLE', 100], ['SHOOTING', 73], ['SURVIVAL', 70], ['CO-OP', 73], ['OBJECTIVE', 51]]
+            strengths: ['Daya tahan posisi luar biasa', 'Disiplin formasi', 'Peredam tekanan musuh', 'Trade-frag andal'],
+            stats: [['VEHICLE', 80], ['SHOOTING', 78], ['SURVIVAL', 96], ['CO-OP', 88], ['OBJECTIVE', 90]]
         },
         'SCP-051': {
             name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
@@ -375,85 +328,48 @@
         var newPanel = document.getElementById(targetId);
         if (!oldPanel || !newPanel) { isTransitioning = false; return; }
 
-        // Update nav immediately
         setActiveNav(targetId);
+        if (newPanel.classList.contains('panel--scrollable')) newPanel.scrollTop = 0;
 
         if (gsapReady) {
-            // GSAP transition — glitch style
+            var dir = (Math.random() > 0.5 ? 1 : -1);
+
+            // Reveal the NEW panel UNDERNEATH the old one, already fully opaque.
+            // A complete background is always painted, so there is NO dark void
+            // between panels (this removes the "blink"). The new panel never
+            // fades opacity and gets no filter, so every card's backdrop-filter
+            // blur is live the instant it appears.
+            gsap.set(newPanel, { clearProps: 'filter,transform,opacity' });
+            newPanel.style.visibility = 'visible';
+            newPanel.style.zIndex = '1';
+            newPanel.classList.add('panel--active');
+            oldPanel.style.zIndex = '2';
+
             var tl = gsap.timeline({
                 onComplete: function () {
                     oldPanel.classList.remove('panel--active');
                     oldPanel.style.cssText = '';
+                    newPanel.style.zIndex = '';
                     isTransitioning = false;
                     currentPanel = targetId;
                     updateNavButtons();
-                    // Glitch decode text in new panel
                     glitchPanelText(newPanel);
                 }
             });
 
-            // Glitch-out old panel
-            tl.to(oldPanel, {
-                opacity: 0,
-                x: (Math.random() > 0.5 ? 1 : -1) * 30,
-                filter: 'brightness(2) hue-rotate(10deg)',
-                duration: 0.15,
-                ease: 'power2.in'
-            })
-                .to(oldPanel, {
-                    opacity: 0,
-                    duration: 0.05,
-                });
-
-            // Prepare new panel
-            tl.set(newPanel, {
-                visibility: 'visible',
-                opacity: 0,
-                x: (Math.random() > 0.5 ? 1 : -1) * 20,
-                filter: 'brightness(1.5) hue-rotate(-5deg)',
-                zIndex: 2
-            });
-
-            // Show new panel with class
-            tl.call(function () {
-                newPanel.classList.add('panel--active');
-            });
-
-            // Glitch-in new panel
-            tl.to(newPanel, {
-                opacity: 1,
-                x: 0,
-                filter: 'brightness(1) hue-rotate(0deg)',
-                duration: 0.3,
-                ease: 'power2.out'
-            });
-
-            // Clean up
-            tl.set(newPanel, { clearProps: 'filter,x,zIndex' });
-            tl.set(oldPanel, { visibility: 'hidden', zIndex: '' });
+            // Glitch-OUT the old panel on top: harsh RGB / brightness flicker,
+            // then a quick slide + fade. Only the OUTGOING panel is filtered.
+            tl.to(oldPanel, { filter: 'brightness(1.9) contrast(1.3) hue-rotate(8deg)',  x: dir * -7, duration: 0.05, ease: 'none' }, 0)
+              .to(oldPanel, { filter: 'brightness(0.45) contrast(1.6) hue-rotate(-12deg)', x: dir * 10, duration: 0.05, ease: 'none' })
+              .to(oldPanel, { filter: 'brightness(1.5) contrast(1.2)',                     x: dir * -4, duration: 0.05, ease: 'none' })
+              .to(oldPanel, { opacity: 0, x: dir * 38, filter: 'brightness(2.2) blur(1px)', duration: 0.20, ease: 'power2.in' });
 
         } else {
-            // No GSAP fallback
             oldPanel.classList.remove('panel--active');
             newPanel.classList.add('panel--active');
             isTransitioning = false;
             currentPanel = targetId;
             updateNavButtons();
-        }
-
-        // Reset scroll + parallax background for the incoming panel
-        newPanel.scrollTop = 0;
-        var _nbg = newPanel.querySelector('.panel-bg');
-        if (_nbg) {
-            _nbg.style.transform = 'translate3d(0,0,0)';
-            var _ni = _nbg.querySelector('img');
-            if (_ni) _ni.style.transform = 'scale(1.12)';
-        }
-        var _obg = oldPanel.querySelector('.panel-bg');
-        if (_obg) {
-            _obg.style.transform = 'translate3d(0,0,0)';
-            var _oi = _obg.querySelector('img');
-            if (_oi) _oi.style.transform = 'scale(1.12)';
         }
     }
 
@@ -480,15 +396,16 @@
         });
     }
 
-    // CTA button → switch to about
+    // CTA / tactical buttons — internal tabs use #hash, external links open normally
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('.tactical-btn');
         if (btn) {
-            e.preventDefault();
             var href = btn.getAttribute('href');
             if (href && href.startsWith('#')) {
+                e.preventDefault();
                 switchPanel(href.replace('#', ''));
             }
+            // external links (http...) fall through to default navigation
         }
     });
 
@@ -499,7 +416,7 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
-
+        
         const currentIndex = panelOrder.indexOf(currentPanel);
         prevBtn.disabled = currentIndex <= 0;
         nextBtn.disabled = currentIndex >= panelOrder.length - 1;
@@ -510,14 +427,14 @@
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
 
-        prevBtn.addEventListener('click', function () {
+        prevBtn.addEventListener('click', function() {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex > 0) {
                 switchPanel(panelOrder[currentIndex - 1]);
             }
         });
 
-        nextBtn.addEventListener('click', function () {
+        nextBtn.addEventListener('click', function() {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex < panelOrder.length - 1) {
                 switchPanel(panelOrder[currentIndex + 1]);
@@ -532,10 +449,13 @@
        4. GLITCH TEXT DECODE
        ═══════════════════════════════════════════ */
     function glitchDecode(element, duration) {
-        var chars = '!<>-_\\/[]{}—=+*^?#░▒▓';
+        if (!element) return;
+        var chars = '!<>-_\\/[]{}\u2014=+*^?#01\u2591\u2592\u2593\u00a7\u00b1\u00d7\u00f7';
         duration = duration || 350;
-        var original = element.textContent;
+        var original = element.dataset.decodeText || element.textContent;
+        element.dataset.decodeText = original;
         var start = performance.now();
+        element.classList.add('is-glitching');
 
         function tick(now) {
             var elapsed = now - start;
@@ -549,24 +469,42 @@
             }).join('');
 
             if (p < 1) requestAnimationFrame(tick);
-            else element.textContent = original;
+            else { element.textContent = original; element.classList.remove('is-glitching'); }
         }
         requestAnimationFrame(tick);
     }
 
-    function glitchPanelText(panel) {
-        var tags = panel.querySelectorAll('.section-tag');
-        var titles = panel.querySelectorAll('.section-title');
-        var descs = panel.querySelectorAll('.about-card p, .objective-card p, .founder-card .role, .match-versus, .member-role, .hero-desc');
-        var headings = panel.querySelectorAll('.about-card h3, .objective-card h3, .founder-card h4, .match-day, .subsection-title');
-
-        tags.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 300); }, 50 + i * 50); });
-        titles.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 400); }, 150 + i * 50); });
-        headings.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 250); }, 250 + i * 40); });
-        descs.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 250); }, 350 + i * 30); });
+    /* Digital tear/slice boot-in for shapes (cards) \u2014 keeps backdrop blur intact */
+    function glitchShape(card) {
+        if (!card) return;
+        card.classList.remove('is-shape-glitch');
+        // force reflow so the animation re-triggers every visit
+        void card.offsetWidth;
+        card.classList.add('is-shape-glitch');
+        setTimeout(function () { card.classList.remove('is-shape-glitch'); }, 520);
     }
 
-    /* ═══════════════════════════════════════════
+    function glitchPanelText(panel) {
+        if (!panel) return;
+        var tags     = panel.querySelectorAll('.section-tag');
+        var titles   = panel.querySelectorAll('.section-title');
+        var descs    = panel.querySelectorAll('.about-card p, .objective-card p, .founder-card .role, .match-versus, .member-role, .member-name, .member-id, .hero-desc, .match-time');
+        var headings = panel.querySelectorAll('.about-card h3, .objective-card h3, .founder-card h4, .match-day, .subsection-title');
+        var shapes   = panel.querySelectorAll('.glass-card');
+
+        tags.forEach(function (el, i)     { setTimeout(function () { glitchDecode(el, 320); }, 40 + i * 50); });
+        titles.forEach(function (el, i)   { setTimeout(function () { glitchDecode(el, 420); }, 130 + i * 50); });
+        headings.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 260); }, 230 + i * 40); });
+        descs.forEach(function (el, i)    { setTimeout(function () { glitchDecode(el, 240); }, 320 + i * 28); });
+
+        // shapes tear in, staggered (capped so big lists stay snappy)
+        shapes.forEach(function (card, i) {
+            if (i > 13) return;
+            setTimeout(function () { glitchShape(card); }, 60 + i * 55);
+        });
+    }
+
+/* ═══════════════════════════════════════════
        5. HERO ENTRANCE
        ═══════════════════════════════════════════ */
     function animateHeroEntrance() {
@@ -574,9 +512,9 @@
 
         var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
         tl.from('#heroTag', { y: 20, opacity: 0, duration: 0.6 })
-            .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
-            .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
-            .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
+          .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
+          .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
+          .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
 
         setTimeout(function () {
             var tag = document.getElementById('heroTag');
@@ -676,16 +614,17 @@
 
             var card = visibleCards[Math.floor(Math.random() * visibleCards.length)];
             card.style.transition = 'none';
-            card.style.transform = 'translateX(' + ((Math.random() - 0.5) * 8) + 'px) skewX(' + ((Math.random() - 0.5) * 3) + 'deg)';
-            card.style.filter = 'hue-rotate(' + (Math.random() * 15) + 'deg) brightness(' + (1 + Math.random() * 0.2) + ')';
-            card.style.borderColor = 'rgba(0,240,255,0.4)';
+            card.style.transform = 'translate(' + ((Math.random() - 0.5) * 6) + 'px,' + ((Math.random() - 0.5) * 3) + 'px) skewX(' + ((Math.random() - 0.5) * 2.5) + 'deg)';
+            // RGB-split ghost via dual box-shadow (red / white) — no filter, blur stays intact
+            card.style.boxShadow = '-3px 0 0 rgba(255,45,85,0.55), 3px 0 0 rgba(233,236,242,0.45), 0 0 18px rgba(255,45,85,0.15)';
+            card.style.borderColor = 'rgba(255,45,85,0.45)';
 
             setTimeout(function () {
-                card.style.transition = 'all 0.3s ease';
+                card.style.transition = 'transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease';
                 card.style.transform = '';
-                card.style.filter = '';
+                card.style.boxShadow = '';
                 card.style.borderColor = '';
-            }, 60 + Math.random() * 80);
+            }, 70 + Math.random() * 90);
 
             setTimeout(glitchCard, 2000 + Math.random() * 5000);
         }
