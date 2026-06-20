@@ -8,19 +8,19 @@
     'use strict';
 
     /* ─── DOM ─── */
-    const preloader    = document.getElementById('preloader');
-    const progressBar  = document.getElementById('preloaderProgress');
-    const percentText  = document.getElementById('preloaderPercent');
-    const navLinks     = document.querySelectorAll('.nav-link');
-    const panels       = document.querySelectorAll('.panel');
-    const hamburger    = document.getElementById('hamburger');
-    const mainNav      = document.getElementById('mainNav');
-    const logoLink     = document.getElementById('logoLink');
+    const preloader = document.getElementById('preloader');
+    const progressBar = document.getElementById('preloaderProgress');
+    const percentText = document.getElementById('preloaderPercent');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const panels = document.querySelectorAll('.panel');
+    const hamburger = document.getElementById('hamburger');
+    const mainNav = document.getElementById('mainNav');
+    const logoLink = document.getElementById('logoLink');
 
-    let currentPanel   = 'hero';
+    let currentPanel = 'hero';
     let isTransitioning = false;
-    let gsapReady      = typeof gsap !== 'undefined';
-    const panelOrder   = ['hero', 'about', 'founders', 'objectives', 'scrim'];
+    let gsapReady = typeof gsap !== 'undefined';
+    const panelOrder = ['hero', 'about', 'founders', 'objectives', 'scrim'];
 
     /* ═══════════════════════════════════════════
        1. PRELOADER — Simple setInterval counter
@@ -101,15 +101,15 @@
         },
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"Iron Vanguard"',
-            unique: 'Mampu menahan tekanan tembakan beruntun sambil tetap menjaga formasi — dinding hidup di garis depan tim.',
+            alias: '"Iron Dome Vanguard"',
+            unique: 'Mampu menahan berbagai hantaman Rudal Balistik musuh',
             track: [
-                { clan: 'NOTS Squad', role: 'Frontliner', year: '2020 – 2022' },
-                { clan: 'Sankai Corps', role: 'Main Tank', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
+                { clan: 'NOTS', role: 'Loyality III', year: '2025 – Now' },
+                { clan: 'NOTS REBORN DFNC S2', role: 'IGL Squad', year: '2026 – 2026' },
+                // { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
             ],
-            strengths: ['Daya tahan posisi luar biasa', 'Disiplin formasi', 'Peredam tekanan musuh', 'Trade-frag andal'],
-            stats: [['VEHICLE', 80], ['SHOOTING', 78], ['SURVIVAL', 96], ['CO-OP', 88], ['OBJECTIVE', 90]]
+            strengths: ['Mampu memaksimalkan kemampuan kendaraan tempur', 'Dapat memprediksi pergerakan kendaraan musuh', 'Siap menjadi badan utama infantry', 'Pelindung sektor vital fraksi'],
+            stats: [['VEHICLE', 100], ['SHOOTING', 73], ['SURVIVAL', 70], ['CO-OP', 73], ['OBJECTIVE', 51]]
         },
         'SCP-051': {
             name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
@@ -157,14 +157,14 @@
         },
         'SCP-022': {
             name: '[ NOTSJessSCP22 ]', role: 'Engineer', clearance: 'CLEARANCE: LEVEL V',
-            alias: '"The Gadgeteer"',
-            unique: 'Menguasai setiap perangkat dan gadget di medan — mengubah peralatan biasa menjadi senjata taktis.',
+            alias: '"The Vulcan"',
+            unique: 'Bisa mengontrol Loitering di celah yang sempit.',
             track: [
-                { clan: 'NOTS Squad', role: 'Support Eng.', year: '2021 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'Engineer', year: '2023 – Aktif' }
+                { clan: 'NOTS', role: 'Suave V', year: '2025 – Now' },
+                { clan: 'NOTS', role: 'Engineer Flanker', year: '2025 – Now' }
             ],
-            strengths: ['Penguasaan gadget total', 'Setup defensif kreatif', 'Info-gathering canggih', 'Efisiensi resource'],
-            stats: [['VEHICLE', 88], ['SHOOTING', 75], ['SURVIVAL', 82], ['CO-OP', 90], ['OBJECTIVE', 86]]
+            strengths: ['Saat medan perang hancur, aku membangun', 'Saat mesin berhenti, aku menghidupkan', 'Saat harapan padam, aku menempa jalan'],
+            stats: [['VEHICLE', 90], ['SHOOTING', 70], ['SURVIVAL', 68], ['CO-OP', 90], ['OBJECTIVE', 60]]
         },
         'SCP-018': {
             name: '[ NOTS 丶FinzNXS ]', role: 'Engineer Support', clearance: 'CLEARANCE: LEVEL V',
@@ -359,10 +359,10 @@
 
             // Glitch-OUT the old panel on top: harsh RGB / brightness flicker,
             // then a quick slide + fade. Only the OUTGOING panel is filtered.
-            tl.to(oldPanel, { filter: 'brightness(1.9) contrast(1.3) hue-rotate(8deg)',  x: dir * -7, duration: 0.05, ease: 'none' }, 0)
-              .to(oldPanel, { filter: 'brightness(0.45) contrast(1.6) hue-rotate(-12deg)', x: dir * 10, duration: 0.05, ease: 'none' })
-              .to(oldPanel, { filter: 'brightness(1.5) contrast(1.2)',                     x: dir * -4, duration: 0.05, ease: 'none' })
-              .to(oldPanel, { opacity: 0, x: dir * 38, filter: 'brightness(2.2) blur(1px)', duration: 0.20, ease: 'power2.in' });
+            tl.to(oldPanel, { filter: 'brightness(1.9) contrast(1.3) hue-rotate(8deg)', x: dir * -7, duration: 0.05, ease: 'none' }, 0)
+                .to(oldPanel, { filter: 'brightness(0.45) contrast(1.6) hue-rotate(-12deg)', x: dir * 10, duration: 0.05, ease: 'none' })
+                .to(oldPanel, { filter: 'brightness(1.5) contrast(1.2)', x: dir * -4, duration: 0.05, ease: 'none' })
+                .to(oldPanel, { opacity: 0, x: dir * 38, filter: 'brightness(2.2) blur(1px)', duration: 0.20, ease: 'power2.in' });
 
         } else {
             oldPanel.classList.remove('panel--active');
@@ -416,7 +416,7 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
-        
+
         const currentIndex = panelOrder.indexOf(currentPanel);
         prevBtn.disabled = currentIndex <= 0;
         nextBtn.disabled = currentIndex >= panelOrder.length - 1;
@@ -427,14 +427,14 @@
         const nextBtn = document.getElementById('nextBtn');
         if (!prevBtn || !nextBtn) return;
 
-        prevBtn.addEventListener('click', function() {
+        prevBtn.addEventListener('click', function () {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex > 0) {
                 switchPanel(panelOrder[currentIndex - 1]);
             }
         });
 
-        nextBtn.addEventListener('click', function() {
+        nextBtn.addEventListener('click', function () {
             const currentIndex = panelOrder.indexOf(currentPanel);
             if (currentIndex < panelOrder.length - 1) {
                 switchPanel(panelOrder[currentIndex + 1]);
@@ -486,16 +486,16 @@
 
     function glitchPanelText(panel) {
         if (!panel) return;
-        var tags     = panel.querySelectorAll('.section-tag');
-        var titles   = panel.querySelectorAll('.section-title');
-        var descs    = panel.querySelectorAll('.about-card p, .objective-card p, .founder-card .role, .match-versus, .member-role, .member-name, .member-id, .hero-desc, .match-time');
+        var tags = panel.querySelectorAll('.section-tag');
+        var titles = panel.querySelectorAll('.section-title');
+        var descs = panel.querySelectorAll('.about-card p, .objective-card p, .founder-card .role, .match-versus, .member-role, .member-name, .member-id, .hero-desc, .match-time');
         var headings = panel.querySelectorAll('.about-card h3, .objective-card h3, .founder-card h4, .match-day, .subsection-title');
-        var shapes   = panel.querySelectorAll('.glass-card');
+        var shapes = panel.querySelectorAll('.glass-card');
 
-        tags.forEach(function (el, i)     { setTimeout(function () { glitchDecode(el, 320); }, 40 + i * 50); });
-        titles.forEach(function (el, i)   { setTimeout(function () { glitchDecode(el, 420); }, 130 + i * 50); });
+        tags.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 320); }, 40 + i * 50); });
+        titles.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 420); }, 130 + i * 50); });
         headings.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 260); }, 230 + i * 40); });
-        descs.forEach(function (el, i)    { setTimeout(function () { glitchDecode(el, 240); }, 320 + i * 28); });
+        descs.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 240); }, 320 + i * 28); });
 
         // shapes tear in, staggered (capped so big lists stay snappy)
         shapes.forEach(function (card, i) {
@@ -504,17 +504,17 @@
         });
     }
 
-/* ═══════════════════════════════════════════
-       5. HERO ENTRANCE
-       ═══════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════
+           5. HERO ENTRANCE
+           ═══════════════════════════════════════════ */
     function animateHeroEntrance() {
         if (!gsapReady) return;
 
         var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
         tl.from('#heroTag', { y: 20, opacity: 0, duration: 0.6 })
-          .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
-          .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
-          .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
+            .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
+            .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
+            .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
 
         setTimeout(function () {
             var tag = document.getElementById('heroTag');
