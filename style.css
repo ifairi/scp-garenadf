@@ -1,10 +1,3 @@
-/* ═══════════════════════════════════════════════════════════
-   S.C.P — SPECIAL CLASSIFIED PROTOCOL
-   Stylesheet v5.0 — Tab-Based Compact Layout
-   VHS/CRT Effects + Tactical Design + Panel Transitions
-   ═══════════════════════════════════════════════════════════ */
-
-/* ─── Custom Fonts ─── */
 @font-face {
     font-family: 'PMed';
     src: url('p-med.ttf') format('truetype');
@@ -21,7 +14,6 @@
     font-display: swap;
 }
 
-/* ─── Design Tokens ─── */
 :root {
     --bg-void: #0a0a12;
     --bg-glass: rgba(20, 20, 30, 0.6);
@@ -112,7 +104,6 @@ h6 {
     color: var(--text-primary);
 }
 
-/* ═══ CRT / VHS OVERLAYS — Enhanced ═══ */
 .crt-overlay {
     position: fixed;
     inset: 0;
@@ -193,7 +184,6 @@ h6 {
     background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.025) 2px, rgba(0, 0, 0, 0.025) 4px);
 }
 
-/* ═══ HUD ELEMENTS ═══ */
 .hud-corner {
     position: fixed;
     z-index: 9990;
@@ -255,7 +245,6 @@ h6 {
     text-overflow: ellipsis;
 }
 
-/* ═══ PRELOADER ═══ */
 #preloader {
     position: fixed;
     inset: 0;
@@ -367,7 +356,6 @@ h6 {
     }
 }
 
-/* ═══ GRID CANVAS ═══ */
 #gridCanvas {
     position: fixed;
     inset: 0;
@@ -376,7 +364,6 @@ h6 {
     opacity: 0.6;
 }
 
-/* ═══ HEADER ═══ */
 .header {
     position: fixed;
     top: 0;
@@ -399,7 +386,6 @@ h6 {
     gap: 2.5rem;
 }
 
-/* extra breathing room between the SCP logo and the social icons */
 .social-icons {
     margin-left: 0.4rem;
     padding-left: 1rem;
@@ -452,7 +438,6 @@ h6 {
     transition: transform var(--duration-fast) var(--ease-out);
 }
 
-/* industrial corner tick */
 .social-btn::before {
     content: '';
     position: absolute;
@@ -466,7 +451,6 @@ h6 {
     transition: width var(--duration-fast), opacity var(--duration-fast);
 }
 
-/* fill sweep */
 .social-btn::after {
     content: '';
     position: absolute;
@@ -497,7 +481,6 @@ h6 {
     transform: scale(1.12);
 }
 
-/* Navigation */
 .nav {
     position: absolute;
     left: 50%;
@@ -557,7 +540,6 @@ h6 {
     box-shadow: 0 0 12px var(--accent-glow), 0 0 25px var(--accent-dim);
 }
 
-/* Header Right */
 .header-right {
     display: flex;
     align-items: center;
@@ -592,7 +574,6 @@ h6 {
     flex-shrink: 0;
 }
 
-/* Hamburger — enlarged tap target for touch devices */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -641,7 +622,6 @@ h6 {
     background: var(--accent-bright);
 }
 
-/* ═══ PANEL SYSTEM — Full Viewport Tabs ═══ */
 #panelContainer {
     position: fixed;
     top: var(--header-height);
@@ -670,15 +650,19 @@ h6 {
     z-index: 1;
 }
 
-/* Scrollable panel (Tim) */
 .panel--scrollable {
     overflow-y: auto;
     overflow-x: hidden;
     align-items: flex-start;
 }
 
+.panel--scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: #e01437 transparent;
+}
+
 .panel--scrollable::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
 }
 
 .panel--scrollable::-webkit-scrollbar-track {
@@ -686,15 +670,13 @@ h6 {
 }
 
 .panel--scrollable::-webkit-scrollbar-thumb {
-    background: rgba(200, 16, 46, 0.3);
-    border-radius: 2px;
+    background: linear-gradient(to bottom, #e01437 0%, #f5c542 50%, #e6e8ee 100%);
+    border-radius: 0;
 }
 
-/* Panel Backgrounds — fixed so they stay put while content scrolls
-   (smooth, GPU-cheap, no JS, never cut off) */
 .panel-bg {
     position: absolute;
-    /* fallback for very old browsers */
+
     position: fixed;
     inset: 0;
     z-index: 0;
@@ -708,7 +690,6 @@ h6 {
     transform: none;
 }
 
-/* ─── Per-panel VHS / CRT overlay (scanlines + grille + curvature vignette) ─── */
 .panel-bg::before {
     content: '';
     position: absolute;
@@ -730,7 +711,6 @@ h6 {
     98.5% { opacity: 0.98; }
 }
 
-/* Panel overlays — brightened */
 #hero .panel-bg::after {
     content: '';
     position: absolute;
@@ -759,7 +739,6 @@ h6 {
     object-fit: cover;
 }
 
-
 #founders .panel-bg::after {
     content: '';
     position: absolute;
@@ -772,14 +751,12 @@ h6 {
     filter: brightness(0.75) contrast(1.15) saturate(0.9);
 }
 
-/* Panel Content */
 .panel-content {
     position: relative;
     z-index: 2;
     padding: 0 var(--container-padding);
 }
 
-/* ═══ HERO ═══ */
 .hero-content {
     max-width: 600px;
 }
@@ -819,7 +796,6 @@ h6 {
     animation: scp-flicker 6s steps(1) infinite;
 }
 
-/* chromatic aberration layers (VHS) */
 .hero-title .title-accent::before,
 .hero-title .title-accent::after {
     content: attr(data-text);
@@ -832,7 +808,6 @@ h6 {
     z-index: -1;
 }
 
-/* cyan ghost (left) */
 .hero-title .title-accent::before {
     color: var(--accent-cyan);
     transform: translate(-2px, 0);
@@ -841,7 +816,6 @@ h6 {
     animation: scp-glitch-cyan 5s infinite linear;
 }
 
-/* red ghost (right) */
 .hero-title .title-accent::after {
     color: var(--accent-bright);
     transform: translate(2px, 0);
@@ -850,14 +824,12 @@ h6 {
     animation: scp-glitch-red 5.5s infinite linear;
 }
 
-/* base brightness flicker — CRT feel */
 @keyframes scp-flicker {
     0%, 38%, 42%, 70%, 100% { opacity: 1; }
     40% { opacity: 0.86; }
     71% { opacity: 0.93; }
 }
 
-/* cyan layer slices/jitter */
 @keyframes scp-glitch-cyan {
     0%, 88%, 100% { transform: translate(-2px, 0); clip-path: inset(0 0 0 0); }
     89% { transform: translate(-6px, -2px); clip-path: inset(8% 0 62% 0); }
@@ -866,7 +838,6 @@ h6 {
     95% { transform: translate(-2px, 0); clip-path: inset(0 0 0 0); }
 }
 
-/* red layer slices/jitter (offset timing) */
 @keyframes scp-glitch-red {
     0%, 84%, 100% { transform: translate(2px, 0); clip-path: inset(0 0 0 0); }
     85% { transform: translate(6px, 1px); clip-path: inset(20% 0 50% 0); }
@@ -883,14 +854,12 @@ h6 {
     max-width: 45ch;
 }
 
-/* ═══ TACTICAL BUTTON — asymmetric industrial frame ═══ */
 .tactical-btn-wrapper {
     position: relative;
     display: inline-block;
     padding: 14px 18px 14px 22px;
 }
 
-/* single L-bracket, top-left only (asymmetric) */
 .tac-bracket {
     position: absolute;
     top: 0;
@@ -904,7 +873,6 @@ h6 {
     transition: width 0.4s var(--ease-smooth), height 0.4s var(--ease-smooth), box-shadow 0.3s;
 }
 
-/* thin vertical accent rail on the far left */
 .tac-rail {
     position: absolute;
     left: 0;
@@ -917,7 +885,6 @@ h6 {
     transition: height 0.4s var(--ease-smooth), top 0.4s var(--ease-smooth);
 }
 
-/* single accent dot, bottom-right only */
 .tac-dot {
     position: absolute;
     bottom: 6px;
@@ -946,9 +913,6 @@ h6 {
     box-shadow: 0 0 14px var(--accent-glow-strong), 0 0 24px var(--accent-dim);
 }
 
-
-
-/* Main button */
 .tactical-btn {
     position: relative;
     display: inline-flex;
@@ -976,7 +940,6 @@ h6 {
     z-index: 2;
 }
 
-/* Button background layer */
 .tac-btn-bg {
     position: absolute;
     inset: 0;
@@ -985,7 +948,6 @@ h6 {
     transition: background 0.3s ease;
 }
 
-/* Scanning line animation */
 .tac-btn-scan {
     position: absolute;
     top: 0;
@@ -1007,20 +969,17 @@ h6 {
     }
 }
 
-/* Button text */
 .tac-btn-text {
     position: relative;
     z-index: 1;
 }
 
-/* Arrow */
 .tac-btn-arrow {
     position: relative;
     z-index: 1;
     transition: transform 0.3s ease;
 }
 
-/* Glitch layer */
 .tac-btn-glitch {
     position: absolute;
     top: 50%;
@@ -1037,7 +996,6 @@ h6 {
     z-index: 1;
 }
 
-/* Hover states */
 .tactical-btn:hover {
     color: #ffffff;
     border-color: var(--accent-bright);
@@ -1051,7 +1009,6 @@ h6 {
     transform: translateX(4px);
 }
 
-/* Glitch animation — periodic auto-trigger */
 @keyframes tac-glitch {
 
     0%,
@@ -1092,7 +1049,6 @@ h6 {
     animation: tac-glitch 4s ease-in-out infinite;
 }
 
-/* Button border glitch — subtle periodic flash */
 @keyframes tac-border-glitch {
 
     0%,
@@ -1127,7 +1083,6 @@ h6 {
     animation: tac-border-glitch 4s ease-in-out infinite;
 }
 
-/* Bottom tag */
 .tac-tag {
     display: block;
     margin-top: 0.6rem;
@@ -1145,7 +1100,6 @@ h6 {
     opacity: 0.7;
 }
 
-/* ═══ SECTION COMMON ═══ */
 .section-container {
     width: 100%;
     max-width: 1000px;
@@ -1194,7 +1148,7 @@ h6 {
     top: 50%;
     transform: translateY(-50%);
     width: 3px;
-    /* uniform height across every menu (Tim included) */
+
     height: clamp(1.8rem, 4.5vw, 2.5rem);
     border-radius: 2px;
     background: linear-gradient(180deg,
@@ -1208,7 +1162,6 @@ h6 {
     animation: railFlow 5s linear infinite;
 }
 
-/* living gradient — colors flow smoothly within the line */
 @keyframes railFlow {
     0% { background-position: 50% 0%; }
     100% { background-position: 50% 300%; }
@@ -1229,7 +1182,6 @@ h6 {
     margin: 2rem 0 1rem;
 }
 
-/* ═══ GLASS CARD ═══ */
 .glass-card {
     position: relative;
     background: var(--bg-glass);
@@ -1282,7 +1234,6 @@ h6 {
     width: 50px;
 }
 
-/* ═══ ABOUT ═══ */
 .about-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1308,7 +1259,6 @@ h6 {
     line-height: 1.75;
 }
 
-/* ═══ OBJECTIVES ═══ */
 .objectives-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1342,7 +1292,6 @@ h6 {
     line-height: 1.75;
 }
 
-/* ═══ FOUNDERS & TEAM — CRT Glass Cards ═══ */
 .stats-row {
     display: flex;
     gap: 2.5rem;
@@ -1377,7 +1326,6 @@ h6 {
     margin-bottom: 1.5rem;
 }
 
-/* Founder card — CRT glass look */
 .founder-card {
     padding: 1.5rem;
     text-align: center;
@@ -1390,7 +1338,6 @@ h6 {
     overflow: hidden;
 }
 
-/* CRT scanline overlay on card */
 .founder-card::before {
     content: '';
     position: absolute;
@@ -1400,7 +1347,6 @@ h6 {
     z-index: 4;
 }
 
-/* Accent line top */
 .founder-card::after {
     content: '';
     position: absolute;
@@ -1453,7 +1399,6 @@ h6 {
     text-transform: uppercase;
 }
 
-/* Member grid */
 .member-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1461,7 +1406,6 @@ h6 {
     padding-bottom: 2rem;
 }
 
-/* Member card — CRT glass, neutral tones */
 .member-card {
     padding: 1rem 1.2rem;
     display: flex;
@@ -1477,7 +1421,6 @@ h6 {
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* CRT scanlines on card */
 .member-card::before {
     content: '';
     position: absolute;
@@ -1487,7 +1430,6 @@ h6 {
     z-index: 4;
 }
 
-/* Red accent line */
 .member-card::after {
     content: '';
     position: absolute;
@@ -1569,7 +1511,6 @@ h6 {
     text-transform: uppercase;
 }
 
-/* ═══ SCRIM ═══ */
 .scrim-cards {
     display: grid;
     gap: 1.2rem;
@@ -1661,7 +1602,6 @@ h6 {
     background: rgba(232, 168, 56, 0.1);
 }
 
-/* ═══ FOOTER ═══ */
 .footer {
     text-align: center;
     padding: 2rem 0 1rem;
@@ -1681,7 +1621,6 @@ h6 {
     color: var(--accent-bright);
 }
 
-/* ═══ NAVIGATION CONTROLS ═══ */
 .nav-controls {
     position: fixed;
     bottom: 25px;
@@ -1744,15 +1683,10 @@ h6 {
     background: rgba(6, 6, 10, 0.4);
 }
 
-/* ═══ RESPONSIVE ═══ */
-
-/* keep scrollable content clear of the fixed next/back controls on every size */
 .panel--scrollable .section-container {
     padding-bottom: clamp(5rem, 11vh, 7.5rem);
 }
 
-/* ── Tablet & below : collapse centered nav into hamburger, hide partner logos
-      so the brand/menu/logos never overlap ── */
 @media (max-width: 992px) {
     .nav {
         position: fixed;
@@ -1779,7 +1713,6 @@ h6 {
         gap: 0.6rem;
     }
 
-    /* full-width, larger tap targets for touch */
     .nav-link {
         display: block;
         width: 100%;
@@ -1810,13 +1743,11 @@ h6 {
     }
 }
 
-/* ── Phones ── */
 @media (max-width: 768px) {
     .member-grid {
         grid-template-columns: 1fr;
     }
 
-    /* panels become vertical scroll containers */
     .panel {
         overflow-y: auto !important;
         overflow-x: hidden;
@@ -1829,7 +1760,7 @@ h6 {
     .panel-content {
         margin: auto 0;
         padding-top: 2rem;
-        padding-bottom: 9.5rem; /* clears next/back controls + status strip */
+        padding-bottom: 9.5rem;
         width: 100%;
     }
 
@@ -1837,7 +1768,6 @@ h6 {
         padding-bottom: 9.5rem;
     }
 
-    /* next/back centered above the status line, enlarged for touch */
     .nav-controls {
         left: 50%;
         right: auto;
@@ -1871,7 +1801,6 @@ h6 {
     }
 }
 
-/* ── Small phones ── */
 @media (max-width: 480px) {
     .header-left {
         gap: 0.7rem;
@@ -1902,12 +1831,6 @@ h6 {
     }
 }
 
-
-/* ═══════════════════════════════════════════════════════════
-   OPERATIVE DOSSIER OVERLAY — Futuristic tactical HUD modal
-   ═══════════════════════════════════════════════════════════ */
-
-/* Member cards become interactive */
 .member-card {
     cursor: pointer;
 }
@@ -1922,7 +1845,6 @@ h6 {
     transform: scale(1.05);
 }
 
-/* "ACCESS FILE" affordance */
 .member-card .member-info::after {
     content: '▸ ACCESS FILE';
     display: block;
@@ -1942,7 +1864,6 @@ h6 {
     transform: translateY(0);
 }
 
-/* ─── Overlay shell ─── */
 .dossier {
     position: fixed;
     inset: 0;
@@ -1970,7 +1891,6 @@ h6 {
     backdrop-filter: blur(8px) saturate(120%);
 }
 
-/* ─── Frame ─── */
 .dossier-frame {
     position: relative;
     width: min(1080px, 100%);
@@ -1996,7 +1916,6 @@ h6 {
     opacity: 1;
 }
 
-/* moving scan sweep */
 .dossier-scan {
     position: absolute;
     inset: 0;
@@ -2013,7 +1932,6 @@ h6 {
     100% { transform: translateY(320%); }
 }
 
-/* frame corner ticks */
 .dossier-corner {
     position: absolute;
     width: 22px;
@@ -2028,7 +1946,6 @@ h6 {
 .dossier-corner--bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; border-color: var(--accent-cyan); }
 .dossier-corner--br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
 
-/* ─── Top bar ─── */
 .dossier-topbar {
     position: relative;
     z-index: 8;
@@ -2099,7 +2016,6 @@ h6 {
     box-shadow: 0 0 14px var(--accent-glow);
 }
 
-/* ─── Body grid ─── */
 .dossier-body {
     position: relative;
     z-index: 8;
@@ -2109,12 +2025,11 @@ h6 {
     padding: clamp(1rem, 2.5vw, 1.8rem);
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--accent) transparent;
+    scrollbar-color: #e01437 transparent;
 }
 .dossier-body::-webkit-scrollbar { width: 6px; }
-.dossier-body::-webkit-scrollbar-thumb { background: var(--accent-dim); }
+.dossier-body::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #e01437 0%, #f5c542 50%, #e6e8ee 100%); border-radius: 0; }
 
-/* ─── HUD side panels ─── */
 .dossier-hud {
     display: flex;
     flex-direction: column;
@@ -2144,7 +2059,6 @@ h6 {
 }
 .dossier-hud--right .hud-block-label { color: var(--accent-cyan); text-shadow: 0 0 8px var(--accent-cyan-glow); }
 
-/* Track record timeline */
 .hud-timeline {
     list-style: none;
     display: flex;
@@ -2189,7 +2103,6 @@ h6 {
     font-size: 0.58rem;
 }
 
-/* Alias / julukan */
 .hud-alias {
     font-family: var(--font-display);
     font-size: var(--text-lg);
@@ -2200,7 +2113,6 @@ h6 {
     text-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* Strengths list */
 .hud-strengths {
     list-style: none;
     display: flex;
@@ -2225,7 +2137,6 @@ h6 {
     text-shadow: 0 0 6px var(--accent-cyan-glow);
 }
 
-/* Unique trait */
 .hud-unique {
     font-family: var(--font-body);
     font-size: 0.7rem;
@@ -2234,7 +2145,6 @@ h6 {
     font-style: italic;
 }
 
-/* Combat metric bars */
 .hud-stats {
     display: flex;
     flex-direction: column;
@@ -2269,7 +2179,6 @@ h6 {
     transition: right 0.9s var(--ease-smooth);
 }
 
-/* ─── Center column ─── */
 .dossier-center {
     display: flex;
     flex-direction: column;
@@ -2310,7 +2219,6 @@ h6 {
 }
 .portrait-placeholder small { font-size: 0.5rem; letter-spacing: 2px; color: rgba(230, 232, 238, 0.4); }
 
-/* targeting reticle on portrait */
 .portrait-reticle {
     position: absolute;
     inset: 14px;
@@ -2374,7 +2282,6 @@ h6 {
     text-transform: uppercase;
 }
 
-/* ─── Responsive : stack HUDs below portrait ─── */
 @media (max-width: 860px) {
     .dossier-body {
         grid-template-columns: 1fr;
@@ -2384,8 +2291,6 @@ h6 {
     .dossier-hud--right .hud-block { border-right: 1px solid var(--border-subtle); border-left: 2px solid var(--accent-cyan); }
 }
 
-
-/* ═══ Respect reduced-motion: keep it fast & calm on low-end / sensitive users ═══ */
 @media (prefers-reduced-motion: reduce) {
 
     .hero-title .title-accent,
@@ -2406,12 +2311,6 @@ h6 {
     }
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   POST-FIX PACK v7
-   • Safari frosted-glass prefix for every shape
-   • name-card affordance in red
-   • uniform card shapes on mobile
-   ════════════════════════════════════════════════════════════════════ */
 .glass-card,
 .about-card,
 .objective-card,
@@ -2421,13 +2320,11 @@ h6 {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* keep the "ACCESS FILE" affordance red (matches name-card accent) */
 .member-card .member-info::after {
     color: var(--accent-bright) !important;
     text-shadow: 0 0 8px var(--accent-glow);
 }
 
-/* ── Uniform card shapes on mobile (same footprint per menu) ── */
 @media (max-width: 768px) {
     .about-grid,
     .objectives-grid,
@@ -2459,15 +2356,6 @@ h6 {
     .founders-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-
-/* ════════════════════════════════════════════════════════════════════
-   HACKER GLITCH ENGINE  (text decode + shape tear, per-menu)
-   • text: RGB-split (red/white) + micro jitter while decoding
-   • shapes: digital slice/tear boot-in — no opacity/blur change,
-     so each card's frosted glass stays live the whole time
-   ════════════════════════════════════════════════════════════════════ */
-
-/* ── Text decode glitch ── */
 .is-glitching {
     text-shadow:
         2px 0 rgba(255, 45, 85, 0.9),
@@ -2484,7 +2372,6 @@ h6 {
     100% { transform: translate(0, 0); }
 }
 
-/* ── Shape tear / slice boot-in ── */
 .is-shape-glitch {
     animation: shapeTear 0.5s steps(1, end) both;
     z-index: 3;

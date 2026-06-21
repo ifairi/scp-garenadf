@@ -113,14 +113,14 @@
         },
         'SCP-051': {
             name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"Silent Architect"',
-            unique: 'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi tim secara real-time.',
+            alias: '"RRQEVOSNOTSAE"',
+            unique: 'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi squad secara real-time.',
             track: [
-                { clan: 'Apex Riders', role: 'Flex', year: '2021 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
+                { clan: 'PDR', role: 'Destroyer', year: '2025 – 2025' },
+                { clan: 'NOTS', role: 'Flanker', year: '2025 – Now' }
             ],
             strengths: ['Adaptasi peran fleksibel', 'Pembacaan rotasi musuh', 'Eksekusi taktik cepat', 'Komunikasi jernih'],
-            stats: [['VEHICLE', 78], ['SHOOTING', 84], ['SURVIVAL', 82], ['CO-OP', 90], ['OBJECTIVE', 88]]
+            stats: [['VEHICLE', 100], ['SHOOTING', 62], ['SURVIVAL', 71], ['CO-OP', 67], ['OBJECTIVE', 60]]
         },
         'SCP-054': {
             name: '[ NOTS 丶NaaSCP54 ]', role: 'Steel Keeper', clearance: 'CLEARANCE: LEVEL VII',
@@ -209,6 +209,17 @@
             ],
             strengths: ['Kepemimpinan in-game', 'Strategi & draft jitu', 'Mid-round adaptation', 'Manajemen mental tim'],
             stats: [['VEHICLE', 78], ['SHOOTING', 82], ['SURVIVAL', 85], ['CO-OP', 92], ['OBJECTIVE', 96]]
+        },
+        'SCP-099': {
+            name: '[ SEALxKeenan舎 ]', role: 'Recon Striker', clearance: 'CLEARANCE: LEVEL VI',
+            alias: '"Silent Tide"',
+            unique: 'Spesialis infiltrasi senyap — masuk lebih dulu, membuka informasi, dan menutup celah sebelum musuh sadar.',
+            track: [
+                { clan: 'SEAL Division', role: 'Recon', year: '2022 – 2024' },
+                { clan: 'S.C.P Alliance', role: 'Recon Striker', year: '2024 – Aktif' }
+            ],
+            strengths: ['Infiltrasi senyap', 'Pembacaan posisi musuh', 'Eksekusi flank presisi', 'Disiplin info call'],
+            stats: [['VEHICLE', 80], ['SHOOTING', 85], ['SURVIVAL', 84], ['CO-OP', 86], ['OBJECTIVE', 88]]
         }
     };
 
@@ -237,7 +248,11 @@
             var parts = buildDossier(d);
 
             document.getElementById('dsFileId').textContent = id;
-            document.getElementById('dsIdTag').textContent = id;
+            var idTagEl = document.getElementById('dsIdTag');
+            var nameEl = document.getElementById('dsName');
+            idTagEl.textContent = id;
+            delete idTagEl.dataset.decodeText;
+            delete nameEl.dataset.decodeText;
             document.getElementById('dsClearance').textContent = d.clearance || 'CLEARANCE: LEVEL V';
             document.getElementById('dsName').textContent = d.name;
             document.getElementById('dsRole').textContent = d.role;
