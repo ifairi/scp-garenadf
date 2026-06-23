@@ -92,12 +92,13 @@
             alias: '"The Phantom Strike"',
             unique: 'Selalu mengeksekusi entry pertama tanpa menunggu info caller — gaya "silent breach" yang membuat lawan kehilangan tempo sejak ronde pertama.',
             track: [
-                { clan: 'TXD Esports', role: 'Entry Fragger', year: '2021 – 2022' },
-                { clan: 'WMORI Division', role: 'Assault Lead', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Assault Squad', year: '2024 – Aktif' }
+                { clan: 'JAC', role: 'Vehicle', year: '2025 – 2025' },
+                { clan: 'TREX', role: 'Vehicle', year: '2025 – 2025' },
+                { clan: 'NOTS', role: 'Vehicle (Commander)', year: '2025 – 2026' },
+                { clan: 'TXDNR', role: 'Vehicle (Commander)', year: '2025 – Now' },
             ],
             strengths: ['Refleks tembak presisi tinggi', 'Penguasaan peta agresif', 'Konsistensi clutch 1vX', 'Spray control elite'],
-            stats: [['VEHICLE', 72], ['SHOOTING', 95], ['SURVIVAL', 80], ['CO-OP', 78], ['OBJECTIVE', 85]]
+            stats: [['VEHICLE', 100], ['SHOOTING', 75], ['SURVIVAL', 80], ['CO-OP', 78], ['OBJECTIVE', 65]]
         },
         'SCP-048': {
             name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
@@ -116,6 +117,7 @@
             alias: '"RRQEVOSNOTSAE"',
             unique: 'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi squad secara real-time.',
             track: [
+                { clan: 'WG', role: 'Casual', year: '2025 – 2025' },
                 { clan: 'PDR', role: 'Destroyer', year: '2025 – 2025' },
                 { clan: 'NOTS', role: 'Flanker', year: '2025 – Now' }
             ],
