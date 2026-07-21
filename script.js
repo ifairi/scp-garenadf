@@ -78,6 +78,7 @@
         initHUDCorners();
         initCardGlitch();
         initCardHover();
+        syncTeamCounters();
         animateCounters();
         initNavControls();
         initDossier();
@@ -337,8 +338,12 @@
         if (match) match.classList.add('active');
     }
 
-    function switchPanel(targetId) {
-        if (targetId === currentPanel || isTransitioning) return;
+    function switchPanel(targetId, afterSwitch) {
+        if (targetId === currentPanel) {
+            if (typeof afterSwitch === 'function') afterSwitch(document.getElementById(targetId));
+            return;
+        }
+        if (isTransitioning) return;
         isTransitioning = true;
 
         var oldPanel = document.getElementById(currentPanel);
@@ -371,6 +376,7 @@
                     currentPanel = targetId;
                     updateNavButtons();
                     glitchPanelText(newPanel);
+                    if (typeof afterSwitch === 'function') afterSwitch(newPanel);
                 }
             });
 
@@ -387,7 +393,27 @@
             isTransitioning = false;
             currentPanel = targetId;
             updateNavButtons();
+            if (typeof afterSwitch === 'function') afterSwitch(newPanel);
         }
+    }
+
+    function scrollPanelToTarget(panel, targetId) {
+        if (!panel || !targetId) return;
+        var target = document.getElementById(targetId);
+        if (!target || !panel.contains(target)) return;
+
+        requestAnimationFrame(function () {
+            var panelRect = panel.getBoundingClientRect();
+            var targetRect = target.getBoundingClientRect();
+            var targetTop = panel.scrollTop + targetRect.top - panelRect.top;
+            var centeredTop = targetTop - (panel.clientHeight - targetRect.height) / 2;
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            panel.scrollTo({
+                top: Math.max(0, centeredTop),
+                behavior: reduceMotion ? 'auto' : 'smooth'
+            });
+        });
     }
 
     // Attach nav click handlers
@@ -413,12 +439,19 @@
         });
     }
 
-    // CTA / tactical buttons — internal tabs use #hash, external links open normally
+    // CTA buttons — internal tabs switch panels, external links open normally
     document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.tactical-btn');
+        var btn = e.target.closest('.tactical-btn, [data-section-link]');
         if (btn) {
+            var sectionId = btn.getAttribute('data-section-link');
+            var scrollTargetId = btn.getAttribute('data-scroll-target');
             var href = btn.getAttribute('href');
-            if (href && href.startsWith('#')) {
+            if (sectionId) {
+                e.preventDefault();
+                switchPanel(sectionId, function (panel) {
+                    scrollPanelToTarget(panel, scrollTargetId);
+                });
+            } else if (href && href.startsWith('#')) {
                 e.preventDefault();
                 switchPanel(href.replace('#', ''));
             }
@@ -469,7 +502,9 @@
         if (!element) return;
         var chars = '!<>-_\\/[]{}\u2014=+*^?#01\u2591\u2592\u2593\u00a7\u00b1\u00d7\u00f7';
         duration = duration || 350;
+        var originalMarkup = element.dataset.decodeMarkup || element.innerHTML;
         var original = element.dataset.decodeText || element.textContent;
+        element.dataset.decodeMarkup = originalMarkup;
         element.dataset.decodeText = original;
         var start = performance.now();
         element.classList.add('is-glitching');
@@ -486,7 +521,7 @@
             }).join('');
 
             if (p < 1) requestAnimationFrame(tick);
-            else { element.textContent = original; element.classList.remove('is-glitching'); }
+            else { element.innerHTML = originalMarkup; element.classList.remove('is-glitching'); }
         }
         requestAnimationFrame(tick);
     }
@@ -714,6 +749,17 @@
     /* ═══════════════════════════════════════════
        12. COUNTERS
        ═══════════════════════════════════════════ */
+    function syncTeamCounters() {
+        var teamPanel = document.getElementById('founders');
+        if (!teamPanel) return;
+
+        teamPanel.querySelectorAll('.stat-number[data-count-selector]').forEach(function (el) {
+            var selector = el.getAttribute('data-count-selector');
+            var count = selector ? teamPanel.querySelectorAll(selector).length : 0;
+            el.setAttribute('data-target', String(count));
+        });
+    }
+
     function animateCounters() {
         document.querySelectorAll('.stat-number').forEach(function (el) {
             var target = parseInt(el.getAttribute('data-target'), 10);
