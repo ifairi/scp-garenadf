@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.C.P | Special Classified Protocol</title>
+    <meta name="description"
+        content="Website portofolio resmi Aliansi SCP — Special Classified Protocol. Beroperasi di balik bayang-bayang, menyerang dengan presisi.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <img src="logo.png" alt="SCP" class="preloader-logo">
+        <div class="preloader-text">INITIATING PROTOCOL...</div>
+        <div class="preloader-bar">
+            <div class="preloader-progress" id="preloaderProgress"></div>
+        </div>
+        <div class="preloader-percent" id="preloaderPercent">0%</div>
+    </div>
+
+    <!-- ═══ VHS / CRT Effect Layers ═══ -->
+    <div class="crt-overlay"></div>
+    <div class="vhs-tracking"></div>
+    <div class="chromatic-layer"></div>
+    <div class="crt-vignette"></div>
+    <div class="scanline"></div>
+
+    <!-- ═══ HUD Decorative Corners ═══ -->
+    <div class="hud-corner hud-corner--tl"></div>
+    <div class="hud-corner hud-corner--tr"></div>
+    <div class="hud-corner hud-corner--bl"></div>
+    <div class="hud-corner hud-corner--br"></div>
+    <div class="hud-status" id="hudStatus">SYS: ONLINE // SIGNAL: ACTIVE // PROTOCOL: S.C.P</div>
+
+    <!-- Grid Canvas Background -->
+    <canvas id="gridCanvas"></canvas>
+
+    <!-- ═══ Header ═══ -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <a href="#" class="logo" id="logoLink">
+                <img src="logo.png" alt="SCP Logo">
+            </a>
+            <div class="social-icons">
+                <a href="https://discord.gg/R2Ek7V5DS" class="social-btn" title="Discord" target="_blank"
+                    rel="noopener noreferrer" aria-label="Discord SCP Alliance">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                    </svg>
+                </a>
+                <a href="https://www.tiktok.com/@s.c.p.entity" class="social-btn" title="TikTok" target="_blank"
+                    rel="noopener" aria-label="TikTok">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <nav class="nav" id="mainNav">
+            <ul class="nav-links">
+                <li><a href="#hero" class="nav-link active" data-section="hero">Beranda</a></li>
+                <li><a href="#about" class="nav-link" data-section="about">Tentang</a></li>
+                <li><a href="#founders" class="nav-link" data-section="founders">Tim</a></li>
+                <li><a href="#objectives" class="nav-link" data-section="objectives">Tujuan</a></li>
+                <li><a href="#scrim" class="nav-link" data-section="scrim">Jadwal</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-right">
+            <div class="partner-logos game-logos" aria-label="Game yang dimainkan komunitas">
+                <span class="community-label">UNOFFICIAL COMMUNITY</span>
+                <img src="delta_force_logo.png" width="112" height="24" alt="Logo Delta Force">
+                <div class="partner-divider" aria-hidden="true"></div>
+                <img src="garena_logo.png" width="80" height="24" alt="Logo Garena">
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ═══ Main Content — Tab Panels ═══ -->
+    <main id="panelContainer">
+        <!-- ─── Hero ─── -->
+        <section id="hero" class="panel panel--active">
+            <div class="panel-bg">
+                <img src="gambar1.2.jpg" alt="SCP Operative">
+            </div>
+            <div class="panel-content hero-content">
+                <span class="hero-tag" id="heroTag">// ALIANSI INDEPENDEN • DELTA FORCE MOBILE INDONESIA</span>
+                <h1 class="hero-title" id="heroTitle">
+                    <span class="title-line">WE ARE</span>
+                    <span class="title-line title-accent" data-text="S.C.P">S.C.P</span>
+                </h1>
+                <p class="hero-desc" id="heroDesc">
+                    Aliansi independen player Delta Force mobile Indonesia. Kami mempertemukan pemain lintas clan untuk
+                    latihan, scrim, dan kompetisi. Tanpa kewajiban pindah clan atau mengganti nickname.
+                </p>
+                <div class="hero-actions" id="heroCta">
+                    <div class="tactical-btn-wrapper">
+                        <!-- asymmetric tactical frame -->
+                        <span class="tac-bracket" aria-hidden="true"></span>
+                        <span class="tac-rail" aria-hidden="true"></span>
+                        <span class="tac-dot" aria-hidden="true"></span>
+                        <!-- Main button -->
+                        <a href="https://forms.gle/ycAfC2AnGW3QJBhQ6" class="tactical-btn" id="tacBtn"
+                            target="_blank" rel="noopener noreferrer">
+                            <span class="tac-btn-bg"></span>
+                            <span class="tac-btn-scan"></span>
+                            <span class="tac-btn-text">JOIN THE PROTOCOL</span>
+                            <svg class="tac-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                            <span class="tac-btn-glitch" aria-hidden="true">JOIN THE PROTOCOL</span>
+                        </a>
+                        <!-- Bottom tag -->
+                        <span class="tac-tag">◆ PROTOCOL_ACCESS :: AUTHORIZED</span>
+                    </div>
+                    <a href="#scrim" class="secondary-btn" data-section-link="scrim"
+                        data-scroll-target="scrimContactLink">AJUKAN SCRIM <span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── About ─── -->
+        <section id="about" class="panel panel--scrollable">
+            <div class="panel-bg">
+                <img src="gambar2.png" alt="About Background">
+            </div>
+            <div class="panel-content section-container">
+                <span class="section-tag">// INTEL BRIEFING</span>
+                <h2 class="section-title">Apa itu <span class="highlight">SCP</span> &amp; <span
+                        class="highlight">Sejarah</span> Aliansi</h2>
+                <div class="about-grid">
+                    <div class="about-card glass-card">
+                        <h3>// Dunia SCP</h3>
+                        <p>Terinspirasi dari SCP Foundation. Organisasi fiksi yang identik dengan misi Secure, Contain,
+                            Protect terhadap entitas anomali. Kami pakai konsepnya, tapi dengan misi yang berbeda, bukan
+                            menahan anomali, justru merangkul dan menampilkannya.</p>
+                    </div>
+                    <div class="about-card glass-card">
+                        <h3>// Sejarah Aliansi</h3>
+                        <p>Berbeda dari clan pada umumnya, SCP bukan dibentuk untuk menyaingi atau menggantikan clan
+                            manapun. Kami adalah aliansi independen lintas clan, kumpulan player dengan skill anomali
+                            yang unik, tanpa memandang asal clan. Bergabung ke SCP tidak mengharuskan siapapun mengganti
+                            nickname in-game, cukup jago, unik, dan patuh pada protokol sederhana yang kami tetapkan. Di
+                            sinilah player tersembunyi di komunitas Delta Force Mobile diberi ruang untuk dikenali dan
+                            diuji.</p>
+                    </div>
+                </div>
+                <br><br><br><br><br><br>
+            </div>
+        </section>
+
+        <!-- ─── Objectives ─── -->
+        <section id="objectives" class="panel">
+            <div class="panel-bg">
+                <img src="sejarah.png" alt="Objectives Background">
+            </div>
+            <div class="panel-content section-container">
+                <span class="section-tag">// MISSION PARAMETERS</span>
+                <h2 class="section-title">Tujuan <span class="highlight">Aliansi</span></h2>
+                <div class="objectives-grid">
+                    <div class="objective-card glass-card">
+                        <span class="hud-icon hud-icon--showcase" aria-hidden="true"></span>
+                        <div>
+                            <h3>Showcase Anomali</h3>
+                            <p>Member mendapatkan ruang untuk menunjukkan kemampuan, membangun rekam jejak, dan
+                                terhubung dengan clan yang membutuhkan pemain loan untuk event atau kompetisi.</p>
+                        </div>
+                    </div>
+                    <div class="objective-card glass-card">
+                        <span class="hud-icon hud-icon--target" aria-hidden="true"></span>
+                        <div>
+                            <h3>Kolaborasi Independen</h3>
+                            <p>SCP terbuka bagi pemain lintas clan tanpa syarat pindah identitas. Kami menerima latihan
+                                dan scrim untuk menguji formasi, koordinasi, serta adaptasi taktis.</p>
+                        </div>
+                    </div>
+                    <div class="objective-card glass-card">
+                        <span class="hud-icon hud-icon--protocol" aria-hidden="true"></span>
+                        <div>
+                            <h3>Profesionalisme</h3>
+                            <p>Profesionalisme berarti komunikasi satu komando, pembagian peran sebelum match,
+                                ketepatan waktu, sikap sportif, dan evaluasi setelah scrim.</p>
+                        </div>
+                    </div>
+                </div>
+                <br><br><br><br><br><br>
+            </div>
+        </section>
+
+        <!-- ─── Founders & Team (SCROLLABLE) ─── -->
+        <section id="founders" class="panel panel--scrollable">
+            <div class="panel-bg">
+                <img src="bg-long.jpg" alt="Tim Background">
+            </div>
+            <div class="panel-content section-container">
+                <span class="section-tag">// PERSONNEL DATABASE</span>
+                <h2 class="section-title">Founder &amp; <span class="highlight">Team</span></h2>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-number" id="memberCount" data-count-selector=".member-grid .member-card">0</span>
+                        <span class="stat-label">Member Dossiers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="founderCount" data-count-selector=".founders-grid .founder-card">0</span>
+                        <span class="stat-label">Founders</span>
+                    </div>
+                </div>
+
+                <!-- Founders -->
+                <h3 class="subsection-title">// Founders</h3>
+                <div class="founders-grid">
+                    <div class="founder-card glass-card">
+                        <div class="founder-avatar">SCP-1</div>
+                        <h4>[ W***M*** ]</h4>
+                        <p class="role">Tactical Commander</p>
+                    </div>
+                    <div class="founder-card glass-card">
+                        <div class="founder-avatar">SCP-2</div>
+                        <h4>[ F**R** ]</h4>
+                        <p class="role">Captain Squadron</p>
+                    </div>
+                    <div class="founder-card glass-card">
+                        <div class="founder-avatar">SCP-3</div>
+                        <h4>[ A*V** ]</h4>
+                        <p class="role">Cavalry Commander</p>
+                    </div>
+                    <div class="founder-card glass-card">
+                        <div class="founder-avatar">SCP-4</div>
+                        <h4>[ N*** ]</h4>
+                        <p class="role">The Overseer</p>
+                    </div>
+                </div>
+
+                <!-- Members -->
+                <h3 class="subsection-title">// Member Directory</h3>
+                <div class="member-grid">
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-013</span>
+                            <h4 class="member-name">[ TXD | WMORI ]</h4>
+                            <p class="member-role">Assault Squad</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-048</span>
+                            <h4 class="member-name">[ NOTS 丶Alpin鋼 ]</h4>
+                            <p class="member-role">Tankerch Sankai</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-051</span>
+                            <h4 class="member-name">[ RenSCP ]</h4>
+                            <p class="member-role">The Squadron</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-054</span>
+                            <h4 class="member-name">[ NOTS 丶NaaSCP54 ]</h4>
+                            <p class="member-role">Steel Keeper</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-044</span>
+                            <h4 class="member-name">[ NOTS 丶KoazyNXS ]</h4>
+                            <p class="member-role">Tactical Tanker</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-012</span>
+                            <h4 class="member-name">[ NOTS 丶Ndan3NXS ]</h4>
+                            <p class="member-role">The Squadron</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><img src="jess-scp.png" alt="Jess SCP"
+                                style="width: 100%; height: 100%; object-fit: cover;"></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-022</span>
+                            <h4 class="member-name">[ NOTSJessSCP22 ]</h4>
+                            <p class="member-role">Engineer</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-018</span>
+                            <h4 class="member-name">[ NOTS 丶FinzNXS ]</h4>
+                            <p class="member-role">Engineer Support</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-017</span>
+                            <h4 class="member-name">[ NOTS 丶RimuNXS ]</h4>
+                            <p class="member-role">Engineer Recon</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-027</span>
+                            <h4 class="member-name">[ ICE丨UrYuuVG ]</h4>
+                            <p class="member-role">Anomaly Recon</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-119</span>
+                            <h4 class="member-name">[ SCP°119 ]</h4>
+                            <p class="member-role">Tactical Mind</p>
+                        </div>
+                    </div>
+                    <div class="member-card glass-card">
+                        <div class="member-photo"><span class="photo-placeholder">CLASSIFIED</span></div>
+                        <div class="member-info">
+                            <span class="member-id">SCP-099</span>
+                            <h4 class="member-name">[ SEALxKeenan舎 ]</h4>
+                            <p class="member-role">Recon Striker</p>
+                        </div>
+                    </div>
+                </div>
+                <br><br><br><br>
+
+                <!-- Footer inside Tim panel -->
+                <!-- <footer class="footer">
+                    <span class="footer-text">&copy; 2026 SCP Alliance — <span>Special. Classified.
+                            Protocol.</span></span>
+                </footer> -->
+            </div>
+        </section>
+
+        <!-- ─── Scrim ─── -->
+        <section id="scrim" class="panel panel--scrollable">
+            <div class="panel-bg">
+                <img src="gambar2.png" alt="Scrim Background">
+            </div>
+            <div class="panel-content section-container">
+                <span class="section-tag">// OPERATION SCHEDULE</span>
+                <h2 class="section-title">Jadwal <span class="highlight">Scrim</span></h2>
+                <p class="section-intro">Jadwal rutin SCP Alliance. Seluruh waktu menggunakan WIB dan dapat berubah
+                    setelah konfirmasi.</p>
+                <p class="updated-note">DATA REFRESH // <time datetime="2026-07-17">17 JULI 2026</time></p>
+                <div class="scrim-cards">
+                    <div class="scrim-match glass-card">
+                        <div class="match-header">
+                            <span class="match-day">Setiap Jumat</span>
+                            <span class="match-time">20.00–22.00 WIB</span>
+                        </div>
+                        <div class="match-versus">Latihan internal divisi</div>
+                        <div class="match-meta">
+                            <span class="match-type">Training</span>
+                            <span class="status active">Dijadwalkan</span>
+                        </div>
+                    </div>
+                    <div class="scrim-match glass-card">
+                        <div class="match-header">
+                            <span class="match-day">Setiap Sabtu</span>
+                            <span class="match-time">19.00 WIB–selesai</span>
+                        </div>
+                        <div class="match-versus">Lawan belum ditentukan</div>
+                        <div class="match-meta">
+                            <span class="match-type">Scrim Match</span>
+                            <span class="status pending">Mencari lawan</span>
+                        </div>
+                    </div>
+                    <div class="scrim-match glass-card">
+                        <div class="match-header">
+                            <span class="match-day">Setiap Minggu</span>
+                            <span class="match-time">15.00–18.00 WIB</span>
+                        </div>
+                        <div class="match-versus">Lawan belum ditentukan</div>
+                        <div class="match-meta">
+                            <span class="match-type">Scrim Match</span>
+                            <span class="status pending">Mencari lawan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="scrim-contact glass-card" aria-labelledby="scrimContactTitle">
+                    <span class="section-tag">// SCRIM REQUEST</span>
+                    <h3 id="scrimContactTitle">Uji Formasi SCP</h3>
+                    <p>Kirim nama clan, mode, tanggal, waktu, format pertandingan, dan kontak PIC melalui Discord.</p>
+                    <a href="https://discord.gg/R2Ek7V5DS" class="secondary-btn" id="scrimContactLink" target="_blank"
+                        rel="noopener noreferrer" aria-label="Ajukan scrim melalui Discord SCP Alliance (tab baru)">
+                        AJUKAN SCRIM VIA DISCORD
+                    </a>
+                </aside>
+
+                <footer class="footer">
+                    <p class="footer-brand">© 2026 SCP Alliance — Special Classified Protocol.</p>
+                    <p class="footer-disclaimer">SCP Alliance adalah komunitas independen. Situs ini tidak berafiliasi,
+                        disponsori, atau didukung secara resmi oleh Garena, Delta Force, maupun SCP Foundation. Nama,
+                        logo, dan merek dagang terkait merupakan milik pemegang hak masing-masing.</p>
+                    <div class="footer-links">
+                        <a href="https://www.tiktok.com/@s.c.p.entity" target="_blank"
+                            rel="noopener noreferrer">TikTok</a>
+                        <a href="https://forms.gle/ycAfC2AnGW3QJBhQ6" target="_blank"
+                            rel="noopener noreferrer">Formulir anggota</a>
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </main>
+
+    <!-- ═══ Navigation Controls ═══ -->
+    <div class="nav-controls">
+        <button class="nav-btn prev-btn" id="prevBtn" aria-label="Previous Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>BACK</span>
+        </button>
+        <button class="nav-btn next-btn" id="nextBtn" aria-label="Next Menu">
+            <span>NEXT</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         OPERATIVE DOSSIER OVERLAY (opens on member click)
+         ═══════════════════════════════════════════════ -->
+    <div class="dossier" id="scpDossier" aria-hidden="true" role="dialog" aria-modal="true"
+        aria-label="Operative Dossier">
+        <div class="dossier-backdrop" data-dossier-close></div>
+
+        <div class="dossier-frame glass-card">
+            <!-- decorative scan + grid -->
+            <div class="dossier-scan"></div>
+            <span class="dossier-corner dossier-corner--tl"></span>
+            <span class="dossier-corner dossier-corner--tr"></span>
+            <span class="dossier-corner dossier-corner--bl"></span>
+            <span class="dossier-corner dossier-corner--br"></span>
+
+            <!-- Top bar -->
+            <header class="dossier-topbar">
+                <div class="dossier-topbar-left">
+                    <span class="dossier-rec">● REC</span>
+                    <span class="dossier-file">PERSONNEL FILE // <span id="dsFileId">SCP-013</span></span>
+                </div>
+                <div class="dossier-topbar-right">
+                    <span class="dossier-clearance" id="dsClearance">CLEARANCE: LEVEL Ω</span>
+                    <button class="dossier-close" id="dossierClose" aria-label="Close" data-dossier-close>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Body : LEFT HUD | CENTER VISUAL | RIGHT HUD -->
+            <div class="dossier-body">
+
+                <!-- ── LEFT HUD ── -->
+                <aside class="dossier-hud dossier-hud--left">
+                    <div class="hud-block">
+                        <span class="hud-block-label">// TRACK RECORD</span>
+                        <ul class="hud-timeline" id="dsTrack"></ul>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// JULUKAN</span>
+                        <p class="hud-alias" id="dsAlias"></p>
+                    </div>
+                </aside>
+
+                <!-- ── CENTER VISUAL ── -->
+                <div class="dossier-center">
+                    <div class="dossier-portrait" id="dsPortrait">
+                        <span class="portrait-reticle"></span>
+                        <span class="portrait-placeholder">[ NO VISUAL FEED ]<br><small>INSERT OPERATIVE
+                                RENDER</small></span>
+                    </div>
+                    <div class="dossier-nameplate">
+                        <span class="ds-id-tag" id="dsIdTag">SCP-013</span>
+                        <h3 class="ds-name" id="dsName">[ TXD | WMORI ]</h3>
+                        <p class="ds-role" id="dsRole">Assault Squad</p>
+                    </div>
+                    <div class="dossier-status-strip" id="dsStatusStrip">
+                        BIO-SIGN: STABLE // LOADOUT: ARMED // STATUS: ACTIVE
+                    </div>
+                </div>
+
+                <!-- ── RIGHT HUD ── -->
+                <aside class="dossier-hud dossier-hud--right">
+                    <div class="hud-block">
+                        <span class="hud-block-label">// KELEBIHAN</span>
+                        <ul class="hud-strengths" id="dsStrength"></ul>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// KEUNIKAN</span>
+                        <p class="hud-unique" id="dsUnique"></p>
+                    </div>
+                    <div class="hud-block">
+                        <span class="hud-block-label">// COMBAT METRICS</span>
+                        <div class="hud-stats" id="dsStats"></div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Scripts ═══ -->
+    <script>
+        window.__scpReady = false;
+        setTimeout(function () {
+            if (!window.__scpReady) {
+                var p = document.getElementById('preloader');
+                if (p) { p.style.opacity = '0'; setTimeout(function () { p.style.display = 'none'; }, 500); }
+                document.querySelectorAll('.panel').forEach(function (el) { el.style.opacity = '1'; });
+                document.querySelector('.panel--active').style.display = 'flex';
+            }
+        }, 6000);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
