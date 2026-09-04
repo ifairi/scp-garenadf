@@ -1,0 +1,12 @@
+{
+  "name": "scp-alliance",
+  "version": "2.0.0",
+  "private": true,
+  "description": "SCP Alliance — lightweight independent Delta Force Mobile community website",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

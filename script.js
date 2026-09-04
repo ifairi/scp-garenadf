@@ -1,792 +1,416 @@
-/* ═══════════════════════════════════════════════════════════
-   S.C.P — SPECIAL CLASSIFIED PROTOCOL
-   Tab-Based Navigation Engine v5.0
-   No scroll — panels switch with GSAP transitions
-   ═══════════════════════════════════════════════════════════ */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const order = ['hero', 'about', 'founders', 'objectives', 'scrim'];
+  const labels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal'];
+  const panels = [...document.querySelectorAll('.panel')];
+  const navLinks = [...document.querySelectorAll('.nav-link')];
+  const menu = $('mainNav');
+  const menuToggle = $('menuToggle');
+  const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let current = 'hero';
+  let desired = current;
+  let routeRevision = 0;
+  let effects = true;
+  let toastTimeout;
+  try { effects = localStorage.getItem('scp-effects') !== 'off'; } catch { /* Device preferences are optional. */ }
+  root.classList.add('js');
 
-(function () {
-    'use strict';
-
-    /* ─── DOM ─── */
-    const preloader = document.getElementById('preloader');
-    const progressBar = document.getElementById('preloaderProgress');
-    const percentText = document.getElementById('preloaderPercent');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const panels = document.querySelectorAll('.panel');
-    const hamburger = document.getElementById('hamburger');
-    const mainNav = document.getElementById('mainNav');
-    const logoLink = document.getElementById('logoLink');
-
-    let currentPanel = 'hero';
-    let isTransitioning = false;
-    let gsapReady = typeof gsap !== 'undefined';
-    const panelOrder = ['hero', 'about', 'founders', 'objectives', 'scrim'];
-
-    /* ═══════════════════════════════════════════
-       1. PRELOADER — Simple setInterval counter
-       ═══════════════════════════════════════════ */
-    function runPreloader() {
-        let pct = 0;
-        const interval = setInterval(function () {
-            pct += 2;
-            if (pct > 100) pct = 100;
-            if (progressBar) progressBar.style.width = pct + '%';
-            if (percentText) percentText.textContent = pct + '%';
-
-            if (pct >= 100) {
-                clearInterval(interval);
-                // Show "READY" then exit
-                var preText = document.querySelector('.preloader-text');
-                if (preText) preText.textContent = 'PROTOCOL READY';
-
-                setTimeout(function () {
-                    exitPreloader();
-                }, 500);
-            }
-        }, 30); // 30ms * 50 steps = ~1.5s total
+  function closeMenu(returnFocus = false) {
+    menu.classList.remove('is-open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Buka menu');
+    if (returnFocus) menuToggle.focus();
+  }
+  function syncPageButtons(id) {
+    const index = order.indexOf(id);
+    $('prevBtn').disabled = index === 0;
+    $('nextBtn').disabled = index === order.length - 1;
+    $('prevBtn').setAttribute('aria-label', index ? `Menu sebelumnya: ${labels[index - 1]}` : 'Menu sebelumnya');
+    $('nextBtn').setAttribute('aria-label', index < 4 ? `Menu berikutnya: ${labels[index + 1]}` : 'Menu berikutnya');
+  }
+  function render(id, { focus = false, scroll = false, contact = false } = {}) {
+    if (!order.includes(id)) id = 'hero';
+    current = id;
+    panels.forEach(panel => { panel.hidden = panel.id !== id; panel.classList.remove('is-entering'); });
+    const panel = $(id);
+    panel.classList.add('is-entering');
+    navLinks.forEach(link => {
+      const active = link.hash === '#' + id;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    const index = order.indexOf(id);
+    $('pageNumber').textContent = String(index + 1).padStart(2, '0');
+    syncPageButtons(id);
+    document.title = `${labels[index]} — S.C.P Alliance`;
+    if (id === 'scrim') updateDates();
+    closeMenu();
+    if (scroll) window.scrollTo({ top: 0, behavior: 'instant' });
+    if (focus) {
+      const heading = panel.querySelector('h1, h2');
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
     }
-
-    function exitPreloader() {
-        if (gsapReady) {
-            gsap.to(preloader, {
-                yPercent: -100,
-                duration: 0.7,
-                ease: 'power3.inOut',
-                onComplete: onReady
-            });
+    if (contact && current === 'scrim') {
+      $('scrimContact').scrollIntoView({ block: 'center', behavior: 'instant' });
+      $('scrimContactLink').focus({ preventScroll: true });
+    }
+  }
+  function navigate(id, options = {}, fromHistory = false) {
+    if (!order.includes(id)) return;
+    desired = id;
+    syncPageButtons(id);
+    const revision = ++routeRevision;
+    closeMenu();
+    closeDossier({ immediate: true, restoreFocus: false });
+    if ($('copyDialog').open) $('copyDialog').close();
+    const commit = () => {
+      if (!fromHistory && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+      render(id, { scroll: true });
+      return () => {
+        if (revision !== routeRevision || current !== id) return;
+        if (options.contact && id === 'scrim') {
+          $('scrimContact').scrollIntoView({ block: 'center', behavior: 'instant' });
+          $('scrimContactLink').focus({ preventScroll: true });
         } else {
-            preloader.style.transition = 'transform 0.7s ease';
-            preloader.style.transform = 'translateY(-100%)';
-            setTimeout(onReady, 700);
+          const heading = $(id).querySelector('h1, h2');
+          heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true });
         }
-    }
-
-    function onReady() {
-        window.__scpReady = true;
-        preloader.style.display = 'none';
-        initSite();
-    }
-
-    /* ═══════════════════════════════════════════
-       2. SITE INIT — after preloader done
-       ═══════════════════════════════════════════ */
-    function initSite() {
-        animateHeroEntrance();
-        initGridCanvas();
-        initVHSGlitch();
-        initHUDStatus();
-        initHUDCorners();
-        initCardGlitch();
-        initCardHover();
-        syncTeamCounters();
-        animateCounters();
-        initNavControls();
-        initDossier();
-    }
-
-    /* ═══════════════════════════════════════════════
-       OPERATIVE DOSSIER — click a member to open file
-       ═══════════════════════════════════════════════ */
-    var DOSSIER = {
-        'SCP-013': {
-            name: '[ TXD | WMORI ]', role: 'Assault Squad', clearance: 'CLEARANCE: LEVEL Ω',
-            alias: '"The Phantom Strike"',
-            unique: 'Selalu mengeksekusi entry pertama tanpa menunggu info caller — gaya "silent breach" yang membuat lawan kehilangan tempo sejak ronde pertama.',
-            track: [
-                { clan: 'JAC', role: 'Vehicle', year: '2025 – 2025' },
-                { clan: 'TREX', role: 'Vehicle', year: '2025 – 2025' },
-                { clan: 'NOTS', role: 'Vehicle (Commander)', year: '2025 – 2026' },
-                { clan: 'TXDNR', role: 'Vehicle (Commander)', year: '2025 – Now' },
-            ],
-            strengths: ['Refleks tembak presisi tinggi', 'Penguasaan peta agresif', 'Konsistensi clutch 1vX', 'Spray control elite'],
-            stats: [['VEHICLE', 100], ['SHOOTING', 75], ['SURVIVAL', 80], ['CO-OP', 78], ['OBJECTIVE', 65]]
-        },
-        'SCP-048': {
-            name: '[ NOTS 丶Alpin鋼 ]', role: 'Tankerch Sankai', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"Iron Dome Vanguard"',
-            unique: 'Mampu menahan berbagai hantaman Rudal Balistik musuh',
-            track: [
-                { clan: 'NOTS', role: 'Loyality III', year: '2025 – Now' },
-                { clan: 'NOTS REBORN DFNC S2', role: 'IGL Squad', year: '2026 – 2026' },
-                // { clan: 'S.C.P Alliance', role: 'Tankerch Sankai', year: '2024 – Aktif' }
-            ],
-            strengths: ['Mampu memaksimalkan kemampuan kendaraan tempur', 'Dapat memprediksi pergerakan kendaraan musuh', 'Siap menjadi badan utama infantry', 'Pelindung sektor vital fraksi'],
-            stats: [['VEHICLE', 100], ['SHOOTING', 73], ['SURVIVAL', 70], ['CO-OP', 73], ['OBJECTIVE', 51]]
-        },
-        'SCP-051': {
-            name: '[ RenSCP ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"RRQEVOSNOTSAE"',
-            unique: 'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi squad secara real-time.',
-            track: [
-                { clan: 'WG', role: 'Casual', year: '2025 – 2025' },
-                { clan: 'PDR', role: 'Destroyer', year: '2025 – 2025' },
-                { clan: 'NOTS', role: 'Flanker', year: '2025 – Now' }
-            ],
-            strengths: ['Adaptasi peran fleksibel', 'Pembacaan rotasi musuh', 'Eksekusi taktik cepat', 'Komunikasi jernih'],
-            stats: [['VEHICLE', 100], ['SHOOTING', 62], ['SURVIVAL', 71], ['CO-OP', 67], ['OBJECTIVE', 60]]
-        },
-        'SCP-054': {
-            name: '[ NOTS 丶NaaSCP54 ]', role: 'Steel Keeper', clearance: 'CLEARANCE: LEVEL VII',
-            alias: '"The Bulwark"',
-            unique: 'Spesialis hold site — pernah mempertahankan bomb-site sendirian melawan serangan penuh tanpa kehilangan posisi.',
-            track: [
-                { clan: 'NOTS Squad', role: 'Anchor', year: '2020 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'Steel Keeper', year: '2023 – Aktif' }
-            ],
-            strengths: ['Anchor site tak tergoyahkan', 'Manajemen utility hebat', 'Tembakan defensif akurat', 'Tenang di bawah tekanan'],
-            stats: [['VEHICLE', 70], ['SHOOTING', 82], ['SURVIVAL', 95], ['CO-OP', 85], ['OBJECTIVE', 92]]
-        },
-        'SCP-044': {
-            name: '[ NOTS 丶KoazyNXS ]', role: 'Tactical Tanker', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"Breach Hammer"',
-            unique: 'Membuka jalan masuk dengan timing utility yang sempurna — gerbang pembuka setiap eksekusi tim.',
-            track: [
-                { clan: 'NXS Gaming', role: 'Initiator', year: '2021 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'Tactical Tanker', year: '2023 – Aktif' }
-            ],
-            strengths: ['Timing utility presisi', 'Initiator agresif', 'Map control kuat', 'Koordinasi push'],
-            stats: [['VEHICLE', 85], ['SHOOTING', 80], ['SURVIVAL', 84], ['CO-OP', 88], ['OBJECTIVE', 90]]
-        },
-        'SCP-012': {
-            name: '[ NOTS 丶Ndan3NXS ]', role: 'The Squadron', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"Twin Blade"',
-            unique: 'Bermain berpasangan dengan sinkronisasi nyaris telepatik — dua orang, satu gerakan.',
-            track: [
-                { clan: 'NXS Gaming', role: 'Duo Support', year: '2021 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'The Squadron', year: '2023 – Aktif' }
-            ],
-            strengths: ['Sinergi duo elite', 'Trade-kill cepat', 'Crossfire disiplin', 'Posisi suportif'],
-            stats: [['VEHICLE', 76], ['SHOOTING', 83], ['SURVIVAL', 80], ['CO-OP', 96], ['OBJECTIVE', 84]]
-        },
-        'SCP-022': {
-            name: '[ NOTSJessSCP22 ]', role: 'Engineer', clearance: 'CLEARANCE: LEVEL V',
-            alias: '"The Vulcan"',
-            unique: 'Bisa mengontrol Loitering di celah yang sempit.',
-            track: [
-                { clan: 'NOTS', role: 'Suave V', year: '2025 – Now' },
-                { clan: 'NOTS', role: 'Engineer Flanker', year: '2025 – Now' }
-            ],
-            strengths: ['Saat medan perang hancur, aku membangun', 'Saat mesin berhenti, aku menghidupkan', 'Saat harapan padam, aku menempa jalan'],
-            stats: [['VEHICLE', 90], ['SHOOTING', 70], ['SURVIVAL', 68], ['CO-OP', 90], ['OBJECTIVE', 60]]
-        },
-        'SCP-018': {
-            name: '[ NOTS 丶FinzNXS ]', role: 'Engineer Support', clearance: 'CLEARANCE: LEVEL V',
-            alias: '"Lifeline"',
-            unique: 'Selalu hadir di momen kritis untuk menyokong rekan — penopang yang menjaga tim tetap hidup.',
-            track: [
-                { clan: 'NXS Gaming', role: 'Support', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Engineer Support', year: '2024 – Aktif' }
-            ],
-            strengths: ['Support timing sempurna', 'Resource management', 'Backup posisi solid', 'Disiplin tim'],
-            stats: [['VEHICLE', 82], ['SHOOTING', 73], ['SURVIVAL', 84], ['CO-OP', 93], ['OBJECTIVE', 80]]
-        },
-        'SCP-017': {
-            name: '[ NOTS 丶RimuNXS ]', role: 'Engineer Recon', clearance: 'CLEARANCE: LEVEL V',
-            alias: '"The Eye"',
-            unique: 'Membaca pergerakan musuh dari jejak sekecil apa pun — radar hidup yang jarang salah.',
-            track: [
-                { clan: 'NXS Gaming', role: 'Recon', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Engineer Recon', year: '2024 – Aktif' }
-            ],
-            strengths: ['Intel-gathering tajam', 'Pembacaan minimap', 'Info call akurat', 'Positioning cerdas'],
-            stats: [['VEHICLE', 84], ['SHOOTING', 78], ['SURVIVAL', 80], ['CO-OP', 88], ['OBJECTIVE', 90]]
-        },
-        'SCP-027': {
-            name: '[ ICE丨UrYuuVG ]', role: 'Anomaly Recon', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"Cold Specter"',
-            unique: 'Bergerak senyap di flank dan muncul dari sudut tak terduga — anomali yang sulit dilacak musuh.',
-            track: [
-                { clan: 'ICE Esports', role: 'Lurker', year: '2021 – 2023' },
-                { clan: 'S.C.P Alliance', role: 'Anomaly Recon', year: '2023 – Aktif' }
-            ],
-            strengths: ['Flank tak terdeteksi', 'Timing serangan brilian', 'Info denial musuh', 'Clutch lurker'],
-            stats: [['VEHICLE', 80], ['SHOOTING', 86], ['SURVIVAL', 88], ['CO-OP', 72], ['OBJECTIVE', 84]]
-        },
-        'SCP-119': {
-            name: '[ SCP°119 ]', role: 'Tactical Mind', clearance: 'CLEARANCE: LEVEL VIII',
-            alias: '"The Strategist"',
-            unique: 'Otak taktik tim — merancang draft, mid-round call, dan adaptasi anti-strat yang menentukan kemenangan.',
-            track: [
-                { clan: 'Vanguard Tactics', role: 'In-Game Leader', year: '2019 – 2022' },
-                { clan: 'S.C.P Alliance', role: 'Tactical Mind', year: '2022 – Aktif' }
-            ],
-            strengths: ['Kepemimpinan in-game', 'Strategi & draft jitu', 'Mid-round adaptation', 'Manajemen mental tim'],
-            stats: [['VEHICLE', 78], ['SHOOTING', 82], ['SURVIVAL', 85], ['CO-OP', 92], ['OBJECTIVE', 96]]
-        },
-        'SCP-099': {
-            name: '[ SEALxKeenan舎 ]', role: 'Recon Striker', clearance: 'CLEARANCE: LEVEL VI',
-            alias: '"Silent Tide"',
-            unique: 'Spesialis infiltrasi senyap — masuk lebih dulu, membuka informasi, dan menutup celah sebelum musuh sadar.',
-            track: [
-                { clan: 'SEAL Division', role: 'Recon', year: '2022 – 2024' },
-                { clan: 'S.C.P Alliance', role: 'Recon Striker', year: '2024 – Aktif' }
-            ],
-            strengths: ['Infiltrasi senyap', 'Pembacaan posisi musuh', 'Eksekusi flank presisi', 'Disiplin info call'],
-            stats: [['VEHICLE', 80], ['SHOOTING', 85], ['SURVIVAL', 84], ['CO-OP', 86], ['OBJECTIVE', 88]]
-        }
+      };
     };
-
-    function buildDossier(d) {
-        var track = (d.track || []).map(function (t) {
-            return '<li><b>' + t.clan + '</b> — ' + t.role + ' <span>(' + t.year + ')</span></li>';
-        }).join('');
-        var strengths = (d.strengths || []).map(function (s) { return '<li>' + s + '</li>'; }).join('');
-        var stats = (d.stats || []).map(function (st) {
-            return '<div class="hud-stat">' +
-                '<div class="hud-stat-top"><span>' + st[0] + '</span><b>' + st[1] + '</b></div>' +
-                '<div class="hud-stat-bar"><span class="hud-stat-fill" data-val="' + st[1] + '"></span></div>' +
-                '</div>';
-        }).join('');
-        return { track: track, strengths: strengths, stats: stats };
+    if (id === current && !root.classList.contains('is-routing')) commit()();
+    else window.SCPMotion.run(commit, labels[order.indexOf(id)].toUpperCase(), String(order.indexOf(id) + 1).padStart(2, '0'));
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href^="#"]');
+    if (link && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && event.button === 0) {
+      const id = link.getAttribute('href').slice(1);
+      if (order.includes(id)) { event.preventDefault(); navigate(id, { contact: link.hasAttribute('data-contact-link') }); }
     }
+    if (!menu.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
+  });
+  window.addEventListener('hashchange', () => {
+    const id = location.hash.slice(1);
+    if (order.includes(id) || !id) navigate(id || 'hero', {}, true);
+  });
+  menuToggle.addEventListener('click', event => {
+    const open = menuToggle.getAttribute('aria-expanded') !== 'true';
+    menu.classList.toggle('is-open', open);
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+    if (open && event.detail === 0) navLinks[0].focus();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') closeMenu(true);
+  });
+  document.addEventListener('focusin', event => {
+    if (menuToggle.getAttribute('aria-expanded') === 'true' && !menu.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
+  });
+  window.matchMedia('(max-width: 680px)').addEventListener('change', () => closeMenu());
+  $('prevBtn').addEventListener('click', () => navigate(order[order.indexOf(desired) - 1]));
+  $('nextBtn').addEventListener('click', () => navigate(order[order.indexOf(desired) + 1]));
 
-    function initDossier() {
-        var modal = document.getElementById('scpDossier');
-        if (!modal) return;
-        var lastFocus = null;
-
-        function openDossier(id) {
-            var d = DOSSIER[id];
-            if (!d) return;
-            var parts = buildDossier(d);
-
-            document.getElementById('dsFileId').textContent = id;
-            var idTagEl = document.getElementById('dsIdTag');
-            var nameEl = document.getElementById('dsName');
-            idTagEl.textContent = id;
-            delete idTagEl.dataset.decodeText;
-            delete nameEl.dataset.decodeText;
-            document.getElementById('dsClearance').textContent = d.clearance || 'CLEARANCE: LEVEL V';
-            document.getElementById('dsName').textContent = d.name;
-            document.getElementById('dsRole').textContent = d.role;
-            document.getElementById('dsAlias').textContent = d.alias;
-            document.getElementById('dsUnique').textContent = d.unique;
-            document.getElementById('dsTrack').innerHTML = parts.track;
-            document.getElementById('dsStrength').innerHTML = parts.strengths;
-            document.getElementById('dsStats').innerHTML = parts.stats;
-
-            // portrait : use d.img if provided, else placeholder
-            var portrait = document.getElementById('dsPortrait');
-            var existingImg = portrait.querySelector('img');
-            if (existingImg) existingImg.remove();
-            var ph = portrait.querySelector('.portrait-placeholder');
-            if (d.img) {
-                if (ph) ph.style.display = 'none';
-                var im = document.createElement('img');
-                im.src = d.img; im.alt = id;
-                portrait.appendChild(im);
-            } else if (ph) {
-                ph.style.display = '';
-            }
-
-            modal.classList.add('is-open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-
-            // animate stat bars after open
-            setTimeout(function () {
-                modal.querySelectorAll('.hud-stat-fill').forEach(function (f) {
-                    f.style.right = (100 - parseInt(f.getAttribute('data-val'), 10)) + '%';
-                });
-            }, 250);
-
-            // glitch decode key text if available
-            if (typeof glitchDecode === 'function') {
-                setTimeout(function () { glitchDecode(document.getElementById('dsName'), 350); }, 120);
-                setTimeout(function () { glitchDecode(document.getElementById('dsIdTag'), 300); }, 60);
-            }
-        }
-
-        function closeDossier() {
-            modal.classList.remove('is-open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-            modal.querySelectorAll('.hud-stat-fill').forEach(function (f) { f.style.right = '100%'; });
-            if (lastFocus && lastFocus.focus) lastFocus.focus();
-        }
-
-        // bind member cards
-        document.querySelectorAll('.member-card').forEach(function (card) {
-            var idEl = card.querySelector('.member-id');
-            var id = idEl ? idEl.textContent.trim() : '';
-            if (!DOSSIER[id]) return;
-            card.setAttribute('tabindex', '0');
-            card.setAttribute('role', 'button');
-            card.addEventListener('click', function () { lastFocus = card; openDossier(id); });
-            card.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lastFocus = card; openDossier(id); }
-            });
-        });
-
-        // close handlers
-        modal.querySelectorAll('[data-dossier-close]').forEach(function (el) {
-            el.addEventListener('click', closeDossier);
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && modal.classList.contains('is-open')) closeDossier();
-        });
+  function syncMotion() {
+    const active = effects && !motionMedia.matches;
+    root.classList.toggle('motion-off', !active);
+    if (!active) {
+      window.SCPMotion.finish();
+      if (dossierClosing) closeDossier({ immediate: true });
+      else dossierExpansion?.cancel();
     }
+    const button = $('motionToggle');
+    button.textContent = active ? '◈ EFEK: AKTIF' : '◇ EFEK: NONAKTIF';
+    button.setAttribute('aria-pressed', String(active));
+    button.setAttribute('aria-label', 'Efek glitch');
+    button.title = motionMedia.matches ? 'Efek dimatikan mengikuti preferensi gerakan perangkat.' : 'Aktifkan atau matikan efek glitch';
+  }
+  $('motionToggle').addEventListener('click', () => {
+    if (motionMedia.matches) { toast('Efek mengikuti pengaturan kurangi gerakan pada perangkat.'); return; }
+    effects = !effects;
+    try { localStorage.setItem('scp-effects', effects ? 'on' : 'off'); } catch { /* Keep the in-memory setting when storage is unavailable. */ }
+    syncMotion();
+  });
+  motionMedia.addEventListener('change', syncMotion);
+  document.addEventListener('visibilitychange', () => root.classList.toggle('motion-paused', document.hidden));
+  function toast(message) {
+    clearTimeout(toastTimeout);
+    $('toast').textContent = message;
+    $('toast').classList.add('is-visible');
+    toastTimeout = setTimeout(() => $('toast').classList.remove('is-visible'), 4000);
+  }
 
-    /* ═══════════════════════════════════════════
-       3. NAV — Tab Switching (click only)
-       ═══════════════════════════════════════════ */
-    function setActiveNav(sectionId) {
-        navLinks.forEach(function (link) {
-            link.classList.remove('active');
-        });
-        var match = document.querySelector('.nav-link[data-section="' + sectionId + '"]');
-        if (match) match.classList.add('active');
+  const dossiers = window.SCP_DOSSIERS || {};
+  const memberCards = [...document.querySelectorAll('.member-card')];
+  const normalize = value => value.normalize('NFKC').toLocaleLowerCase('id').trim();
+  const category = id => ({ 'SCP-013': ['assault'], 'SCP-048': ['vehicle'], 'SCP-051': ['vehicle'], 'SCP-054': ['vehicle'], 'SCP-044': ['vehicle'], 'SCP-012': ['vehicle'], 'SCP-022': ['engineer'], 'SCP-018': ['engineer'], 'SCP-017': ['engineer', 'recon'], 'SCP-027': ['recon'], 'SCP-119': ['assault'], 'SCP-099': ['recon'] }[id] || []);
+  let visibleMembers = memberCards;
+  let activeMember = memberCards[0];
+  let lastGalleryColumns = 0;
+  const galleryColumns = () => matchMedia('(min-width: 801px)').matches ? 2 : 1;
+  function syncGallery() {
+    const index = Math.max(0, visibleMembers.indexOf(activeMember));
+    const columns = galleryColumns();
+    lastGalleryColumns = columns;
+    const start = Math.floor(index / columns) * columns;
+    const end = Math.min(start + columns, visibleMembers.length);
+    const first = String(start + 1).padStart(2, '0');
+    $('operativeToolbar').hidden = visibleMembers.length === 0;
+    $('operativeCurrent').textContent = end > start + 1 ? `${first}–${String(end).padStart(2, '0')}` : first;
+    $('operativeTotal').textContent = String(visibleMembers.length).padStart(2, '0');
+    $('operativeCurrentId').textContent = visibleMembers.slice(start, end).map(card => card.dataset.operative).join(' / ');
+    $('operativePrev').disabled = start === 0;
+    $('operativeNext').disabled = end >= visibleMembers.length;
+    $('operativePrev').setAttribute('aria-label', columns === 2 ? 'Baris anggota sebelumnya' : 'Anggota sebelumnya');
+    $('operativeNext').setAttribute('aria-label', columns === 2 ? 'Baris anggota berikutnya' : 'Anggota berikutnya');
+    visibleMembers.forEach((card, i) => card.style.setProperty('--reveal-delay', `${i % columns * 100}ms`));
+  }
+  function stepMember(direction) {
+    const columns = galleryColumns();
+    const index = Math.floor(visibleMembers.indexOf(activeMember) / columns) * columns;
+    const next = visibleMembers[index + direction * columns];
+    if (!next) return;
+    activeMember = next; syncGallery();
+    next.scrollIntoView({ block: 'start', behavior: window.SCPMotion.allowed() ? 'smooth' : 'instant' });
+  }
+  $('operativePrev').addEventListener('click', () => stepMember(-1));
+  $('operativeNext').addEventListener('click', () => stepMember(1));
+  if ('IntersectionObserver' in window) {
+    const entrance = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.intersectionRatio >= .08) entry.target.classList.add('is-in-view');
+      else if (!entry.isIntersecting) entry.target.classList.remove('is-in-view');
+    }), { threshold: .08 });
+    memberCards.forEach(card => { card.classList.add('will-reveal'); entrance.observe(card); });
+  }
+  let galleryFrame = 0;
+  function updateActiveRow() {
+    galleryFrame = 0;
+    if ($('founders').hidden || !visibleMembers.length || dossier?.open) return;
+    const columns = galleryColumns();
+    const target = innerHeight * .48;
+    let nearest = visibleMembers[0], distance = Infinity;
+    for (let i = 0; i < visibleMembers.length; i += columns) {
+      const rect = visibleMembers[i].getBoundingClientRect();
+      const delta = Math.abs(rect.top + rect.height / 2 - target);
+      if (delta < distance) { nearest = visibleMembers[i]; distance = delta; }
     }
-
-    function switchPanel(targetId, afterSwitch) {
-        if (targetId === currentPanel) {
-            if (typeof afterSwitch === 'function') afterSwitch(document.getElementById(targetId));
-            return;
-        }
-        if (isTransitioning) return;
-        isTransitioning = true;
-
-        var oldPanel = document.getElementById(currentPanel);
-        var newPanel = document.getElementById(targetId);
-        if (!oldPanel || !newPanel) { isTransitioning = false; return; }
-
-        setActiveNav(targetId);
-        if (newPanel.classList.contains('panel--scrollable')) newPanel.scrollTop = 0;
-
-        if (gsapReady) {
-            var dir = (Math.random() > 0.5 ? 1 : -1);
-
-            // Reveal the NEW panel UNDERNEATH the old one, already fully opaque.
-            // A complete background is always painted, so there is NO dark void
-            // between panels (this removes the "blink"). The new panel never
-            // fades opacity and gets no filter, so every card's backdrop-filter
-            // blur is live the instant it appears.
-            gsap.set(newPanel, { clearProps: 'filter,transform,opacity' });
-            newPanel.style.visibility = 'visible';
-            newPanel.style.zIndex = '1';
-            newPanel.classList.add('panel--active');
-            oldPanel.style.zIndex = '2';
-
-            var tl = gsap.timeline({
-                onComplete: function () {
-                    oldPanel.classList.remove('panel--active');
-                    oldPanel.style.cssText = '';
-                    newPanel.style.zIndex = '';
-                    isTransitioning = false;
-                    currentPanel = targetId;
-                    updateNavButtons();
-                    glitchPanelText(newPanel);
-                    if (typeof afterSwitch === 'function') afterSwitch(newPanel);
-                }
-            });
-
-            // Glitch-OUT the old panel on top: harsh RGB / brightness flicker,
-            // then a quick slide + fade. Only the OUTGOING panel is filtered.
-            tl.to(oldPanel, { filter: 'brightness(1.9) contrast(1.3) hue-rotate(8deg)', x: dir * -7, duration: 0.05, ease: 'none' }, 0)
-                .to(oldPanel, { filter: 'brightness(0.45) contrast(1.6) hue-rotate(-12deg)', x: dir * 10, duration: 0.05, ease: 'none' })
-                .to(oldPanel, { filter: 'brightness(1.5) contrast(1.2)', x: dir * -4, duration: 0.05, ease: 'none' })
-                .to(oldPanel, { opacity: 0, x: dir * 38, filter: 'brightness(2.2) blur(1px)', duration: 0.20, ease: 'power2.in' });
-
-        } else {
-            oldPanel.classList.remove('panel--active');
-            newPanel.classList.add('panel--active');
-            isTransitioning = false;
-            currentPanel = targetId;
-            updateNavButtons();
-            if (typeof afterSwitch === 'function') afterSwitch(newPanel);
-        }
-    }
-
-    function scrollPanelToTarget(panel, targetId) {
-        if (!panel || !targetId) return;
-        var target = document.getElementById(targetId);
-        if (!target || !panel.contains(target)) return;
-
-        requestAnimationFrame(function () {
-            var panelRect = panel.getBoundingClientRect();
-            var targetRect = target.getBoundingClientRect();
-            var targetTop = panel.scrollTop + targetRect.top - panelRect.top;
-            var centeredTop = targetTop - (panel.clientHeight - targetRect.height) / 2;
-            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-            panel.scrollTo({
-                top: Math.max(0, centeredTop),
-                behavior: reduceMotion ? 'auto' : 'smooth'
-            });
-        });
-    }
-
-    // Attach nav click handlers
-    navLinks.forEach(function (link) {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            var sectionId = link.getAttribute('data-section');
-            if (sectionId) switchPanel(sectionId);
-
-            // Close mobile menu
-            if (mainNav && mainNav.classList.contains('open')) {
-                hamburger.classList.remove('active');
-                mainNav.classList.remove('open');
-            }
-        });
+    if (activeMember !== nearest || lastGalleryColumns !== columns) { activeMember = nearest; syncGallery(); }
+  }
+  function queueActiveRow() { if (!galleryFrame) galleryFrame = requestAnimationFrame(updateActiveRow); }
+  window.addEventListener('scroll', queueActiveRow, { passive: true });
+  window.addEventListener('resize', queueActiveRow);
+  function filterMembers() {
+    const query = normalize($('memberSearch').value);
+    const role = $('roleFilter').value;
+    let count = 0;
+    memberCards.forEach(card => {
+      const id = card.querySelector('.member-id').textContent.trim();
+      const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || ''));
+      const matches = searchable.includes(query) && (role === 'all' || category(id).includes(role));
+      card.hidden = !matches;
+      if (matches) count++;
     });
+    $('memberCount').textContent = count;
+    $('emptyState').hidden = count > 0;
+    visibleMembers = memberCards.filter(card => !card.hidden);
+    activeMember = visibleMembers[0]; syncGallery();
+    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan. Pilih anggota untuk membuka profil.`;
+  }
+  $('memberSearch').addEventListener('input', filterMembers);
+  $('roleFilter').addEventListener('change', filterMembers);
+  $('resetSearch').addEventListener('click', () => { $('memberSearch').value = ''; $('roleFilter').value = 'all'; filterMembers(); $('memberSearch').focus(); });
 
-    // Logo click → Beranda
-    if (logoLink) {
-        logoLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            switchPanel('hero');
-        });
+  const dossier = $('scpDossier');
+  let dossierTrigger = null;
+  let dossierEffectTimer;
+  let dossierExpansion;
+  let dossierClosing = false;
+  let dossierCloseTimer;
+  let dossierGeneration = 0;
+  let dossierReturnTimer;
+  let dossierReturnCard;
+  function closeDossier({ immediate = false, restoreFocus = true } = {}) {
+    if (!restoreFocus) dossierTrigger = null;
+    if (!dossier.open) return;
+    if (dossierClosing && !immediate) return;
+    const generation = ++dossierGeneration;
+    const finalize = () => {
+      if (generation !== dossierGeneration) return;
+      clearTimeout(dossierCloseTimer);
+      dossierExpansion?.cancel();
+      dossierClosing = false;
+      dossier.classList.remove('is-closing', 'is-decoding');
+      if (dossier.open) dossier.close();
+    };
+    if (immediate || !window.SCPMotion.allowed() || !dossier.animate) { finalize(); return; }
+    dossierClosing = true;
+    clearTimeout(dossierEffectTimer);
+    const computed = getComputedStyle(dossier);
+    const from = { transform: computed.transform, opacity: computed.opacity, clipPath: computed.clipPath };
+    dossierExpansion?.cancel();
+    dossier.classList.remove('is-decoding');
+    dossier.classList.add('is-closing');
+    const bounds = dossier.getBoundingClientRect();
+    const card = dossierTrigger?.closest('.member-card');
+    const target = card && !card.closest('[hidden]') ? card.getBoundingClientRect() : null;
+    let transform = 'translateY(16px) scale(.96)';
+    if (target?.width && target?.height) {
+      const dx = target.left + target.width / 2 - bounds.left - bounds.width / 2;
+      const dy = Math.max(-innerHeight, Math.min(innerHeight, target.top + target.height / 2 - bounds.top - bounds.height / 2));
+      transform = `translate(${dx}px, ${dy}px) scale(${Math.min(1, target.width / bounds.width)}, ${Math.min(.82, target.height / bounds.height)})`;
     }
-
-    // CTA buttons — internal tabs switch panels, external links open normally
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.tactical-btn, [data-section-link]');
-        if (btn) {
-            var sectionId = btn.getAttribute('data-section-link');
-            var scrollTargetId = btn.getAttribute('data-scroll-target');
-            var href = btn.getAttribute('href');
-            if (sectionId) {
-                e.preventDefault();
-                switchPanel(sectionId, function (panel) {
-                    scrollPanelToTarget(panel, scrollTargetId);
-                });
-            } else if (href && href.startsWith('#')) {
-                e.preventDefault();
-                switchPanel(href.replace('#', ''));
-            }
-            // external links (http...) fall through to default navigation
-        }
+    dossierExpansion = dossier.animate([from, { transform, opacity: 0, clipPath: 'inset(4% 0 round 20px)' }], { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    dossierExpansion.finished.then(finalize, () => {});
+    dossierCloseTimer = setTimeout(finalize, 500);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && dossierClosing) closeDossier({ immediate: true });
+  });
+  function appendText(parent, tag, value, className) {
+    const node = document.createElement(tag);
+    node.textContent = value;
+    if (className) node.className = className;
+    parent.append(node);
+    return node;
+  }
+  function openDossier(id, trigger) {
+    const data = dossiers[id];
+    if (!data) { toast('Dossier belum tersedia.'); return; }
+    ++dossierGeneration;
+    clearTimeout(dossierCloseTimer);
+    dossierClosing = false;
+    dossier.classList.remove('is-closing');
+    dossierTrigger = trigger;
+    const sourceRect = trigger.closest('.member-card').getBoundingClientRect();
+    dossier.style.setProperty('--dossier-art', `url("${trigger.closest('.member-card').querySelector('.member-art').getAttribute('src')}")`);
+    dossierExpansion?.cancel();
+    clearTimeout(dossierEffectTimer);
+    dossier.classList.remove('is-decoding');
+    $('dsFileId').textContent = id;
+    $('dsClearance').textContent = data.clearance;
+    $('dsName').textContent = data.name;
+    $('dsRole').textContent = data.role;
+    $('dsAlias').textContent = data.alias;
+    $('dsUnique').textContent = data.unique;
+    const portrait = $('dsPortrait');
+    portrait.replaceChildren();
+    const photo = document.createElement('img');
+    photo.src = id === 'SCP-022' ? 'assets/jess.webp' : 'assets/emblem.webp';
+    photo.alt = id === 'SCP-022' ? 'Emblem Jess SCP' : '';
+    portrait.classList.toggle('has-photo', id === 'SCP-022');
+    portrait.append(photo);
+    appendText(portrait, 'span', id === 'SCP-022' ? 'OPERATIVE / SCP-022' : 'VISUAL CLASSIFIED', 'portrait-caption');
+    $('dsTrack').replaceChildren();
+    for (const track of data.track || []) {
+      const item = document.createElement('li');
+      appendText(item, 'strong', track.clan);
+      item.append(document.createTextNode(' — ' + track.role));
+      appendText(item, 'small', track.year);
+      $('dsTrack').append(item);
+    }
+    $('dsStrengths').replaceChildren();
+    for (const strength of data.strengths || []) appendText($('dsStrengths'), 'li', strength);
+    $('dsStats').replaceChildren();
+    for (const [name, value] of data.stats || []) {
+      const stat = document.createElement('div'); stat.className = 'skill-stat';
+      const label = document.createElement('div'); label.className = 'skill-stat-label';
+      appendText(label, 'span', name); appendText(label, 'b', `${value} / 100`); stat.append(label);
+      const progress = document.createElement('progress'); progress.max = 100; progress.value = value; progress.setAttribute('aria-label', name); progress.className = 'sr-only'; stat.append(progress);
+      const meter = document.createElement('div'); meter.className = 'stat-meter'; meter.setAttribute('aria-hidden', 'true');
+      const fill = document.createElement('span'); fill.className = 'stat-meter-fill'; fill.style.width = `${value}%`; meter.append(fill); stat.append(meter);
+      $('dsStats').append(stat);
+    }
+    dossier.showModal();
+    document.body.classList.add('modal-open');
+    dossier.scrollTop = 0;
+    $('dossierClose').focus();
+    if (effects && !motionMedia.matches) {
+      // Restart decorative effects without ever scrambling the member's data.
+      void dossier.offsetWidth;
+      dossier.classList.add('is-decoding');
+      const targetRect = dossier.getBoundingClientRect();
+      const dx = sourceRect.left + sourceRect.width / 2 - targetRect.left - targetRect.width / 2;
+      const dy = Math.max(-innerHeight, Math.min(innerHeight, sourceRect.top + sourceRect.height / 2 - targetRect.top - targetRect.height / 2));
+      if (dossier.animate) dossierExpansion = dossier.animate([
+        { transform: `translate(${dx}px, ${dy}px) scale(${Math.min(1.15, sourceRect.width / targetRect.width)}, .65)`, opacity: .15, clipPath: 'inset(12% 0 12% 0 round 24px)' },
+        { transform: 'translate(0, 0) scale(1)', opacity: 1, clipPath: 'inset(0 round 8px)' }
+      ], { duration: 620, easing: 'cubic-bezier(.16,1,.3,1)' });
+      dossierEffectTimer = setTimeout(() => dossier.classList.remove('is-decoding'), 1000);
+    }
+  }
+  memberCards.forEach(card => {
+    const id = card.querySelector('.member-id').textContent.trim();
+    const button = card.querySelector('.member-open');
+    button.addEventListener('click', () => openDossier(id, button));
+  });
+  $('dossierClose').addEventListener('click', () => closeDossier());
+  dossier.addEventListener('cancel', event => { event.preventDefault(); closeDossier(); });
+  dossier.addEventListener('close', () => {
+    if (dossier.open) return;
+    ++dossierGeneration;
+    clearTimeout(dossierCloseTimer);
+    clearTimeout(dossierEffectTimer);
+    dossierExpansion?.cancel();
+    dossierClosing = false;
+    dossier.classList.remove('is-decoding', 'is-closing');
+    document.body.classList.remove('modal-open');
+    if (dossierTrigger?.isConnected && !dossierTrigger.closest('[hidden]')) {
+      dossierTrigger.focus({ preventScroll: true });
+      const card = dossierTrigger.closest('.member-card');
+      dossierReturnCard?.classList.remove('just-returned');
+      dossierReturnCard = card;
+      card.classList.add('just-returned');
+      clearTimeout(dossierReturnTimer);
+      dossierReturnTimer = setTimeout(() => card.classList.remove('just-returned'), 550);
+    }
+  });
+  [dossier, $('copyDialog')].forEach(dialog => {
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+        if (dialog === dossier) closeDossier(); else dialog.close();
+      }
     });
+  });
 
-    /* ═══════════════════════════════════════════
-       3.5 NAV CONTROLS (Next/Prev)
-       ═══════════════════════════════════════════ */
-    function updateNavButtons() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        if (!prevBtn || !nextBtn) return;
-
-        const currentIndex = panelOrder.indexOf(currentPanel);
-        prevBtn.disabled = currentIndex <= 0;
-        nextBtn.disabled = currentIndex >= panelOrder.length - 1;
+  const dateFormatter = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' });
+  function updateDates() {
+    document.querySelectorAll('.next-date').forEach(node => {
+      const next = SCPSchedule.nextOccurrence(Number(node.dataset.weekday), Number(node.dataset.hour));
+      node.textContent = `BERIKUTNYA / ${dateFormatter.format(next)}`;
+    });
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateDates(); });
+  window.addEventListener('hashchange', updateDates);
+  $('calendarDownload').addEventListener('click', () => {
+    const file = new Blob([SCPSchedule.calendar()], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a'); link.href = url; link.download = 'scp-jadwal-rutin.ics';
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Kalender diunduh. Konfirmasi jadwal melalui Discord.');
+  });
+  const template = 'PENGAJUAN SCRIM — SCP ALLIANCE\n\nNama clan:\nMode permainan:\nTanggal:\nWaktu (WIB):\nFormat pertandingan:\nKontak PIC:\nCatatan tambahan:';
+  $('copyTemplate').addEventListener('click', async () => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(template);
+      toast('Format pengajuan disalin. Lengkapi lalu kirim di Discord.');
+    } catch {
+      $('copyText').value = template;
+      $('copyDialog').showModal();
+      document.body.classList.add('modal-open');
+      $('copyText').focus(); $('copyText').select();
     }
-
-    function initNavControls() {
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        if (!prevBtn || !nextBtn) return;
-
-        prevBtn.addEventListener('click', function () {
-            const currentIndex = panelOrder.indexOf(currentPanel);
-            if (currentIndex > 0) {
-                switchPanel(panelOrder[currentIndex - 1]);
-            }
-        });
-
-        nextBtn.addEventListener('click', function () {
-            const currentIndex = panelOrder.indexOf(currentPanel);
-            if (currentIndex < panelOrder.length - 1) {
-                switchPanel(panelOrder[currentIndex + 1]);
-            }
-        });
-
-        // Set initial state
-        updateNavButtons();
-    }
-
-    /* ═══════════════════════════════════════════
-       4. GLITCH TEXT DECODE
-       ═══════════════════════════════════════════ */
-    function glitchDecode(element, duration) {
-        if (!element) return;
-        var chars = '!<>-_\\/[]{}\u2014=+*^?#01\u2591\u2592\u2593\u00a7\u00b1\u00d7\u00f7';
-        duration = duration || 350;
-        var originalMarkup = element.dataset.decodeMarkup || element.innerHTML;
-        var original = element.dataset.decodeText || element.textContent;
-        element.dataset.decodeMarkup = originalMarkup;
-        element.dataset.decodeText = original;
-        var start = performance.now();
-        element.classList.add('is-glitching');
-
-        function tick(now) {
-            var elapsed = now - start;
-            var p = Math.min(elapsed / duration, 1);
-            var eased = 1 - (1 - p) * (1 - p); // easeOutQuad
-
-            element.textContent = original.split('').map(function (c, i) {
-                if (c === ' ' || c === '\n') return c;
-                if (eased > (i / original.length) + 0.1) return original[i];
-                return chars[Math.floor(Math.random() * chars.length)];
-            }).join('');
-
-            if (p < 1) requestAnimationFrame(tick);
-            else { element.innerHTML = originalMarkup; element.classList.remove('is-glitching'); }
-        }
-        requestAnimationFrame(tick);
-    }
-
-    /* Digital tear/slice boot-in for shapes (cards) \u2014 keeps backdrop blur intact */
-    function glitchShape(card) {
-        if (!card) return;
-        card.classList.remove('is-shape-glitch');
-        // force reflow so the animation re-triggers every visit
-        void card.offsetWidth;
-        card.classList.add('is-shape-glitch');
-        setTimeout(function () { card.classList.remove('is-shape-glitch'); }, 520);
-    }
-
-    function glitchPanelText(panel) {
-        if (!panel) return;
-        var tags = panel.querySelectorAll('.section-tag');
-        var titles = panel.querySelectorAll('.section-title');
-        var descs = panel.querySelectorAll('.about-card p, .objective-card p, .founder-card .role, .match-versus, .member-role, .member-name, .member-id, .hero-desc, .match-time');
-        var headings = panel.querySelectorAll('.about-card h3, .objective-card h3, .founder-card h4, .match-day, .subsection-title');
-        var shapes = panel.querySelectorAll('.glass-card');
-
-        tags.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 320); }, 40 + i * 50); });
-        titles.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 420); }, 130 + i * 50); });
-        headings.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 260); }, 230 + i * 40); });
-        descs.forEach(function (el, i) { setTimeout(function () { glitchDecode(el, 240); }, 320 + i * 28); });
-
-        // shapes tear in, staggered (capped so big lists stay snappy)
-        shapes.forEach(function (card, i) {
-            if (i > 13) return;
-            setTimeout(function () { glitchShape(card); }, 60 + i * 55);
-        });
-    }
-
-    /* ═══════════════════════════════════════════
-           5. HERO ENTRANCE
-           ═══════════════════════════════════════════ */
-    function animateHeroEntrance() {
-        if (!gsapReady) return;
-
-        var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-        tl.from('#heroTag', { y: 20, opacity: 0, duration: 0.6 })
-            .from('.hero-title .title-line', { y: 80, opacity: 0, duration: 1, stagger: 0.2, ease: 'power4.out' }, '-=0.3')
-            .from('#heroDesc', { y: 25, opacity: 0, duration: 0.7 }, '-=0.5')
-            .from('#heroCta', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4');
-
-        setTimeout(function () {
-            var tag = document.getElementById('heroTag');
-            if (tag) glitchDecode(tag, 500);
-        }, 400);
-        setTimeout(function () {
-            var desc = document.getElementById('heroDesc');
-            if (desc) glitchDecode(desc, 600);
-        }, 800);
-    }
-
-    /* ═══════════════════════════════════════════
-       6. GRID CANVAS
-       ═══════════════════════════════════════════ */
-    function initGridCanvas() {
-        var canvas = document.getElementById('gridCanvas');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-        var dots = [];
-        var spacing = 40;
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            dots = [];
-            for (var x = 0; x < canvas.width; x += spacing) {
-                for (var y = 0; y < canvas.height; y += spacing) {
-                    dots.push({
-                        x: x, y: y,
-                        a: 0.012 + Math.random() * 0.02,
-                        sp: 0.3 + Math.random() * 1.5,
-                        off: Math.random() * Math.PI * 2,
-                        pulse: Math.random() > 0.88,
-                        cross: Math.random() > 0.97
-                    });
-                }
-            }
-        }
-
-        function draw(t) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (var i = 0; i < dots.length; i++) {
-                var d = dots[i];
-                var a = d.a;
-                if (d.pulse) a += Math.sin(t * 0.001 * d.sp + d.off) * 0.03;
-                if (a <= 0) continue;
-                if (d.cross) {
-                    ctx.strokeStyle = 'rgba(0,240,255,' + (a * 1.2) + ')';
-                    ctx.lineWidth = 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(d.x - 3, d.y); ctx.lineTo(d.x + 3, d.y);
-                    ctx.moveTo(d.x, d.y - 3); ctx.lineTo(d.x, d.y + 3);
-                    ctx.stroke();
-                } else {
-                    ctx.fillStyle = 'rgba(200,16,46,' + a + ')';
-                    ctx.fillRect(d.x, d.y, 1, 1);
-                }
-            }
-            requestAnimationFrame(draw);
-        }
-
-        resize();
-        window.addEventListener('resize', resize);
-        requestAnimationFrame(draw);
-    }
-
-    /* ═══════════════════════════════════════════
-       7. VHS GLITCH
-       ═══════════════════════════════════════════ */
-    function initVHSGlitch() {
-        function trigger() {
-            var d = Math.random() > 0.5 ? 1 : -1;
-            document.body.style.transform = 'translateX(' + (Math.random() * 3 * d) + 'px)';
-            document.body.style.filter = 'hue-rotate(' + (Math.random() * 4) + 'deg)';
-            setTimeout(function () {
-                document.body.style.transform = '';
-                document.body.style.filter = '';
-            }, 40 + Math.random() * 60);
-            setTimeout(trigger, 4000 + Math.random() * 8000);
-        }
-        setTimeout(trigger, 5000);
-    }
-
-    /* ═══════════════════════════════════════════
-       8. CARD VHS GLITCH
-       ═══════════════════════════════════════════ */
-    function initCardGlitch() {
-        var cards = document.querySelectorAll('.glass-card');
-        if (!cards.length) return;
-
-        function glitchCard() {
-            // Pick a random card from the ACTIVE panel
-            var active = document.querySelector('.panel--active');
-            if (!active) { setTimeout(glitchCard, 3000); return; }
-            var visibleCards = active.querySelectorAll('.glass-card');
-            if (!visibleCards.length) { setTimeout(glitchCard, 3000); return; }
-
-            var card = visibleCards[Math.floor(Math.random() * visibleCards.length)];
-            card.style.transition = 'none';
-            card.style.transform = 'translate(' + ((Math.random() - 0.5) * 6) + 'px,' + ((Math.random() - 0.5) * 3) + 'px) skewX(' + ((Math.random() - 0.5) * 2.5) + 'deg)';
-            // RGB-split ghost via dual box-shadow (red / white) — no filter, blur stays intact
-            card.style.boxShadow = '-3px 0 0 rgba(255,45,85,0.55), 3px 0 0 rgba(233,236,242,0.45), 0 0 18px rgba(255,45,85,0.15)';
-            card.style.borderColor = 'rgba(255,45,85,0.45)';
-
-            setTimeout(function () {
-                card.style.transition = 'transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease';
-                card.style.transform = '';
-                card.style.boxShadow = '';
-                card.style.borderColor = '';
-            }, 70 + Math.random() * 90);
-
-            setTimeout(glitchCard, 2000 + Math.random() * 5000);
-        }
-
-        setTimeout(glitchCard, 6000);
-    }
-
-    /* ═══════════════════════════════════════════
-       9. CARD HOVER 3D TILT
-       ═══════════════════════════════════════════ */
-    function initCardHover() {
-        if (!gsapReady) return;
-        document.querySelectorAll('.glass-card').forEach(function (card) {
-            card.addEventListener('mousemove', function (e) {
-                var rect = card.getBoundingClientRect();
-                var x = e.clientX - rect.left, y = e.clientY - rect.top;
-                var cx = rect.width / 2, cy = rect.height / 2;
-                gsap.to(card, {
-                    rotationX: ((y - cy) / cy) * -4,
-                    rotationY: ((x - cx) / cx) * 4,
-                    duration: 0.4, ease: 'power2.out',
-                    transformPerspective: 800, transformOrigin: 'center center'
-                });
-            });
-            card.addEventListener('mouseleave', function () {
-                gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.6, ease: 'elastic.out(1,0.5)' });
-            });
-        });
-    }
-
-    /* ═══════════════════════════════════════════
-       10. HUD STATUS TEXT
-       ═══════════════════════════════════════════ */
-    function initHUDStatus() {
-        var el = document.getElementById('hudStatus');
-        if (!el) return;
-        var msgs = [
-            'SYS: ONLINE // SIGNAL: ACTIVE // PROTOCOL: S.C.P',
-            'UPLINK: STABLE // ENCRYPTION: AES-256 // STATUS: ARMED',
-            'THREAT LVL: OMEGA // CONTAINMENT: ACTIVE // TEAM: READY',
-            'FREQ: 147.3 MHz // LAT: [REDACTED] // LON: [REDACTED]'
-        ];
-        var idx = 0;
-        var chars = '!<>-_\\/[]{}—=+*^?#█▓▒░';
-        setInterval(function () {
-            idx = (idx + 1) % msgs.length;
-            var target = msgs[idx];
-            var iter = 0;
-            var iv = setInterval(function () {
-                el.textContent = target.split('').map(function (c, i) {
-                    return i < iter ? c : chars[Math.floor(Math.random() * chars.length)];
-                }).join('');
-                iter += 2;
-                if (iter > target.length) { clearInterval(iv); el.textContent = target; }
-            }, 25);
-        }, 6000);
-    }
-
-    /* ═══════════════════════════════════════════
-       11. HUD CORNERS
-       ═══════════════════════════════════════════ */
-    function initHUDCorners() {
-        if (!gsapReady) return;
-        document.querySelectorAll('.hud-corner').forEach(function (c, i) {
-            gsap.fromTo(c, { opacity: 0 }, { opacity: 1, duration: 0.4, delay: 0.1 * i, ease: 'power2.out' });
-            gsap.to(c, { opacity: 0.4, duration: 2 + Math.random(), repeat: -1, yoyo: true, ease: 'sine.inOut', delay: Math.random() * 2 });
-        });
-    }
-
-    /* ═══════════════════════════════════════════
-       12. COUNTERS
-       ═══════════════════════════════════════════ */
-    function syncTeamCounters() {
-        var teamPanel = document.getElementById('founders');
-        if (!teamPanel) return;
-
-        teamPanel.querySelectorAll('.stat-number[data-count-selector]').forEach(function (el) {
-            var selector = el.getAttribute('data-count-selector');
-            var count = selector ? teamPanel.querySelectorAll(selector).length : 0;
-            el.setAttribute('data-target', String(count));
-        });
-    }
-
-    function animateCounters() {
-        document.querySelectorAll('.stat-number').forEach(function (el) {
-            var target = parseInt(el.getAttribute('data-target'), 10);
-            if (!target) return;
-            var current = 0;
-            var step = Math.ceil(target / 30);
-            var iv = setInterval(function () {
-                current += step;
-                if (current >= target) { current = target; clearInterval(iv); }
-                el.textContent = current;
-            }, 50);
-        });
-    }
-
-    /* ═══════════════════════════════════════════
-       13. MOBILE MENU
-       ═══════════════════════════════════════════ */
-    if (hamburger && mainNav) {
-        hamburger.addEventListener('click', function () {
-            hamburger.classList.toggle('active');
-            mainNav.classList.toggle('open');
-        });
-    }
-
-    /* ═══════════════════════════════════════════
-       START — Run preloader immediately
-       ═══════════════════════════════════════════ */
-    runPreloader();
-
+  });
+  $('copyClose').addEventListener('click', () => $('copyDialog').close());
+  $('copyDialog').addEventListener('close', () => { document.body.classList.remove('modal-open'); if (current === 'scrim' && !root.classList.contains('is-routing')) $('copyTemplate').focus({ preventScroll: true }); });
+  syncMotion();
+  updateDates();
+  render(location.hash.slice(1));
+  desired = current;
+  syncGallery();
+  window.dispatchEvent(new Event('scp:ready'));
 })();
