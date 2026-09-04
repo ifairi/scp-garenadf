@@ -56,12 +56,40 @@
   const brand = document.querySelector('.brand');
   const bevelSlope = .55;
   const drawings = [];
+  function svgNode(tag, attributes = {}) {
+    const node = document.createElementNS(ns, tag);
+    Object.entries(attributes).forEach(([name, value]) => node.setAttribute(name, value));
+    return node;
+  }
   document.querySelectorAll('.header, .panel, .nav, .header-community').forEach(surface => {
     const svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('class', 'protocol-frame'); svg.setAttribute('aria-hidden', 'true');
     const path = document.createElementNS(ns, 'path');
     path.setAttribute('vector-effect', 'non-scaling-stroke');
     svg.append(path); surface.prepend(svg);
+    let insetPath, navMask, navTiles;
+    if (surface === nav) {
+      const defs = svgNode('defs');
+      const gradient = svgNode('linearGradient', { id: 'navEmerald', x2: '1', y2: '1' });
+      gradient.append(svgNode('stop', { offset: '0', 'stop-color': '#326d50' }), svgNode('stop', { offset: '1', 'stop-color': '#205039' }));
+      navMask = svgNode('mask', { id: 'navInset', maskUnits: 'userSpaceOnUse', x: '0', y: '0', 'mask-type': 'luminance' });
+      // One contour supplies both the stroke and its exact 4px inner offset.
+      insetPath = svgNode('path', { fill: 'white', stroke: 'black', 'stroke-width': '8' });
+      navMask.append(insetPath); defs.append(gradient, navMask);
+      const fills = svgNode('g', { mask: 'url(#navInset)', stroke: 'none' });
+      navTiles = [...nav.querySelectorAll('.nav-link')].map(link => {
+        const tile = svgNode('rect', { class: 'nav-fill', rx: '4', fill: 'url(#navEmerald)' });
+        fills.append(tile);
+        const sync = () => tile.classList.toggle('is-active', link.classList.contains('active'));
+        sync();
+        new MutationObserver(() => { sync(); queueFrames(); }).observe(link, { attributes: true, attributeFilter: ['class'] });
+        link.addEventListener('pointerenter', () => tile.classList.add('is-hovered'));
+        link.addEventListener('pointerleave', () => tile.classList.remove('is-hovered'));
+        return { link, tile };
+      });
+      svg.prepend(defs, fills);
+      nav.classList.add('has-contour-fill');
+    }
     function draw() {
       const w = surface.clientWidth, h = surface.clientHeight;
       if (!w || !h) return;
@@ -71,6 +99,16 @@
       if (surface.classList.contains('nav')) {
         const endX = 5 + bevelSlope * (h - 26);
         d = `M 16 1 Q -2 1 5 13 L ${endX} ${h - 13} Q ${endX + bevelSlope * 12} ${h - 1} ${endX + 18} ${h - 1} H ${w - 23} Q ${w - 20} ${h - 1} ${w - 17} ${h - 4} L ${w - 3} ${h - 18} Q ${w - 1} ${h - 20} ${w - 1} ${h - 23} V 10 Q ${w - 1} 1 ${w - 10} 1 Z`;
+        insetPath.setAttribute('d', d);
+        navMask.setAttribute('width', w); navMask.setAttribute('height', h);
+        const bounds = nav.getBoundingClientRect();
+        navTiles.forEach(({ link, tile }, index) => {
+          const rect = link.getBoundingClientRect();
+          const left = index === 0 ? 0 : rect.left - bounds.left + 1;
+          const right = index === navTiles.length - 1 ? w : rect.right - bounds.left - 1;
+          tile.setAttribute('x', left); tile.setAttribute('y', 5);
+          tile.setAttribute('width', Math.max(0, right - left)); tile.setAttribute('height', Math.max(0, h - 10));
+        });
       } else if (surface.classList.contains('header')) {
         const bounds = header.getBoundingClientRect();
         const navBounds = nav.getBoundingClientRect();

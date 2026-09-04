@@ -17,6 +17,48 @@
   try { effects = localStorage.getItem('scp-effects') !== 'off'; } catch { /* Device preferences are optional. */ }
   root.classList.add('js');
 
+  const heroPanel = $('hero');
+  let heroAnimations = [];
+  let heroEntranceTimer;
+  function clearHeroEntrance() {
+    clearTimeout(heroEntranceTimer);
+    heroAnimations.forEach(animation => animation.cancel());
+    heroAnimations = [];
+  }
+  function prepareHeroEntrance() {
+    clearHeroEntrance();
+    if (!effects || motionMedia.matches || document.hidden || !heroPanel.animate) return;
+    const sequence = [
+      ['.hero-scene', 0, 1050, true],
+      ['.hero-topline', 40], ['.hero-copy > .eyebrow', 90],
+      ['.hero-first-line', 140, 760], ['.glitch-title', 220, 760],
+      ['.hero-manifesto', 290], ['.hero-description', 340],
+      ['.hero-actions > :first-child', 390], ['.hero-actions > :last-child', 450],
+      ['.hero-footnote', 490], ['.field-label', 330], ['.hero-bottom', 440]
+    ];
+    try {
+      sequence.forEach(([selector, delay, duration = 650, scene = false]) => {
+        const element = heroPanel.querySelector(selector);
+        if (!element) return;
+        const animation = element.animate([
+          { opacity: 0, transform: scene ? 'scale(1.045)' : 'translateY(22px)', filter: scene ? 'none' : 'blur(3px)' },
+          { opacity: 1, transform: scene ? 'scale(1)' : 'translateY(0)', filter: 'none' }
+        ], { duration, delay, easing: 'cubic-bezier(.2,.75,.25,1)', fill: 'backwards' });
+        animation.pause();
+        heroAnimations.push(animation);
+      });
+    } catch { clearHeroEntrance(); }
+  }
+  function playHeroEntrance() {
+    if (current !== 'hero' || desired !== 'hero' || $('bootLoader')?.open || root.classList.contains('is-routing')) return;
+    if (!effects || motionMedia.matches || document.hidden) { clearHeroEntrance(); return; }
+    heroAnimations.forEach(animation => animation.play());
+    clearTimeout(heroEntranceTimer);
+    heroEntranceTimer = setTimeout(clearHeroEntrance, 1250);
+  }
+  // Native close covers normal completion, Escape and the intro watchdog.
+  $('bootLoader')?.addEventListener('close', playHeroEntrance);
+
   function closeMenu(returnFocus = false) {
     menu.classList.remove('is-open');
     menuToggle.setAttribute('aria-expanded', 'false');
@@ -36,6 +78,7 @@
     panels.forEach(panel => { panel.hidden = panel.id !== id; panel.classList.remove('is-entering'); });
     const panel = $(id);
     panel.classList.add('is-entering');
+    if (id === 'hero') prepareHeroEntrance(); else clearHeroEntrance();
     navLinks.forEach(link => {
       const active = link.hash === '#' + id;
       link.classList.toggle('active', active);
@@ -78,6 +121,7 @@
           const heading = $(id).querySelector('h1, h2');
           heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true });
         }
+        if (id === 'hero') playHeroEntrance();
       };
     };
     if (id === current && !root.classList.contains('is-routing')) commit()();
@@ -116,9 +160,14 @@
     const active = effects && !motionMedia.matches;
     root.classList.toggle('motion-off', !active);
     if (!active) {
+      clearHeroEntrance();
       window.SCPMotion.finish();
       if (dossierClosing) closeDossier({ immediate: true });
-      else dossierExpansion?.cancel();
+      else {
+        dossierExpansion?.cancel();
+        clearTimeout(dossierEffectTimer);
+        dossier.classList.remove('is-decoding');
+      }
     }
     const button = $('motionToggle');
     button.textContent = active ? '◈ EFEK: AKTIF' : '◇ EFEK: NONAKTIF';
@@ -133,7 +182,10 @@
     syncMotion();
   });
   motionMedia.addEventListener('change', syncMotion);
-  document.addEventListener('visibilitychange', () => root.classList.toggle('motion-paused', document.hidden));
+  document.addEventListener('visibilitychange', () => {
+    root.classList.toggle('motion-paused', document.hidden);
+    if (document.hidden) clearHeroEntrance();
+  });
   function toast(message) {
     clearTimeout(toastTimeout);
     $('toast').textContent = message;
@@ -230,6 +282,7 @@
   let dossierGeneration = 0;
   let dossierReturnTimer;
   let dossierReturnCard;
+  let dossierDirection = 1;
   function closeDossier({ immediate = false, restoreFocus = true } = {}) {
     if (!restoreFocus) dossierTrigger = null;
     if (!dossier.open) return;
@@ -238,6 +291,7 @@
     const finalize = () => {
       if (generation !== dossierGeneration) return;
       clearTimeout(dossierCloseTimer);
+      clearTimeout(dossierEffectTimer);
       dossierExpansion?.cancel();
       dossierClosing = false;
       dossier.classList.remove('is-closing', 'is-decoding');
@@ -247,25 +301,22 @@
     dossierClosing = true;
     clearTimeout(dossierEffectTimer);
     const computed = getComputedStyle(dossier);
-    const from = { transform: computed.transform, opacity: computed.opacity, clipPath: computed.clipPath };
+    const from = { transform: computed.transform, opacity: computed.opacity };
     dossierExpansion?.cancel();
-    dossier.classList.remove('is-decoding');
     dossier.classList.add('is-closing');
-    const bounds = dossier.getBoundingClientRect();
-    const card = dossierTrigger?.closest('.member-card');
-    const target = card && !card.closest('[hidden]') ? card.getBoundingClientRect() : null;
-    let transform = 'translateY(16px) scale(.96)';
-    if (target?.width && target?.height) {
-      const dx = target.left + target.width / 2 - bounds.left - bounds.width / 2;
-      const dy = Math.max(-innerHeight, Math.min(innerHeight, target.top + target.height / 2 - bounds.top - bounds.height / 2));
-      transform = `translate(${dx}px, ${dy}px) scale(${Math.min(1, target.width / bounds.width)}, ${Math.min(.82, target.height / bounds.height)})`;
-    }
-    dossierExpansion = dossier.animate([from, { transform, opacity: 0, clipPath: 'inset(4% 0 round 20px)' }], { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-    dossierExpansion.finished.then(finalize, () => {});
-    dossierCloseTimer = setTimeout(finalize, 500);
+    dossierCloseTimer = setTimeout(finalize, 240);
+    try {
+      dossierExpansion = dossier.animate([from, { transform: `translate(${dossierDirection * 10}px, 6px)`, opacity: 0 }], { duration: 170, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' });
+      dossierExpansion.finished.then(finalize, () => {});
+    } catch { finalize(); }
   }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && dossierClosing) closeDossier({ immediate: true });
+    else if (document.hidden && dossier.open) {
+      dossierExpansion?.cancel();
+      clearTimeout(dossierEffectTimer);
+      dossier.classList.remove('is-decoding');
+    }
   });
   function appendText(parent, tag, value, className) {
     const node = document.createElement(tag);
@@ -282,8 +333,11 @@
     dossierClosing = false;
     dossier.classList.remove('is-closing');
     dossierTrigger = trigger;
-    const sourceRect = trigger.closest('.member-card').getBoundingClientRect();
-    dossier.style.setProperty('--dossier-art', `url("${trigger.closest('.member-card').querySelector('.member-art').getAttribute('src')}")`);
+    const sourceCard = trigger.closest('.member-card');
+    const sourceRect = sourceCard.getBoundingClientRect();
+    dossierDirection = sourceRect.left + sourceRect.width / 2 < innerWidth / 2 ? -1 : 1;
+    const art = sourceCard.querySelector('.member-art');
+    dossier.style.setProperty('--dossier-art', `url("${art.currentSrc || art.getAttribute('src')}")`);
     dossierExpansion?.cancel();
     clearTimeout(dossierEffectTimer);
     dossier.classList.remove('is-decoding');
@@ -325,18 +379,16 @@
     document.body.classList.add('modal-open');
     dossier.scrollTop = 0;
     $('dossierClose').focus();
-    if (effects && !motionMedia.matches) {
-      // Restart decorative effects without ever scrambling the member's data.
-      void dossier.offsetWidth;
+    if (window.SCPMotion.allowed() && dossier.animate) {
+      // Keep the panel at its final size: only composited position and opacity move.
       dossier.classList.add('is-decoding');
-      const targetRect = dossier.getBoundingClientRect();
-      const dx = sourceRect.left + sourceRect.width / 2 - targetRect.left - targetRect.width / 2;
-      const dy = Math.max(-innerHeight, Math.min(innerHeight, sourceRect.top + sourceRect.height / 2 - targetRect.top - targetRect.height / 2));
-      if (dossier.animate) dossierExpansion = dossier.animate([
-        { transform: `translate(${dx}px, ${dy}px) scale(${Math.min(1.15, sourceRect.width / targetRect.width)}, .65)`, opacity: .15, clipPath: 'inset(12% 0 12% 0 round 24px)' },
-        { transform: 'translate(0, 0) scale(1)', opacity: 1, clipPath: 'inset(0 round 8px)' }
-      ], { duration: 620, easing: 'cubic-bezier(.16,1,.3,1)' });
-      dossierEffectTimer = setTimeout(() => dossier.classList.remove('is-decoding'), 1000);
+      try {
+        dossierExpansion = dossier.animate([
+          { transform: `translate(${dossierDirection * 18}px, 8px)`, opacity: 0 },
+          { transform: 'translate(0, 0)', opacity: 1 }
+        ], { duration: 240, easing: 'cubic-bezier(.2,.8,.25,1)' });
+        dossierEffectTimer = setTimeout(() => dossier.classList.remove('is-decoding'), 360);
+      } catch { dossier.classList.remove('is-decoding'); }
     }
   }
   memberCards.forEach(card => {
@@ -411,6 +463,7 @@
   updateDates();
   render(location.hash.slice(1));
   desired = current;
+  if (current === 'hero') playHeroEntrance();
   syncGallery();
   window.dispatchEvent(new Event('scp:ready'));
 })();

@@ -9,8 +9,15 @@
   if (!loader || typeof loader.showModal !== 'function' || reducedMotion.matches || effectsOff) return;
 
   const started = performance.now();
-  const status = document.getElementById('bootStatus');
+  const percentage = document.getElementById('bootPercent');
+  const progressbar = document.getElementById('bootProgress');
+  if (!percentage || !progressbar) return;
   let finished = false;
+  let progressFrame;
+  let target = 0;
+  let progress = 0;
+  let lastFrame = started;
+  let displayed = -1;
   let exitTimer;
   let readyTimer;
   let watchdog;
@@ -23,6 +30,7 @@
     clearTimeout(watchdog);
     clearTimeout(exitTimer);
     clearTimeout(readyTimer);
+    cancelAnimationFrame(progressFrame);
     root.classList.remove('is-booting');
     loader.classList.remove('is-leaving');
     window.removeEventListener('scp:ready', onReady);
@@ -42,7 +50,6 @@
   }
 
   // Register escape hatches before showing the modal, independently of script.js.
-  document.getElementById('bootSkip').addEventListener('click', closeNow);
   loader.addEventListener('cancel', event => { event.preventDefault(); closeNow(); });
   loader.addEventListener('close', cleanUp);
   window.addEventListener('scp:ready', onReady, { once: true });
@@ -53,16 +60,37 @@
     root.classList.add('is-booting');
   } catch { closeNow(); return; }
 
+  // Progress represents initialization milestones, including usable fallbacks.
+  // Animate toward completed work; 100 is only reachable once every step settles.
+  function milestone(work, weight) {
+    Promise.resolve().then(work).catch(() => {}).then(() => {
+      if (!finished) target = Math.min(100, target + weight);
+    });
+  }
   const hero = document.querySelector('#hero .scene img');
-  const visual = hero?.decode ? hero.decode().catch(() => {}) : Promise.resolve();
-  const fonts = document.fonts ? Promise.allSettled([
+  milestone(() => ready, 34);
+  milestone(() => hero?.decode?.(), 33);
+  milestone(() => document.fonts ? Promise.allSettled([
     document.fonts.load('500 16px "SCP UI"'),
     document.fonts.load('700 16px "SCP UI"')
-  ]) : Promise.resolve();
-  Promise.allSettled([ready, visual, fonts]).then(() => {
+  ]) : undefined, 33);
+
+  function paint(now) {
     if (finished) return;
-    status.textContent = 'PROTOCOL READY';
-    loader.classList.add('is-ready');
-    readyTimer = setTimeout(reveal, Math.max(250, 1100 - (performance.now() - started)));
-  });
+    progress = Math.min(target, progress + Math.max(0, now - lastFrame) * .095);
+    lastFrame = now;
+    const value = Math.floor(progress);
+    if (value !== displayed) {
+      displayed = value;
+      percentage.textContent = String(value).padStart(2, '0');
+      progressbar.setAttribute('aria-valuenow', String(value));
+    }
+    progressbar.style.setProperty('--boot-progress', String(progress / 100));
+    if (progress === 100) {
+      readyTimer = setTimeout(reveal, Math.max(180, 1100 - (now - started)));
+    } else {
+      progressFrame = requestAnimationFrame(paint);
+    }
+  }
+  progressFrame = requestAnimationFrame(paint);
 })();

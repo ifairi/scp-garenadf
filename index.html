@@ -31,15 +31,12 @@
 </head>
 <body>
   <dialog class="boot-loader" id="bootLoader" aria-labelledby="bootTitle" aria-describedby="bootDescription">
-    <div class="boot-content">
-      <p class="boot-coordinate" aria-hidden="true">SCP / INDONESIA <span>SECURE CONNECTION</span></p>
-      <div class="boot-emblem" aria-hidden="true"><img src="assets/emblem.webp" width="92" height="94" alt=""><span></span></div>
-      <p class="eyebrow">SPECIAL CLASSIFIED PROTOCOL</p>
-      <h2 id="bootTitle">ENTER THE <span>PROTOCOL.</span></h2>
-      <p id="bootDescription">Lintas clan. Satu protokol.</p>
-      <div class="boot-track" aria-hidden="true"><span></span></div>
-      <p id="bootStatus" class="boot-status" role="status">INITIALIZING PROTOCOL</p>
-      <button id="bootSkip" class="text-link" autofocus>Lewati intro <span aria-hidden="true">↗</span></button>
+    <div class="boot-content" tabindex="-1" autofocus>
+      <h2 id="bootTitle" class="sr-only">Memuat SCP Alliance</h2>
+      <p id="bootDescription" class="sr-only">Menyiapkan tampilan website. Tekan Escape untuk melewati intro.</p>
+      <div class="boot-emblem" aria-hidden="true"><img src="assets/emblem.webp" width="120" height="123" alt=""></div>
+      <p class="boot-percent" aria-hidden="true"><span id="bootPercent">00</span><span class="boot-unit">%</span></p>
+      <div id="bootProgress" class="boot-track" role="progressbar" aria-label="Persiapan website" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     </div>
   </dialog>
   <a class="skip-link" href="#mainContent">Lewati navigasi</a>
@@ -52,7 +49,7 @@
       <a href="#objectives" class="nav-link"><span>04</span> Tujuan</a>
       <a href="#scrim" class="nav-link"><span>05</span> Jadwal</a>
     </nav>
-    <a class="header-community" href="https://discord.gg/R2Ek7V5DS" target="_blank" rel="noopener noreferrer"><span>DISCORD</span><span aria-hidden="true">→</span></a>
+    <a class="header-community" href="https://discord.gg/y8GR3HhK48" target="_blank" rel="noopener noreferrer"><span>DISCORD</span><span aria-hidden="true">→</span></a>
     <button class="menu-toggle" id="menuToggle" aria-controls="mainNav" aria-expanded="false" aria-label="Buka menu"><span></span><span></span></button>
   </header>
   <div class="page-wipe" id="pageWipe" aria-hidden="true" hidden><div class="wipe-bands"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="wipe-readout"><span>S.C.P / CHANNEL <b id="wipeNumber">01</b></span><strong id="wipeLabel">BERANDA</strong><span>ESTABLISHING CONNECTION <i>↗</i></span></div><div class="wipe-interference"></div></div>
@@ -62,14 +59,14 @@
       <div class="hero-topline"><span><i class="status-dot"></i> INDEPENDENT ALLIANCE</span><span>EST. INDONESIA <b> / </b> DELTA FORCE MOBILE</span></div>
       <div class="hero-main">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="tiny-cross" aria-hidden="true">+</span> SPECIAL CLASSIFIED PROTOCOL</p>
-          <h1 id="heroTitle" aria-label="We are S.C.P."><span class="hero-first-line">WE ARE</span><br><span class="glitch-title" data-text="S.C.P.">S.C.P.</span></h1>
+          <p class="eyebrow"><span class="tiny-cross" aria-hidden="true"></span> <span class="protocol-caption">SPECIAL CLASSIFIED PROTOCOL</span></p>
+          <h1 id="heroTitle" aria-label="We are S.C.P."><span class="hero-first-line">WE ARE</span><br><span class="glitch-title" data-text="S.C.P.">S.C.P.<span class="scp-glow" aria-hidden="true">S.C.P.</span></span></h1>
           <p class="hero-manifesto">Lintas clan. <span>Satu protokol.</span></p>
           <p class="hero-description">Rumah bagi player dengan kemampuan anomali. Bersatu untuk latihan, scrim, dan kompetisi — tanpa meninggalkan identitasmu.</p>
           <div class="hero-actions"><a class="button button-primary" href="https://forms.gle/ycAfC2AnGW3QJBhQ6" target="_blank" rel="noopener noreferrer">JOIN THE PROTOCOL <span aria-hidden="true">↗</span></a><a class="button button-ghost" href="#scrim" data-contact-link>Ajukan scrim <span aria-hidden="true">↗</span></a></div>
-          <p class="hero-footnote"><span class="tiny-cross" aria-hidden="true">+</span> CLAN TETAP. NICKNAME TETAP. LEVEL BERBEDA.</p>
+          <p class="hero-footnote"><span class="tiny-cross" aria-hidden="true"></span> CLAN TETAP. NICKNAME TETAP. LEVEL BERBEDA.</p>
         </div>
-        <div class="field-label" aria-hidden="true"><span class="field-cross">+</span><span>FIELD UNIT / 001<strong>UNCONVENTIONAL<br>BY DESIGN.</strong><small>DF MOBILE · INDONESIA</small></span></div>
+        <div class="field-label" aria-hidden="true"><span class="field-cross"></span><span>FIELD UNIT / 001<strong>UNCONVENTIONAL<br>BY DESIGN.</strong><small>DF MOBILE · INDONESIA</small></span></div>
       </div>
       <div class="hero-bottom"><a class="intel-cell" href="#founders"><span class="intel-number">12<span> / </span>04</span><span>OPERATIVES / FOUNDERS<small>Kenali orang di balik protokol <b>↗</b></small></span></a><div class="intel-cell"><span class="intel-symbol" aria-hidden="true">⌘</span><span>INDEPENDENT BY NATURE<small>Berbagai clan. Satu visi.</small></span></div><a class="intel-cell intel-next" href="#scrim"><span class="status-dot"></span><span>WEEKLY OPERATIONS<small>Jumat — Minggu <b>↗</b></small></span></a></div>
     </section>
@@ -191,12 +188,12 @@
         <div class="schedule-toolbar"><p><span class="status-dot"></span> RUTINITAS MINGGUAN <span class="timezone">UTC+7 / WIB</span></p><button class="text-link calendar-button" id="calendarDownload">SIMPAN KALENDER <span aria-hidden="true">↓</span></button></div>
         <div class="schedule-grid"><article class="schedule-card"><div class="schedule-card-top"><span>01 / TRAINING</span><span class="badge">Terjadwal</span></div><h3>Jumat<span>FRIDAY</span></h3><p class="schedule-time">20.00 — 22.00 <span>WIB</span></p><div class="schedule-detail"><span>Latihan internal divisi</span><small>Koordinasi & evaluasi tim</small></div><p class="next-date" data-weekday="5" data-hour="20">Setiap Jumat</p></article><article class="schedule-card"><div class="schedule-card-top"><span>02 / SCRIM MATCH</span><span class="badge badge-outline">Mencari lawan</span></div><h3>Sabtu<span>SATURDAY</span></h3><p class="schedule-time">19.00 <span>WIB — selesai</span></p><div class="schedule-detail"><span>Lawan belum ditentukan</span><small>Terbuka untuk tantangan clan</small></div><p class="next-date" data-weekday="6" data-hour="19">Setiap Sabtu</p></article><article class="schedule-card"><div class="schedule-card-top"><span>03 / SCRIM MATCH</span><span class="badge badge-outline">Mencari lawan</span></div><h3>Minggu<span>SUNDAY</span></h3><p class="schedule-time">15.00 — 18.00 <span>WIB</span></p><div class="schedule-detail"><span>Lawan belum ditentukan</span><small>Terbuka untuk tantangan clan</small></div><p class="next-date" data-weekday="0" data-hour="15">Setiap Minggu</p></article></div>
         <p class="schedule-note">Seluruh waktu dalam WIB dan dapat berubah setelah konfirmasi. Data terakhir: <time datetime="2026-07-17">17 Juli 2026</time>. Tanggal berikutnya dihitung dari jadwal rutin.</p>
-        <aside class="scrim-contact" id="scrimContact" aria-labelledby="scrimContactTitle"><div><p class="eyebrow">OPEN CHALLENGE</p><h3 id="scrimContactTitle">Uji formasi. <span>Tantang SCP.</span></h3><p>Kirim nama clan, mode, tanggal, waktu, format pertandingan, dan kontak PIC melalui Discord.</p></div><div class="scrim-actions"><a class="button button-primary" id="scrimContactLink" href="https://discord.gg/R2Ek7V5DS" target="_blank" rel="noopener noreferrer">AJUKAN VIA DISCORD <span aria-hidden="true">↗</span></a><button class="text-link" id="copyTemplate">Salin format pengajuan <span aria-hidden="true">⧉</span></button></div></aside>
+        <aside class="scrim-contact" id="scrimContact" aria-labelledby="scrimContactTitle"><div><p class="eyebrow">OPEN CHALLENGE</p><h3 id="scrimContactTitle">Uji formasi. <span>Tantang SCP.</span></h3><p>Kirim nama clan, mode, tanggal, waktu, format pertandingan, dan kontak PIC melalui Discord.</p></div><div class="scrim-actions"><a class="button button-primary" id="scrimContactLink" href="https://discord.gg/y8GR3HhK48" target="_blank" rel="noopener noreferrer">AJUKAN VIA DISCORD <span aria-hidden="true">↗</span></a><button class="text-link" id="copyTemplate">Salin format pengajuan <span aria-hidden="true">⧉</span></button></div></aside>
       </div>
     </section>
   </main>
   <div class="page-bar" id="pageBar"><div class="page-status"><span class="status-dot"></span><span>SPECIAL. CLASSIFIED. PROTOCOL.</span></div><div class="page-controls"><button id="prevBtn" aria-label="Menu sebelumnya" disabled>←</button><span><b id="pageNumber">01</b> <span>/ 05</span></span><button id="nextBtn" aria-label="Menu berikutnya">→</button></div><button class="motion-toggle" id="motionToggle" aria-pressed="false"><span aria-hidden="true">◈</span> EFEK: AKTIF</button></div>
-  <footer class="footer"><div class="footer-top"><a class="footer-brand" href="#hero">S.C.P <span>ALLIANCE</span></a><div class="game-logos"><img src="delta_force_logo.png" width="112" height="24" alt="Delta Force"><span>UNOFFICIAL COMMUNITY</span></div><div class="footer-links"><a href="https://discord.gg/R2Ek7V5DS" target="_blank" rel="noopener noreferrer">Discord ↗</a><a href="https://www.tiktok.com/@s.c.p.entity" target="_blank" rel="noopener noreferrer">TikTok ↗</a></div></div><div class="footer-bottom"><p>© 2026 SCP Alliance. Special Classified Protocol.</p><p>Komunitas independen. Tidak berafiliasi, disponsori, atau didukung resmi oleh Garena, Delta Force, maupun SCP Foundation. Merek terkait milik pemegang hak masing-masing.</p></div></footer>
+  <footer class="footer"><div class="footer-top"><a class="footer-brand" href="#hero">S.C.P <span>ALLIANCE</span></a><div class="game-logos"><img src="delta_force_logo.png" width="112" height="24" alt="Delta Force"><span>UNOFFICIAL COMMUNITY</span></div><div class="footer-links"><a href="https://discord.gg/y8GR3HhK48" target="_blank" rel="noopener noreferrer">Discord ↗</a><a href="https://www.tiktok.com/@s.c.p.entity" target="_blank" rel="noopener noreferrer">TikTok ↗</a></div></div><div class="footer-bottom"><p>© 2026 SCP Alliance. Special Classified Protocol.</p><p>Komunitas independen. Tidak berafiliasi, disponsori, atau didukung resmi oleh Garena, Delta Force, maupun SCP Foundation. Merek terkait milik pemegang hak masing-masing.</p></div></footer>
   <dialog class="dossier" id="scpDossier" aria-labelledby="dsName">
     <div class="dossier-signal" aria-hidden="true"></div>
     <div class="dossier-topbar"><span>PERSONNEL FILE <b id="dsFileId"></b></span><button class="dossier-close" id="dossierClose" aria-label="Tutup profil">✕</button></div>
