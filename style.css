@@ -650,7 +650,8 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
   width: 100%;
   min-width: 0;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior-x: contain;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -670,6 +671,8 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
 .roster-drag-ready .roster-marquee-track { animation: none; }
 .roster-marquee.is-dragging,
 .roster-marquee.is-dragging .member-open::before { cursor: grabbing; }
+.roster-marquee .member-card,
+.roster-marquee .member-open { touch-action: pan-y pinch-zoom; }
 .roster-marquee img { -webkit-user-drag: none; user-select: none; }
 .roster-lane[data-direction='ltr'] .roster-marquee-track { animation-direction: reverse; }
 .roster-marquee-group {
@@ -741,7 +744,11 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
 .member-grid.roster-rails .member-open { gap: 7px; font-size: 6.5px; letter-spacing: .7px; }
 .member-grid.roster-rails .member-open b { width: 36px; height: 36px; }
 .member-grid.roster-rails .member-open .ui-arrow { --arrow-size: 14px; }
-.member-grid.roster-rails .is-marquee-clone { pointer-events: none; }
+.member-grid.roster-rails .is-marquee-clone { pointer-events: auto; cursor: pointer; }
+.member-grid.roster-rails .is-marquee-clone .member-open { pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .member-grid.roster-rails .is-marquee-clone:hover .member-open b { transform: rotate(45deg); background: #d1ffe3; }
+}
 .roster-marquee:hover .roster-marquee-track,
 .roster-marquee:focus-within .roster-marquee-track,
 .roster-marquee.is-user-paused .roster-marquee-track,
@@ -815,4 +822,187 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
   .panel:not([hidden]) .roster-lane,
   .roster-toolbar::after,
   .roster-signal i { animation: none; }
+}
+
+/* Compact registry reserved for the crests of clans represented in SCP. */
+.clan-network {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(220px, .34fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 58px);
+  margin-top: 34px;
+  padding: 22px 2px;
+  overflow: hidden;
+  border-top: 1px solid #a4efc733;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #a4efc706, transparent 30%, #a4efc703);
+}
+.clan-network::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 0;
+  width: 20%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, #bfffd014, #dfffea2c, #bfffd014, transparent);
+  transform: translateX(-110%);
+  animation: clanRegistryScan 7.2s 1.1s cubic-bezier(.45, 0, .25, 1) infinite;
+  animation-play-state: var(--ambient-state, running);
+}
+.clan-network::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 74px;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 12px #a4efc755;
+}
+.clan-network__intro { min-width: 0; }
+.clan-network__intro h3 {
+  margin: 7px 0 8px;
+  font: 700 clamp(23px, 2.2vw, 31px)/1 var(--display);
+  letter-spacing: -.04em;
+}
+.clan-network__intro h3 span { color: var(--accent); text-shadow: 0 0 17px #a4efc724; }
+.clan-network__intro > p:not(.eyebrow) {
+  max-width: 280px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+.clan-network__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+  color: #87998d;
+  font: 7px var(--mono);
+  letter-spacing: 1.35px;
+}
+.clan-network__status .status-dot { width: 4px; height: 4px; }
+.clan-network__viewport { min-width: 0; }
+.clan-network__list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(146px, 1fr);
+  gap: 9px;
+  margin: 0;
+  padding: 1px 1px 7px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: #a4efc744 transparent;
+  list-style: none;
+  touch-action: pan-x pan-y;
+}
+.clan-network__list::-webkit-scrollbar { height: 3px; }
+.clan-network__list::-webkit-scrollbar-thumb { background: #a4efc744; }
+.clan-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 88px;
+  padding: 13px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  border: 1px solid #a4efc71f;
+  border-radius: 11px 2px 15px 2px;
+  background: linear-gradient(135deg, #111d16e8, #0b130fe8);
+}
+.clan-node::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  border-right: 1px solid #a4efc744;
+  border-bottom: 1px solid #a4efc744;
+}
+.clan-node__mark {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #a4efc73a;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a4efc710, transparent 66%);
+}
+.clan-node__mark::before {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  border: 1px solid #a4efc74a;
+  transform: rotate(45deg);
+}
+.clan-node__mark::after {
+  content: '';
+  position: absolute;
+  inset: calc(50% - 2px);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 9px #a4efc788;
+}
+.clan-node__mark i,
+.clan-node__mark i::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 1px;
+  height: 32px;
+  background: #a4efc71d;
+}
+.clan-node__mark i::before { top: 50%; left: -16px; width: 32px; height: 1px; }
+.clan-node__copy { display: grid; gap: 5px; min-width: 0; }
+.clan-node__copy small {
+  color: var(--accent);
+  font: 7px var(--mono);
+  letter-spacing: 1.2px;
+}
+.clan-node__copy strong {
+  color: #a8b5ac;
+  font: 600 9px var(--mono);
+  letter-spacing: .8px;
+  white-space: nowrap;
+}
+@keyframes clanRegistryScan {
+  0%, 12% { opacity: 0; transform: translateX(-110%); }
+  22% { opacity: .7; }
+  68% { opacity: .7; }
+  80%, 100% { opacity: 0; transform: translateX(510%); }
+}
+.motion-off .clan-network::before { animation: none; }
+
+@media (max-width: 860px) {
+  .clan-network { grid-template-columns: 1fr; gap: 17px; }
+  .clan-network__intro { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0 20px; }
+  .clan-network__intro .eyebrow,
+  .clan-network__intro h3 { grid-column: 1; }
+  .clan-network__intro > p:not(.eyebrow) { grid-column: 1; }
+  .clan-network__status { grid-column: 2; grid-row: 1 / span 3; align-self: center; margin: 0; }
+}
+@media (max-width: 560px) {
+  .clan-network { margin-top: 27px; padding-block: 19px; gap: 14px; }
+  .clan-network::after { width: 52px; }
+  .clan-network__intro { display: block; }
+  .clan-network__intro h3 { font-size: 23px; }
+  .clan-network__intro > p:not(.eyebrow) { font-size: 9px; }
+  .clan-network__status { margin-top: 9px; }
+  .clan-network__list { grid-auto-columns: 151px; }
+  .clan-node { min-height: 82px; padding: 11px; gap: 10px; }
+  .clan-node__mark { width: 40px; height: 40px; }
+  .clan-node__mark::before { inset: 10px; }
+  .clan-node__mark i { top: 6px; height: 28px; }
+  .clan-node__mark i::before { left: -14px; width: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .clan-network::before { animation: none; }
 }

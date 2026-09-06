@@ -224,21 +224,21 @@
 
   const gallery = $('operativeGallery');
   gallery.classList.add('roster-rails');
-  gallery.setAttribute('aria-label', 'Pure SCP roster dan alliance operatives');
+  gallery.setAttribute('aria-label', 'Pure Roster dan The Alliance');
   const railDefinitions = [
     {
       key: 'pure',
       index: '01 / CORE UNIT',
-      title: 'PURE SCP ROSTER',
-      note: 'PRIMARY SIGNAL / HOLD + DRAG',
+      title: 'Pure Roster',
+      note: 'PRIMARY SIGNAL / DRAG + SWIPE',
       direction: 'rtl',
       directionLabel: 'RIGHT TO LEFT'
     },
     {
       key: 'alliance',
       index: '02 / AFFILIATED UNIT',
-      title: 'ALLIANCE OPERATIVES',
-      note: 'EXTERNAL IDENTITY / HOLD + DRAG',
+      title: 'The ALLIANCE',
+      note: 'EXTERNAL IDENTITY / DRAG + SWIPE',
       direction: 'ltr',
       directionLabel: 'LEFT TO RIGHT'
     }
@@ -288,8 +288,8 @@
     viewport.className = 'roster-marquee';
     viewport.tabIndex = 0;
     viewport.setAttribute('role', 'region');
-    viewport.setAttribute('aria-label', `${definition.title}. Seret ke kiri atau kanan, atau gunakan tombol panah. Bergerak otomatis ${definition.directionLabel.toLocaleLowerCase('id')}.`);
-    viewport.title = 'Klik dan tahan, lalu geser ke kiri atau kanan';
+    viewport.setAttribute('aria-label', `${definition.title}. Seret dengan mouse atau usap ke kiri dan kanan, atau gunakan tombol panah. Bergerak otomatis ${definition.directionLabel.toLocaleLowerCase('id')}.`);
+    viewport.title = 'Klik atau tap untuk membuka dossier. Tahan lalu geser atau usap untuk melihat roster.';
     const track = document.createElement('div');
     track.className = 'roster-marquee-track';
     viewport.append(track);
@@ -306,7 +306,11 @@
       candidate: false,
       dragging: false,
       keyboardFocused: false,
+      pointerHovered: false,
       pointerId: null,
+      inputKind: null,
+      pointerCaptured: false,
+      settleUntil: 0,
       startX: 0,
       startY: 0,
       lastX: 0,
@@ -332,7 +336,6 @@
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
     clone.setAttribute('aria-hidden', 'true');
-    clone.setAttribute('inert', '');
     clone.querySelectorAll('a, button, input, select, textarea, [tabindex]').forEach(node => {
       node.tabIndex = -1;
       node.removeAttribute('aria-haspopup');
@@ -356,65 +359,84 @@
 
   function bindRosterDrag(state) {
     const { viewport } = state;
+    const hasTouchEvents = 'ontouchstart' in window;
 
-    const finishPointer = (event, cancelled = false) => {
+    const beginGesture = (id, x, y, inputKind) => {
+      if (state.candidate || state.dragging) return false;
+      state.keyboardFocused = false;
+      state.candidate = true;
+      state.dragging = false;
+      state.pointerId = id;
+      state.inputKind = inputKind;
+      state.pointerCaptured = false;
+      state.startX = state.lastX = x;
+      state.startY = y;
+      state.lastTime = state.lastMoveTime = performance.now();
+      state.distance = 0;
+      state.velocity = 0;
+      state.settleUntil = 0;
+      viewport.classList.add('is-user-paused');
+      ensureRosterMotion();
+      return true;
+    };
+
+    const finishGesture = (id, cancelled = false) => {
       if (!state.candidate && !state.dragging) return;
-      if (event?.pointerId !== undefined && state.pointerId !== event.pointerId) return;
+      if (id !== undefined && state.pointerId !== id) return;
       const pointerId = state.pointerId;
+      const pointerCaptured = state.pointerCaptured;
       const wasDragging = state.dragging;
+      const inputKind = state.inputKind;
       const recentMove = performance.now() - state.lastMoveTime <= 80;
       state.candidate = false;
       state.dragging = false;
       state.pointerId = null;
+      state.inputKind = null;
+      state.pointerCaptured = false;
       viewport.classList.remove('is-user-paused', 'is-dragging');
-      if (pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
+      if (pointerCaptured && pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
         try { viewport.releasePointerCapture(pointerId); } catch { /* Capture may already be released. */ }
       }
       if (cancelled || !wasDragging || !recentMove || !window.SCPMotion.allowed()) state.velocity = 0;
       else state.velocity = clamp(state.velocity, -1600, 1600);
-      if (wasDragging && !cancelled && state.distance >= 6) {
+      if (!cancelled && !wasDragging && inputKind === 'touch') {
+        // Keep the tapped card still until Safari dispatches its synthesized click.
+        state.settleUntil = performance.now() + 220;
+      }
+      if (wasDragging && !cancelled && state.distance >= (inputKind === 'touch' ? 12 : 6)) {
         state.suppressClick = true;
-        setTimeout(() => { state.suppressClick = false; }, 100);
+        setTimeout(() => { state.suppressClick = false; }, inputKind === 'touch' ? 260 : 100);
       }
       ensureRosterMotion();
     };
 
-    state.cancelPointer = () => finishPointer(undefined, true);
-    viewport.addEventListener('pointerdown', event => {
-      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
-      state.keyboardFocused = false;
-      state.candidate = true;
-      state.dragging = false;
-      state.pointerId = event.pointerId;
-      state.startX = state.lastX = event.clientX;
-      state.startY = event.clientY;
-      state.lastTime = state.lastMoveTime = performance.now();
-      state.distance = 0;
-      state.velocity = 0;
-      viewport.classList.add('is-user-paused');
-      ensureRosterMotion();
-    }, { passive: true });
-
-    viewport.addEventListener('pointermove', event => {
-      if (!state.candidate || state.pointerId !== event.pointerId) return;
-      const totalX = event.clientX - state.startX;
-      const totalY = event.clientY - state.startY;
+    const moveGesture = (id, x, y, inputKind, event) => {
+      if (!state.candidate || state.pointerId !== id) return;
+      const totalX = x - state.startX;
+      const totalY = y - state.startY;
       const horizontal = Math.abs(totalX);
       const vertical = Math.abs(totalY);
       if (!state.dragging) {
-        if (event.pointerType === 'touch' && vertical > horizontal && vertical > 6) {
-          finishPointer(event, true);
+        const activationDistance = inputKind === 'touch' ? 12 : 6;
+        if (inputKind === 'touch' && vertical >= activationDistance && vertical > horizontal * 1.25) {
+          finishGesture(id, true);
           return;
         }
-        if (horizontal < 6 || horizontal < vertical) return;
+        if (horizontal < activationDistance) return;
+        if (inputKind === 'touch' ? horizontal < vertical * .75 : horizontal < vertical) return;
         state.dragging = true;
         viewport.classList.add('is-dragging');
-        try { viewport.setPointerCapture(event.pointerId); } catch { /* Continue without capture if unavailable. */ }
+        if (inputKind !== 'touch') {
+          try {
+            viewport.setPointerCapture(id);
+            state.pointerCaptured = true;
+          } catch { /* Continue without capture if unavailable. */ }
+        }
       }
 
       event.preventDefault();
       const now = performance.now();
-      const deltaX = event.clientX - state.lastX;
+      const deltaX = x - state.lastX;
       const deltaTime = clamp(now - state.lastTime, 4, 64);
       state.distance = Math.max(state.distance, Math.hypot(totalX, totalY));
       if (window.SCPMotion.allowed()) {
@@ -426,15 +448,59 @@
         viewport.scrollLeft -= deltaX;
         state.velocity = 0;
       }
-      state.lastX = event.clientX;
+      state.lastX = x;
       state.lastTime = state.lastMoveTime = now;
+    };
+
+    state.cancelPointer = () => finishGesture(undefined, true);
+    viewport.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'touch' && hasTouchEvents) return;
+      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      beginGesture(event.pointerId, event.clientX, event.clientY, event.pointerType || 'mouse');
+    }, { passive: true });
+
+    viewport.addEventListener('pointermove', event => {
+      moveGesture(event.pointerId, event.clientX, event.clientY, event.pointerType || state.inputKind, event);
     }, { passive: false });
 
-    viewport.addEventListener('pointerup', event => finishPointer(event));
-    viewport.addEventListener('pointercancel', event => finishPointer(event, true));
-    viewport.addEventListener('lostpointercapture', event => finishPointer(event, true));
+    viewport.addEventListener('pointerup', event => finishGesture(event.pointerId));
+    viewport.addEventListener('pointercancel', event => finishGesture(event.pointerId, true));
+    viewport.addEventListener('lostpointercapture', event => finishGesture(event.pointerId, true));
+
+    viewport.addEventListener('touchstart', event => {
+      if (event.touches.length !== 1 || state.candidate || state.dragging) return;
+      const touch = event.touches[0];
+      beginGesture(`touch-${touch.identifier}`, touch.clientX, touch.clientY, 'touch');
+    }, { passive: true });
+    viewport.addEventListener('touchmove', event => {
+      if (state.inputKind !== 'touch') return;
+      if (event.touches.length !== 1) {
+        finishGesture(state.pointerId, true);
+        return;
+      }
+      const touch = Array.from(event.touches).find(item => `touch-${item.identifier}` === state.pointerId);
+      if (!touch) return;
+      moveGesture(state.pointerId, touch.clientX, touch.clientY, 'touch', event);
+    }, { passive: false });
+    const finishTouch = (event, cancelled = false) => {
+      if (state.inputKind !== 'touch') return;
+      const ended = Array.from(event.changedTouches).some(item => `touch-${item.identifier}` === state.pointerId);
+      if (ended || cancelled) finishGesture(state.pointerId, cancelled);
+    };
+    viewport.addEventListener('touchend', event => finishTouch(event));
+    viewport.addEventListener('touchcancel', event => finishTouch(event, true));
     viewport.addEventListener('dragstart', event => event.preventDefault());
     viewport.addEventListener('selectstart', event => { if (state.dragging) event.preventDefault(); });
+    viewport.addEventListener('pointerenter', event => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      state.pointerHovered = true;
+      state.velocity = 0;
+    });
+    viewport.addEventListener('pointerleave', event => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      state.pointerHovered = false;
+      ensureRosterMotion();
+    });
     viewport.addEventListener('click', event => {
       if (!state.suppressClick) return;
       event.preventDefault();
@@ -463,7 +529,7 @@
       state.offset += event.key === 'ArrowLeft' ? 72 : -72;
       paintRosterOffset(state);
     });
-    window.addEventListener('blur', () => finishPointer(undefined, true));
+    window.addEventListener('blur', () => finishGesture(undefined, true));
   }
 
   function configureRosterMotion(view, revision = view.motion.measureRevision) {
@@ -517,7 +583,7 @@
     if (!visuallyPaused) {
       rosterMotionStates.forEach(state => {
         if (!state.cycleWidth || state.disabled) return;
-        if (!state.candidate && !state.keyboardFocused) {
+        if (!state.candidate && !state.keyboardFocused && !state.pointerHovered && timestamp >= state.settleUntil) {
           const blend = 1 - Math.exp(-delta / .5);
           state.velocity += (state.baseVelocity - state.velocity) * blend;
           state.offset += state.velocity * delta;
@@ -558,7 +624,6 @@
       const replica = document.createElement('div');
       replica.className = 'roster-marquee-group';
       replica.setAttribute('aria-hidden', 'true');
-      replica.setAttribute('inert', '');
       [...primary.children].forEach(card => replica.append(decorativeClone(card)));
       view.track.replaceChildren(primary, replica);
       const duration = Math.max(27, cycleCount * 4.5);
@@ -662,14 +727,14 @@
     parent.append(node);
     return node;
   }
-  function openDossier(id, trigger) {
+  function openDossier(id, trigger, focusTarget = trigger) {
     const data = dossiers[id];
     if (!data) { toast('Dossier belum tersedia.'); return; }
     ++dossierGeneration;
     clearTimeout(dossierCloseTimer);
     dossierClosing = false;
     dossier.classList.remove('is-closing');
-    dossierTrigger = trigger;
+    dossierTrigger = focusTarget;
     const sourceCard = trigger.closest('.member-card');
     const sourceRect = sourceCard.getBoundingClientRect();
     dossierDirection = sourceRect.left + sourceRect.width / 2 < innerWidth / 2 ? -1 : 1;
@@ -730,10 +795,14 @@
       } catch { dossier.classList.remove('is-decoding'); }
     }
   }
-  memberCards.forEach(card => {
-    const id = card.querySelector('.member-id').textContent.trim();
-    const button = card.querySelector('.member-open');
-    button.addEventListener('click', () => openDossier(id, button));
+  gallery.addEventListener('click', event => {
+    const sourceCard = event.target.closest('.member-card');
+    if (!sourceCard || !gallery.contains(sourceCard)) return;
+    const id = sourceCard.dataset.operative || sourceCard.querySelector('.member-id')?.textContent.trim();
+    const sourceButton = sourceCard.querySelector('.member-open');
+    const originalCard = memberCards.find(card => card.dataset.operative === id);
+    const focusTarget = originalCard?.querySelector('.member-open') || sourceButton;
+    if (id && sourceButton) openDossier(id, sourceButton, focusTarget);
   });
   $('dossierClose').addEventListener('click', () => closeDossier());
   dossier.addEventListener('cancel', event => { event.preventDefault(); closeDossier(); });
