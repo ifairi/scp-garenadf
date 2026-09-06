@@ -1,5 +1,7 @@
-(() => {
+(async () => {
   'use strict';
+  try { await (window.SCP_DATA_READY || Promise.resolve()); }
+  catch { /* Static content remains the fallback if remote data is unavailable. */ }
   const $ = id => document.getElementById(id);
   const root = document.documentElement;
   const order = ['hero', 'about', 'founders', 'objectives', 'scrim'];
@@ -16,6 +18,13 @@
   let toastTimeout;
   try { effects = localStorage.getItem('scp-effects') !== 'off'; } catch { /* Device preferences are optional. */ }
   root.classList.add('js');
+
+  /* Safari can retain :focus-visible after a touch-driven dialog closes.
+     Track the actual input method so touch restores focus without painting a ring. */
+  const setPointerNavigation = () => root.classList.remove('keyboard-navigation');
+  document.addEventListener('keydown', () => root.classList.add('keyboard-navigation'), true);
+  document.addEventListener('pointerdown', setPointerNavigation, { capture: true, passive: true });
+  document.addEventListener('touchstart', setPointerNavigation, { capture: true, passive: true });
 
   const heroPanel = $('hero');
   let heroAnimations = [];
@@ -78,6 +87,7 @@
     panels.forEach(panel => { panel.hidden = panel.id !== id; panel.classList.remove('is-entering'); });
     const panel = $(id);
     panel.classList.add('is-entering');
+    if (id === 'founders') queueRailRender();
     if (id === 'hero') prepareHeroEntrance(); else clearHeroEntrance();
     navLinks.forEach(link => {
       const active = link.hash === '#' + id;
@@ -168,6 +178,9 @@
         clearTimeout(dossierEffectTimer);
         dossier.classList.remove('is-decoding');
       }
+      resetRosterMotion();
+    } else if (current === 'founders') {
+      queueRailRender();
     }
     const button = $('motionToggle');
     button.textContent = active ? '◈ EFEK: AKTIF' : '◇ EFEK: NONAKTIF';
@@ -185,6 +198,7 @@
   document.addEventListener('visibilitychange', () => {
     root.classList.toggle('motion-paused', document.hidden);
     if (document.hidden) clearHeroEntrance();
+    else if (current === 'founders') ensureRosterMotion();
   });
   function toast(message) {
     clearTimeout(toastTimeout);
@@ -196,62 +210,377 @@
   const dossiers = window.SCP_DOSSIERS || {};
   const memberCards = [...document.querySelectorAll('.member-card')];
   const normalize = value => value.normalize('NFKC').toLocaleLowerCase('id').trim();
-  const category = id => ({ 'SCP-013': ['assault'], 'SCP-048': ['vehicle'], 'SCP-051': ['vehicle'], 'SCP-054': ['vehicle'], 'SCP-044': ['vehicle'], 'SCP-012': ['vehicle'], 'SCP-022': ['engineer'], 'SCP-018': ['engineer'], 'SCP-017': ['engineer', 'recon'], 'SCP-027': ['recon'], 'SCP-119': ['assault'], 'SCP-099': ['recon'] }[id] || []);
-  let visibleMembers = memberCards;
-  let activeMember = memberCards[0];
-  let lastGalleryColumns = 0;
-  const galleryColumns = () => matchMedia('(min-width: 801px)').matches ? 2 : 1;
-  function syncGallery() {
-    const index = Math.max(0, visibleMembers.indexOf(activeMember));
-    const columns = galleryColumns();
-    lastGalleryColumns = columns;
-    const start = Math.floor(index / columns) * columns;
-    const end = Math.min(start + columns, visibleMembers.length);
-    const first = String(start + 1).padStart(2, '0');
-    $('operativeToolbar').hidden = visibleMembers.length === 0;
-    $('operativeCurrent').textContent = end > start + 1 ? `${first}–${String(end).padStart(2, '0')}` : first;
-    $('operativeTotal').textContent = String(visibleMembers.length).padStart(2, '0');
-    $('operativeCurrentId').textContent = visibleMembers.slice(start, end).map(card => card.dataset.operative).join(' / ');
-    $('operativePrev').disabled = start === 0;
-    $('operativeNext').disabled = end >= visibleMembers.length;
-    $('operativePrev').setAttribute('aria-label', columns === 2 ? 'Baris anggota sebelumnya' : 'Anggota sebelumnya');
-    $('operativeNext').setAttribute('aria-label', columns === 2 ? 'Baris anggota berikutnya' : 'Anggota berikutnya');
-    visibleMembers.forEach((card, i) => card.style.setProperty('--reveal-delay', `${i % columns * 100}ms`));
-  }
-  function stepMember(direction) {
-    const columns = galleryColumns();
-    const index = Math.floor(visibleMembers.indexOf(activeMember) / columns) * columns;
-    const next = visibleMembers[index + direction * columns];
-    if (!next) return;
-    activeMember = next; syncGallery();
-    next.scrollIntoView({ block: 'start', behavior: window.SCPMotion.allowed() ? 'smooth' : 'instant' });
-  }
-  $('operativePrev').addEventListener('click', () => stepMember(-1));
-  $('operativeNext').addEventListener('click', () => stepMember(1));
-  if ('IntersectionObserver' in window) {
-    const entrance = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.intersectionRatio >= .08) entry.target.classList.add('is-in-view');
-      else if (!entry.isIntersecting) entry.target.classList.remove('is-in-view');
-    }), { threshold: .08 });
-    memberCards.forEach(card => { card.classList.add('will-reveal'); entrance.observe(card); });
-  }
-  let galleryFrame = 0;
-  function updateActiveRow() {
-    galleryFrame = 0;
-    if ($('founders').hidden || !visibleMembers.length || dossier?.open) return;
-    const columns = galleryColumns();
-    const target = innerHeight * .48;
-    let nearest = visibleMembers[0], distance = Infinity;
-    for (let i = 0; i < visibleMembers.length; i += columns) {
-      const rect = visibleMembers[i].getBoundingClientRect();
-      const delta = Math.abs(rect.top + rect.height / 2 - target);
-      if (delta < distance) { nearest = visibleMembers[i]; distance = delta; }
+  const fallbackCategories = { 'SCP-013': ['assault'], 'SCP-048': ['vehicle'], 'SCP-051': ['vehicle'], 'SCP-054': ['vehicle'], 'SCP-044': ['vehicle'], 'SCP-012': ['vehicle'], 'SCP-022': ['engineer'], 'SCP-018': ['engineer'], 'SCP-017': ['engineer', 'recon'], 'SCP-027': ['recon'], 'SCP-119': ['assault'], 'SCP-099': ['recon'] };
+  const category = (id, card) => {
+    const remote = (card?.dataset.roleGroups || '').split(' ').filter(Boolean);
+    return remote.length ? remote : (fallbackCategories[id] || []);
+  };
+  const pureRosterFallback = new Set(['SCP-051', 'SCP-022', 'SCP-119']);
+  memberCards.forEach(card => {
+    if (!['pure', 'alliance'].includes(card.dataset.rosterType)) {
+      card.dataset.rosterType = pureRosterFallback.has(card.dataset.operative) ? 'pure' : 'alliance';
     }
-    if (activeMember !== nearest || lastGalleryColumns !== columns) { activeMember = nearest; syncGallery(); }
+  });
+
+  const gallery = $('operativeGallery');
+  gallery.classList.add('roster-rails');
+  gallery.setAttribute('aria-label', 'Pure SCP roster dan alliance operatives');
+  const railDefinitions = [
+    {
+      key: 'pure',
+      index: '01 / CORE UNIT',
+      title: 'PURE SCP ROSTER',
+      note: 'PRIMARY SIGNAL / HOLD + DRAG',
+      direction: 'rtl',
+      directionLabel: 'RIGHT TO LEFT'
+    },
+    {
+      key: 'alliance',
+      index: '02 / AFFILIATED UNIT',
+      title: 'ALLIANCE OPERATIVES',
+      note: 'EXTERNAL IDENTITY / HOLD + DRAG',
+      direction: 'ltr',
+      directionLabel: 'LEFT TO RIGHT'
+    }
+  ];
+  const railViews = {};
+  const rosterMotionStates = new Set();
+  let rosterMotionFrame = 0;
+  let rosterMotionTimestamp = 0;
+
+  function makeArrow(direction) {
+    const arrow = document.createElement('i');
+    arrow.className = `ui-arrow${direction === 'rtl' ? ' ui-arrow-left' : ''}`;
+    arrow.setAttribute('aria-hidden', 'true');
+    return arrow;
   }
-  function queueActiveRow() { if (!galleryFrame) galleryFrame = requestAnimationFrame(updateActiveRow); }
-  window.addEventListener('scroll', queueActiveRow, { passive: true });
-  window.addEventListener('resize', queueActiveRow);
+
+  function createRosterLane(definition) {
+    const section = document.createElement('section');
+    section.className = `roster-lane roster-lane--${definition.key}`;
+    section.dataset.direction = definition.direction;
+    section.setAttribute('aria-labelledby', `roster-${definition.key}-title`);
+
+    const heading = document.createElement('header');
+    heading.className = 'roster-lane-heading';
+    const identity = document.createElement('div');
+    const index = document.createElement('p');
+    index.className = 'roster-lane-index';
+    index.textContent = definition.index;
+    const title = document.createElement('h4');
+    title.id = `roster-${definition.key}-title`;
+    title.textContent = definition.title;
+    const note = document.createElement('span');
+    note.className = 'roster-lane-note';
+    note.textContent = definition.note;
+    identity.append(index, title, note);
+
+    const telemetry = document.createElement('div');
+    telemetry.className = 'roster-lane-telemetry';
+    const count = document.createElement('b');
+    count.textContent = '00';
+    const direction = document.createElement('span');
+    direction.append(document.createTextNode(definition.directionLabel), makeArrow(definition.direction));
+    telemetry.append(count, direction);
+    heading.append(identity, telemetry);
+
+    const viewport = document.createElement('div');
+    viewport.className = 'roster-marquee';
+    viewport.tabIndex = 0;
+    viewport.setAttribute('role', 'region');
+    viewport.setAttribute('aria-label', `${definition.title}. Seret ke kiri atau kanan, atau gunakan tombol panah. Bergerak otomatis ${definition.directionLabel.toLocaleLowerCase('id')}.`);
+    viewport.title = 'Klik dan tahan, lalu geser ke kiri atau kanan';
+    const track = document.createElement('div');
+    track.className = 'roster-marquee-track';
+    viewport.append(track);
+    const motion = {
+      viewport,
+      track,
+      direction: definition.direction === 'rtl' ? -1 : 1,
+      cycleWidth: 0,
+      offset: 0,
+      velocity: 0,
+      baseVelocity: 0,
+      initialized: false,
+      disabled: false,
+      candidate: false,
+      dragging: false,
+      keyboardFocused: false,
+      pointerId: null,
+      startX: 0,
+      startY: 0,
+      lastX: 0,
+      lastTime: 0,
+      lastMoveTime: 0,
+      distance: 0,
+      suppressClick: false,
+      measureRevision: 0
+    };
+    bindRosterDrag(motion);
+    rosterMotionStates.add(motion);
+    section.append(heading, viewport);
+    gallery.append(section);
+    railViews[definition.key] = { definition, section, track, count, motion };
+  }
+
+  gallery.replaceChildren();
+  railDefinitions.forEach(createRosterLane);
+
+  function decorativeClone(source) {
+    const clone = source.cloneNode(true);
+    clone.classList.add('is-marquee-clone');
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    clone.setAttribute('aria-hidden', 'true');
+    clone.setAttribute('inert', '');
+    clone.querySelectorAll('a, button, input, select, textarea, [tabindex]').forEach(node => {
+      node.tabIndex = -1;
+      node.removeAttribute('aria-haspopup');
+    });
+    return clone;
+  }
+
+  const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+
+  function normalizeRosterOffset(state) {
+    if (!state.cycleWidth) return;
+    state.offset %= state.cycleWidth;
+    if (state.offset > 0) state.offset -= state.cycleWidth;
+  }
+
+  function paintRosterOffset(state) {
+    if (!state.cycleWidth) return;
+    normalizeRosterOffset(state);
+    state.track.style.transform = `translate3d(${state.offset.toFixed(3)}px, 0, 0)`;
+  }
+
+  function bindRosterDrag(state) {
+    const { viewport } = state;
+
+    const finishPointer = (event, cancelled = false) => {
+      if (!state.candidate && !state.dragging) return;
+      if (event?.pointerId !== undefined && state.pointerId !== event.pointerId) return;
+      const pointerId = state.pointerId;
+      const wasDragging = state.dragging;
+      const recentMove = performance.now() - state.lastMoveTime <= 80;
+      state.candidate = false;
+      state.dragging = false;
+      state.pointerId = null;
+      viewport.classList.remove('is-user-paused', 'is-dragging');
+      if (pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
+        try { viewport.releasePointerCapture(pointerId); } catch { /* Capture may already be released. */ }
+      }
+      if (cancelled || !wasDragging || !recentMove || !window.SCPMotion.allowed()) state.velocity = 0;
+      else state.velocity = clamp(state.velocity, -1600, 1600);
+      if (wasDragging && !cancelled && state.distance >= 6) {
+        state.suppressClick = true;
+        setTimeout(() => { state.suppressClick = false; }, 100);
+      }
+      ensureRosterMotion();
+    };
+
+    state.cancelPointer = () => finishPointer(undefined, true);
+    viewport.addEventListener('pointerdown', event => {
+      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      state.keyboardFocused = false;
+      state.candidate = true;
+      state.dragging = false;
+      state.pointerId = event.pointerId;
+      state.startX = state.lastX = event.clientX;
+      state.startY = event.clientY;
+      state.lastTime = state.lastMoveTime = performance.now();
+      state.distance = 0;
+      state.velocity = 0;
+      viewport.classList.add('is-user-paused');
+      ensureRosterMotion();
+    }, { passive: true });
+
+    viewport.addEventListener('pointermove', event => {
+      if (!state.candidate || state.pointerId !== event.pointerId) return;
+      const totalX = event.clientX - state.startX;
+      const totalY = event.clientY - state.startY;
+      const horizontal = Math.abs(totalX);
+      const vertical = Math.abs(totalY);
+      if (!state.dragging) {
+        if (event.pointerType === 'touch' && vertical > horizontal && vertical > 6) {
+          finishPointer(event, true);
+          return;
+        }
+        if (horizontal < 6 || horizontal < vertical) return;
+        state.dragging = true;
+        viewport.classList.add('is-dragging');
+        try { viewport.setPointerCapture(event.pointerId); } catch { /* Continue without capture if unavailable. */ }
+      }
+
+      event.preventDefault();
+      const now = performance.now();
+      const deltaX = event.clientX - state.lastX;
+      const deltaTime = clamp(now - state.lastTime, 4, 64);
+      state.distance = Math.max(state.distance, Math.hypot(totalX, totalY));
+      if (window.SCPMotion.allowed()) {
+        state.offset += deltaX;
+        paintRosterOffset(state);
+        const instantVelocity = clamp(deltaX / deltaTime * 1000, -1600, 1600);
+        state.velocity = state.velocity * .28 + instantVelocity * .72;
+      } else {
+        viewport.scrollLeft -= deltaX;
+        state.velocity = 0;
+      }
+      state.lastX = event.clientX;
+      state.lastTime = state.lastMoveTime = now;
+    }, { passive: false });
+
+    viewport.addEventListener('pointerup', event => finishPointer(event));
+    viewport.addEventListener('pointercancel', event => finishPointer(event, true));
+    viewport.addEventListener('lostpointercapture', event => finishPointer(event, true));
+    viewport.addEventListener('dragstart', event => event.preventDefault());
+    viewport.addEventListener('selectstart', event => { if (state.dragging) event.preventDefault(); });
+    viewport.addEventListener('click', event => {
+      if (!state.suppressClick) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      state.suppressClick = false;
+    }, true);
+    viewport.addEventListener('focusin', () => {
+      if (!root.classList.contains('keyboard-navigation')) return;
+      state.keyboardFocused = true;
+      state.velocity = 0;
+    });
+    viewport.addEventListener('focusout', event => {
+      if (viewport.contains(event.relatedTarget)) return;
+      state.keyboardFocused = false;
+      ensureRosterMotion();
+    });
+    viewport.addEventListener('keydown', event => {
+      if (event.target !== viewport || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      if (!window.SCPMotion.allowed()) {
+        viewport.scrollLeft += event.key === 'ArrowLeft' ? -72 : 72;
+        return;
+      }
+      state.keyboardFocused = true;
+      state.velocity = 0;
+      state.offset += event.key === 'ArrowLeft' ? 72 : -72;
+      paintRosterOffset(state);
+    });
+    window.addEventListener('blur', () => finishPointer(undefined, true));
+  }
+
+  function configureRosterMotion(view, revision = view.motion.measureRevision) {
+    const state = view.motion;
+    if (revision !== state.measureRevision) return false;
+    const primary = state.track.querySelector('.roster-marquee-group');
+    const width = primary?.getBoundingClientRect().width || 0;
+    if (width < 1) return false;
+    const oldWidth = state.cycleWidth;
+    const phase = state.initialized && oldWidth
+      ? ((-state.offset / oldWidth) % 1 + 1) % 1
+      : (state.direction < 0 ? .12 : .62);
+    state.cycleWidth = width;
+    state.offset = -phase * width;
+    const duration = view.motion.duration || 36;
+    state.baseVelocity = state.direction * clamp(width / duration, 30, 58);
+    if (!state.initialized || state.disabled) state.velocity = state.baseVelocity;
+    else state.velocity = clamp(state.velocity, -1600, 1600);
+    state.initialized = true;
+    state.disabled = false;
+    paintRosterOffset(state);
+    return true;
+  }
+
+  function resetRosterMotion() {
+    cancelAnimationFrame(rosterMotionFrame);
+    rosterMotionFrame = 0;
+    rosterMotionTimestamp = 0;
+    rosterMotionStates.forEach(state => {
+      state.cancelPointer?.();
+      state.disabled = true;
+      state.velocity = 0;
+      state.track.style.removeProperty('transform');
+      state.viewport.scrollLeft = 0;
+      state.viewport.classList.remove('is-user-paused', 'is-dragging');
+    });
+  }
+
+  function ensureRosterMotion() {
+    if (rosterMotionFrame || current !== 'founders' || !window.SCPMotion.allowed()) return;
+    rosterMotionTimestamp = performance.now();
+    rosterMotionFrame = requestAnimationFrame(runRosterMotion);
+  }
+
+  function runRosterMotion(timestamp) {
+    rosterMotionFrame = 0;
+    if (current !== 'founders' || $('founders').hidden || document.hidden || !window.SCPMotion.allowed()) return;
+    const delta = Math.min(Math.max((timestamp - rosterMotionTimestamp) / 1000, 0), .032);
+    rosterMotionTimestamp = timestamp;
+    const visuallyPaused = document.body.classList.contains('modal-open') || root.classList.contains('is-routing');
+    if (!visuallyPaused) {
+      rosterMotionStates.forEach(state => {
+        if (!state.cycleWidth || state.disabled) return;
+        if (!state.candidate && !state.keyboardFocused) {
+          const blend = 1 - Math.exp(-delta / .5);
+          state.velocity += (state.baseVelocity - state.velocity) * blend;
+          state.offset += state.velocity * delta;
+          paintRosterOffset(state);
+        }
+      });
+    }
+    rosterMotionFrame = requestAnimationFrame(runRosterMotion);
+  }
+
+  let visibleMembers = memberCards;
+  let railResizeFrame = 0;
+  function renderRosterRails() {
+    const galleryWidth = gallery.clientWidth || Math.min(innerWidth, 1920);
+    const estimatedCardWidth = innerWidth <= 680 ? 246 : 320;
+    const minimumCycle = Math.max(6, Math.ceil(galleryWidth / estimatedCardWidth) + 2);
+
+    railDefinitions.forEach(definition => {
+      const view = railViews[definition.key];
+      const cards = visibleMembers.filter(card => card.dataset.rosterType === definition.key);
+      view.motion.cancelPointer?.();
+      view.section.hidden = cards.length === 0;
+      view.count.textContent = String(cards.length).padStart(2, '0');
+      if (!cards.length) {
+        view.motion.cycleWidth = 0;
+        view.motion.track.style.removeProperty('transform');
+        view.track.replaceChildren();
+        return;
+      }
+
+      const cycleCount = Math.max(cards.length, minimumCycle);
+      const primary = document.createElement('div');
+      primary.className = 'roster-marquee-group';
+      for (let index = 0; index < cycleCount; index++) {
+        const card = cards[index % cards.length];
+        primary.append(index < cards.length ? card : decorativeClone(card));
+      }
+      const replica = document.createElement('div');
+      replica.className = 'roster-marquee-group';
+      replica.setAttribute('aria-hidden', 'true');
+      replica.setAttribute('inert', '');
+      [...primary.children].forEach(card => replica.append(decorativeClone(card)));
+      view.track.replaceChildren(primary, replica);
+      const duration = Math.max(27, cycleCount * 4.5);
+      view.motion.duration = duration;
+      view.track.style.setProperty('--rail-duration', `${duration}s`);
+      const revision = ++view.motion.measureRevision;
+      if (!configureRosterMotion(view, revision)) {
+        requestAnimationFrame(() => {
+          if (configureRosterMotion(view, revision)) ensureRosterMotion();
+        });
+      }
+    });
+    ensureRosterMotion();
+  }
+
+  function queueRailRender() {
+    cancelAnimationFrame(railResizeFrame);
+    railResizeFrame = requestAnimationFrame(renderRosterRails);
+  }
+  window.addEventListener('resize', queueRailRender, { passive: true });
+  root.classList.add('roster-drag-ready');
+
   function filterMembers() {
     const query = normalize($('memberSearch').value);
     const role = $('roleFilter').value;
@@ -259,19 +588,27 @@
     memberCards.forEach(card => {
       const id = card.querySelector('.member-id').textContent.trim();
       const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || ''));
-      const matches = searchable.includes(query) && (role === 'all' || category(id).includes(role));
+      const matches = searchable.includes(query) && (role === 'all' || category(id, card).includes(role));
       card.hidden = !matches;
       if (matches) count++;
     });
     $('memberCount').textContent = count;
     $('emptyState').hidden = count > 0;
     visibleMembers = memberCards.filter(card => !card.hidden);
-    activeMember = visibleMembers[0]; syncGallery();
-    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan. Pilih anggota untuk membuka profil.`;
+    renderRosterRails();
+    const pureCount = visibleMembers.filter(card => card.dataset.rosterType === 'pure').length;
+    const allianceCount = count - pureCount;
+    const activeRails = Number(pureCount > 0) + Number(allianceCount > 0);
+    $('operativeToolbar').hidden = count === 0;
+    $('operativeCurrent').textContent = String(activeRails).padStart(2, '0');
+    $('operativeTotal').textContent = String(count).padStart(2, '0');
+    $('operativeCurrentId').textContent = `${String(pureCount).padStart(2, '0')} PURE / ${String(allianceCount).padStart(2, '0')} ALLIANCE`;
+    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan: ${pureCount} Pure SCP dan ${allianceCount} Alliance. Pilih anggota untuk membuka profil.`;
   }
   $('memberSearch').addEventListener('input', filterMembers);
   $('roleFilter').addEventListener('change', filterMembers);
   $('resetSearch').addEventListener('click', () => { $('memberSearch').value = ''; $('roleFilter').value = 'all'; filterMembers(); $('memberSearch').focus(); });
+  filterMembers();
 
   const dossier = $('scpDossier');
   let dossierTrigger = null;
@@ -350,9 +687,10 @@
     const portrait = $('dsPortrait');
     portrait.replaceChildren();
     const photo = document.createElement('img');
-    photo.src = id === 'SCP-022' ? 'assets/jess.webp' : 'assets/emblem.webp';
-    photo.alt = id === 'SCP-022' ? 'Emblem Jess SCP' : '';
-    portrait.classList.toggle('has-photo', id === 'SCP-022');
+    const remotePhoto = data.photo_url || '';
+    photo.src = remotePhoto || (id === 'SCP-022' ? 'assets/jess.webp' : 'assets/emblem.webp');
+    photo.alt = remotePhoto ? `Foto ${data.name}` : (id === 'SCP-022' ? 'Emblem Jess SCP' : '');
+    portrait.classList.toggle('has-photo', Boolean(remotePhoto) || id === 'SCP-022');
     portrait.append(photo);
     appendText(portrait, 'span', id === 'SCP-022' ? 'OPERATIVE / SCP-022' : 'VISUAL CLASSIFIED', 'portrait-caption');
     $('dsTrack').replaceChildren();
@@ -366,7 +704,8 @@
     $('dsStrengths').replaceChildren();
     for (const strength of data.strengths || []) appendText($('dsStrengths'), 'li', strength);
     $('dsStats').replaceChildren();
-    for (const [name, value] of data.stats || []) {
+    const stats = Array.isArray(data.stats) ? data.stats : Object.entries(data.stats || {});
+    for (const [name, value] of stats) {
       const stat = document.createElement('div'); stat.className = 'skill-stat';
       const label = document.createElement('div'); label.className = 'skill-stat-label';
       appendText(label, 'span', name); appendText(label, 'b', `${value} / 100`); stat.append(label);
@@ -430,8 +769,10 @@
   const dateFormatter = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' });
   function updateDates() {
     document.querySelectorAll('.next-date').forEach(node => {
-      const next = SCPSchedule.nextOccurrence(Number(node.dataset.weekday), Number(node.dataset.hour));
-      node.textContent = `BERIKUTNYA / ${dateFormatter.format(next)}`;
+      const next = node.dataset.date
+        ? new Date(`${node.dataset.date}T${(node.dataset.time || '00:00').slice(0, 5)}:00+07:00`)
+        : SCPSchedule.nextOccurrence(Number(node.dataset.weekday), Number(node.dataset.hour), new Date(), Number(node.dataset.minute || 0));
+      node.textContent = `${node.dataset.date ? 'TANGGAL' : 'BERIKUTNYA'} / ${dateFormatter.format(next)}`;
     });
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) updateDates(); });
@@ -464,6 +805,6 @@
   render(location.hash.slice(1));
   desired = current;
   if (current === 'hero') playHeroEntrance();
-  syncGallery();
+  queueRailRender();
   window.dispatchEvent(new Event('scp:ready'));
 })();

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07100b">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>SCP Control — Admin</title>
+  <link rel="icon" href="/assets/emblem.webp">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <script src="/site-config.js" defer></script>
+  <script src="/supabase-client.js" defer></script>
+  <script src="/admin/admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <div class="admin-noise" aria-hidden="true"></div>
+
+  <main class="admin-shell" id="adminApp" aria-busy="true">
+    <section class="auth-gate" id="authGate" aria-labelledby="loginTitle">
+      <div class="auth-card protocol-card">
+        <div class="auth-signal" aria-hidden="true"><i></i><i></i><i></i></div>
+        <p class="admin-kicker">SECURE PERSONNEL CHANNEL / 01</p>
+        <img class="auth-emblem" src="/assets/emblem.webp" width="86" height="86" alt="">
+        <h1 id="loginTitle">Control <span>terminal.</span></h1>
+        <p class="auth-copy">Masuk menggunakan akun administrator untuk mengelola dossier anggota dan jadwal operasi.</p>
+
+        <div class="config-warning" id="configWarning" hidden role="status">
+          <span aria-hidden="true">!</span>
+          <div><strong>Database belum terhubung</strong><small>Tambahkan <code>SUPABASE_URL</code> dan <code>SUPABASE_PUBLISHABLE_KEY</code>, lalu muat ulang halaman.</small></div>
+        </div>
+
+        <form class="auth-form" id="loginForm">
+          <label class="field-block">
+            <span>EMAIL ADMIN</span>
+            <input type="email" name="email" autocomplete="username" placeholder="admin@scp-alliance.id" required>
+          </label>
+          <label class="field-block">
+            <span>PASSWORD</span>
+            <span class="password-field"><input id="loginPassword" type="password" name="password" autocomplete="current-password" placeholder="••••••••••••" minlength="6" required><button class="reveal-password" type="button" aria-controls="loginPassword" aria-label="Tampilkan password">LIHAT</button></span>
+          </label>
+          <button class="primary-action auth-submit" type="submit"><span>BUKA CONTROL TERMINAL</span><i class="vector-arrow" aria-hidden="true"></i></button>
+          <p class="form-message" id="loginMessage" role="alert" aria-live="polite"></p>
+        </form>
+        <p class="auth-foot"><span></span> ENCRYPTED ACCESS · SCP / INDONESIA</p>
+      </div>
+    </section>
+
+    <section class="control-room" id="controlRoom" hidden>
+      <header class="admin-header">
+        <a class="admin-brand" href="/" aria-label="Kembali ke website SCP Alliance">
+          <img src="/assets/emblem.webp" width="44" height="44" alt="">
+          <span><strong>S.C.P</strong><small>CONTROL / TERMINAL</small></span>
+        </a>
+        <div class="header-status">
+          <span class="connection-state" id="connectionState"><i aria-hidden="true"></i><b>CONNECTING</b></span>
+          <button class="quiet-action" id="refreshButton" type="button"><i class="refresh-icon" aria-hidden="true"></i><span>SYNC</span></button>
+          <button class="quiet-action signout-action" id="signOutButton" type="button"><span>KELUAR</span><i class="exit-icon" aria-hidden="true"></i></button>
+        </div>
+      </header>
+
+      <div class="admin-intro">
+        <div>
+          <p class="admin-kicker">ALLIANCE MANAGEMENT SYSTEM</p>
+          <h1>Mission <span>control.</span></h1>
+          <p>Kelola data publik tanpa mengubah kode website.</p>
+        </div>
+        <div class="admin-clock" aria-label="Waktu Indonesia Barat"><span id="wibTime">--:--</span><small>WIB / SECURE</small></div>
+      </div>
+
+      <nav class="admin-tabs" aria-label="Bagian control terminal">
+        <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="membersPanel" id="membersTab" data-tab="members"><span>01</span> ANGGOTA <b id="memberTotal">0</b></button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="schedulePanel" id="scheduleTab" data-tab="schedule"><span>02</span> JADWAL <b id="scheduleTotal">0</b></button>
+      </nav>
+
+      <section class="admin-panel" id="membersPanel" role="tabpanel" aria-labelledby="membersTab">
+        <div class="panel-toolbar">
+          <div>
+            <p class="admin-kicker">PERSONNEL DIRECTORY</p>
+            <h2>Dossier anggota</h2>
+          </div>
+          <div class="toolbar-actions">
+            <label class="admin-search"><span class="search-icon" aria-hidden="true"></span><input id="memberSearch" type="search" placeholder="Cari ID, nama, atau peran…" aria-label="Cari anggota"></label>
+            <button class="primary-action" id="addMemberButton" type="button"><span aria-hidden="true" class="css-plus"></span> TAMBAH ANGGOTA</button>
+          </div>
+        </div>
+        <div class="data-summary" id="memberSummary"><span><i></i><b>0</b> dipublikasikan</span><span><i></i><b>0</b> draft</span></div>
+        <div class="record-list" id="memberList" aria-live="polite"></div>
+        <div class="empty-state" id="memberEmpty" hidden><span class="empty-radar" aria-hidden="true"></span><h3>Belum ada dossier</h3><p>Tambahkan anggota pertama atau ubah kata pencarian.</p></div>
+      </section>
+
+      <section class="admin-panel" id="schedulePanel" role="tabpanel" aria-labelledby="scheduleTab" hidden>
+        <div class="panel-toolbar">
+          <div>
+            <p class="admin-kicker">OPERATION CALENDAR</p>
+            <h2>Jadwal operasi</h2>
+          </div>
+          <div class="toolbar-actions">
+            <label class="admin-search"><span class="search-icon" aria-hidden="true"></span><input id="scheduleSearch" type="search" placeholder="Cari jadwal atau lawan…" aria-label="Cari jadwal"></label>
+            <button class="primary-action" id="addScheduleButton" type="button"><span aria-hidden="true" class="css-plus"></span> TAMBAH JADWAL</button>
+          </div>
+        </div>
+        <div class="data-summary" id="scheduleSummary"><span><i></i><b>0</b> dipublikasikan</span><span><i></i><b>0</b> draft</span></div>
+        <div class="record-list schedule-records" id="scheduleList" aria-live="polite"></div>
+        <div class="empty-state" id="scheduleEmpty" hidden><span class="empty-radar" aria-hidden="true"></span><h3>Belum ada jadwal</h3><p>Tambahkan latihan rutin atau agenda scrim baru.</p></div>
+      </section>
+
+      <footer class="admin-footer"><span>SCP ALLIANCE / DATA CONTROL</span><span id="lastSync">BELUM DISINKRONKAN</span></footer>
+    </section>
+  </main>
+
+  <dialog class="editor-dialog" id="memberDialog" aria-labelledby="memberDialogTitle">
+    <form id="memberForm">
+      <header class="dialog-header"><div><p class="admin-kicker">PERSONNEL FILE</p><h2 id="memberDialogTitle">Tambah anggota</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Tutup formulir"><span aria-hidden="true"></span></button></header>
+      <div class="dialog-scroll">
+        <input type="hidden" name="id">
+        <input type="hidden" name="photo_url">
+        <input type="hidden" name="photo_path">
+        <section class="form-section">
+          <div class="form-section-title"><span>01</span><div><h3>Identitas</h3><p>Data utama yang tampil pada kartu anggota.</p></div></div>
+          <div class="form-grid">
+            <label class="field-block"><span>KODE DOSSIER *</span><input name="code" required placeholder="SCP-000" maxlength="10" pattern="SCP-[0-9]{3,6}" title="Gunakan format SCP-013 (3 sampai 6 digit)."></label>
+            <label class="field-block"><span>NAMA / NICKNAME *</span><input name="name" required placeholder="[ PLAYER NAME ]" maxlength="100"></label>
+            <label class="field-block"><span>PERAN *</span><input name="role" required placeholder="Engineer Recon" maxlength="80"></label>
+            <label class="field-block"><span>JENIS ROSTER *</span><select name="roster_type" required><option value="pure">PURE SCP ROSTER</option><option value="alliance">SCP ALLIANCE</option></select><small>Pure untuk roster inti. Alliance untuk anggota afiliasi SCP.</small></label>
+            <fieldset class="role-picker field-wide"><legend>GRUP PERAN *</legend><label><input type="checkbox" name="role_groups" value="assault"><span>ASSAULT / TACTICAL</span></label><label><input type="checkbox" name="role_groups" value="engineer"><span>ENGINEER</span></label><label><input type="checkbox" name="role_groups" value="recon"><span>RECON</span></label><label><input type="checkbox" name="role_groups" value="vehicle"><span>VEHICLE / TANKER</span></label><label><input type="checkbox" name="role_groups" value="support"><span>SUPPORT</span></label><label><input type="checkbox" name="role_groups" value="command"><span>COMMAND</span></label><label><input type="checkbox" name="role_groups" value="other"><span>LAINNYA</span></label></fieldset>
+            <label class="field-block"><span>CLEARANCE *</span><input name="clearance" required placeholder="CLEARANCE: LEVEL VI" maxlength="80"></label>
+            <label class="field-block"><span>ALIAS *</span><input name="alias" required placeholder="The Silent Watcher" maxlength="120"></label>
+            <label class="field-block field-wide"><span>DESKRIPSI UNIK *</span><textarea name="unique_text" required rows="4" maxlength="2000" placeholder="Karakter, kemampuan, atau gaya bermain anggota…"></textarea></label>
+          </div>
+        </section>
+
+        <section class="form-section media-section">
+          <div class="form-section-title"><span>02</span><div><h3>Foto profil</h3><p>Gunakan JPG, PNG, AVIF, atau WebP. Maksimal 8 MB.</p></div></div>
+          <div class="photo-field">
+            <div class="photo-preview" id="photoPreview"><img src="/assets/emblem.webp" alt="Pratinjau foto anggota"><span>PREVIEW</span></div>
+            <div><label class="upload-action"><input id="memberPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif"><span class="upload-icon" aria-hidden="true"></span>PILIH FOTO</label><p id="photoName">Belum ada foto baru dipilih.</p><button class="text-action" id="removePhotoButton" type="button">Hapus foto saat ini</button></div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><span>03</span><div><h3>Riwayat & kekuatan</h3><p>Satu kekuatan per baris. Riwayat menggunakan format JSON.</p></div></div>
+          <div class="form-grid">
+            <label class="field-block field-wide"><span>RIWAYAT TRACK RECORD</span><textarea class="code-area" name="track" rows="7" spellcheck="false" placeholder='[{"clan":"SCP","role":"Recon","year":"2025 – Now"}]'></textarea><small>Format: daftar objek berisi clan, role, dan year.</small></label>
+            <label class="field-block field-wide"><span>KEKUATAN</span><textarea name="strengths" rows="5" placeholder="Pembacaan map akurat&#10;Komunikasi jernih&#10;Rotasi cepat"></textarea></label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-title"><span>04</span><div><h3>Statistik operatif</h3><p>Masukkan nilai dari 0 sampai 100.</p></div></div>
+          <div class="stat-grid">
+            <label><span>VEHICLE</span><input type="number" name="stat_vehicle" min="0" max="100" value="50" required></label>
+            <label><span>SHOOTING</span><input type="number" name="stat_shooting" min="0" max="100" value="50" required></label>
+            <label><span>SURVIVAL</span><input type="number" name="stat_survival" min="0" max="100" value="50" required></label>
+            <label><span>CO-OP</span><input type="number" name="stat_coop" min="0" max="100" value="50" required></label>
+            <label><span>OBJECTIVE</span><input type="number" name="stat_objective" min="0" max="100" value="50" required></label>
+          </div>
+        </section>
+
+        <section class="form-section publish-section">
+          <div class="form-section-title"><span>05</span><div><h3>Publikasi</h3><p>Atur urutan dan visibilitas pada website.</p></div></div>
+          <div class="form-grid compact-grid">
+            <label class="field-block"><span>URUTAN</span><input type="number" name="sort_order" min="0" step="1" value="0"></label>
+            <label class="switch-field"><input type="checkbox" name="published" checked><span class="switch-ui" aria-hidden="true"></span><span><b>Publikasikan</b><small>Anggota terlihat oleh semua pengunjung.</small></span></label>
+          </div>
+        </section>
+      </div>
+      <footer class="dialog-footer"><p class="form-message" data-form-message role="alert" aria-live="polite"></p><div><button class="secondary-action" type="button" data-close-dialog>BATAL</button><button class="primary-action" type="submit"><span>SIMPAN DOSSIER</span><i class="vector-arrow" aria-hidden="true"></i></button></div></footer>
+    </form>
+  </dialog>
+
+  <dialog class="editor-dialog schedule-dialog" id="scheduleDialog" aria-labelledby="scheduleDialogTitle">
+    <form id="scheduleForm">
+      <header class="dialog-header"><div><p class="admin-kicker">OPERATION FILE</p><h2 id="scheduleDialogTitle">Tambah jadwal</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Tutup formulir"><span aria-hidden="true"></span></button></header>
+      <div class="dialog-scroll">
+        <input type="hidden" name="id">
+        <section class="form-section">
+          <div class="form-section-title"><span>01</span><div><h3>Informasi operasi</h3><p>Nama dan klasifikasi agenda.</p></div></div>
+          <div class="form-grid">
+            <label class="field-block"><span>TIPE *</span><select name="operation_type" required><option value="scrim">Scrim</option><option value="training">Latihan</option><option value="tournament">Turnamen</option><option value="briefing">Briefing</option><option value="meeting">Rapat tim</option><option value="other">Lainnya</option></select></label>
+            <label class="field-block"><span>STATUS *</span><select name="status" required><option value="seeking_opponent">Mencari lawan</option><option value="confirmed">Terkonfirmasi</option><option value="scheduled">Terjadwal</option><option value="completed">Selesai</option><option value="cancelled">Dibatalkan</option></select></label>
+            <label class="field-block field-wide"><span>JUDUL *</span><input name="title" required placeholder="Scrim Mingguan" maxlength="140"></label>
+            <label class="field-block field-wide"><span>LAWAN / PARTNER</span><input name="opponent" placeholder="Belum ditentukan" maxlength="120"></label>
+          </div>
+        </section>
+        <section class="form-section">
+          <div class="form-section-title"><span>02</span><div><h3>Waktu pelaksanaan</h3><p>Pilih jadwal mingguan atau tanggal khusus.</p></div></div>
+          <fieldset class="frequency-picker"><legend>POLA JADWAL *</legend><label><input type="radio" name="schedule_kind" value="weekly" checked><span>MINGGUAN</span></label><label><input type="radio" name="schedule_kind" value="event"><span>TANGGAL KHUSUS</span></label></fieldset>
+          <div class="form-grid time-grid">
+            <label class="field-block" data-weekly-field><span>HARI</span><select name="weekday"><option value="0">Minggu</option><option value="1">Senin</option><option value="2">Selasa</option><option value="3">Rabu</option><option value="4">Kamis</option><option value="5">Jumat</option><option value="6">Sabtu</option></select></label>
+            <label class="field-block" data-dated-field hidden><span>TANGGAL</span><input type="date" name="event_date"></label>
+            <label class="field-block"><span>MULAI *</span><input type="time" name="start_time" required value="19:00"></label>
+            <label class="field-block"><span>SELESAI</span><input type="time" name="end_time"></label>
+            <label class="switch-field field-wide end-open-field"><input type="checkbox" name="end_open"><span class="switch-ui" aria-hidden="true"></span><span><b>Waktu selesai terbuka</b><small>Tampilkan “sampai selesai” dan abaikan jam selesai.</small></span></label>
+            <label class="field-block field-wide"><span>DETAIL PUBLIK</span><textarea name="details" rows="5" maxlength="2000" placeholder="Mode, map pool, jumlah ronde, atau informasi untuk pengunjung…"></textarea></label>
+            <label class="field-block field-wide"><span>CATATAN TAMBAHAN</span><textarea name="notes" rows="3" maxlength="2000" placeholder="Catatan tambahan yang dapat ditampilkan bersama jadwal."></textarea></label>
+          </div>
+        </section>
+        <section class="form-section publish-section">
+          <div class="form-section-title"><span>03</span><div><h3>Publikasi</h3><p>Atur urutan dan visibilitas jadwal.</p></div></div>
+          <div class="form-grid compact-grid">
+            <label class="field-block"><span>URUTAN</span><input type="number" name="sort_order" min="0" step="1" value="0"></label>
+            <label class="switch-field"><input type="checkbox" name="published" checked><span class="switch-ui" aria-hidden="true"></span><span><b>Publikasikan</b><small>Jadwal terlihat oleh semua pengunjung.</small></span></label>
+          </div>
+        </section>
+      </div>
+      <footer class="dialog-footer"><p class="form-message" data-form-message role="alert" aria-live="polite"></p><div><button class="secondary-action" type="button" data-close-dialog>BATAL</button><button class="primary-action" type="submit"><span>SIMPAN JADWAL</span><i class="vector-arrow" aria-hidden="true"></i></button></div></footer>
+    </form>
+  </dialog>
+
+  <dialog class="confirm-dialog" id="confirmDialog" aria-labelledby="confirmTitle">
+    <div class="confirm-mark" aria-hidden="true">!</div><p class="admin-kicker">DELETION PROTOCOL</p><h2 id="confirmTitle">Hapus data?</h2><p id="confirmCopy">Tindakan ini tidak dapat dibatalkan.</p><div><button class="secondary-action" id="cancelDelete" type="button">BATAL</button><button class="danger-action" id="confirmDelete" type="button">HAPUS PERMANEN</button></div>
+  </dialog>
+
+  <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript-message">JavaScript harus diaktifkan untuk membuka control terminal.</p></noscript>
+</body>
+</html>
