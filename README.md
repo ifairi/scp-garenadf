@@ -52,7 +52,7 @@ Supabase bersifat opsional dan hanya aktif setelah konfigurasi publik tersedia s
 
 ## Keanggotaan dan roster kompetitif
 
-Menu **Protokol** (`#rules`) menjelaskan identitas aliansi, alur bergabung, trial, kriteria seleksi, komitmen event, perilaku anggota, dan peninjauan keputusan. Aturan dapat dibaca langsung tanpa mengunduh dokumen. Versi 1.1 menyederhanakan bahasa tanpa mengubah aturan. PDF memakai versi yang sama; saat mengubah kebijakan, perbarui keduanya dan umumkan kepada anggota.
+Menu **Protokol** (`#rules`) menjelaskan identitas aliansi, alur bergabung, trial, kriteria seleksi, komitmen event, perilaku anggota, dan peninjauan keputusan. Aturan dapat dibaca langsung tanpa mengunduh dokumen. Versi 1.1 menyederhanakan bahasa tanpa mengubah aturan. SCP berdiri akhir Maret 2026; tanggal revisi dokumen tetap 7 September 2026. PDF memakai versi yang sama; saat mengubah kebijakan, perbarui keduanya dan umumkan kepada anggota.
 
 **SCP Main Roster** menggantikan istilah Pure Roster. Posisi dipilih dari seluruh anggota berdasarkan performa sesuai peran, kerja sama, kehadiran, dan komitmen yang disepakati; asal clan dicatat terpisah. KPM 2.0+ merupakan acuan awal penyerang, bukan ambang wajib semua peran. **The Alliance** menampung anggota lainnya; kontribusi anggota awal tetap dihormati.
 
@@ -60,7 +60,7 @@ Semua 12 anggota bawaan tetap memiliki identitas dan statistik sebelumnya, dan s
 
 Setelah Supabase tersedia, buka **Admin → Anggota → Edit**. Isi asal clan bila diketahui. Pilih **SCP Main Roster** hanya setelah seleksi dan persetujuan pemain, lalu isi **Periode / event komitmen**, misalnya nama event dan tanggal yang sudah disepakati. Isian ini tampil publik: jangan memasukkan kontak pribadi atau strategi. Setelah periode berakhir, evaluasi ulang dan ubah kembali ke Alliance bila komitmen tidak diperpanjang. Website tidak menafsirkan tanggal dari catatan tersebut secara otomatis.
 
-Keanggotaan Main bukan penetapan starter untuk semua event. Pengurus tetap mengonfirmasi satu bendera, jadwal, peran, pemain utama/cadangan, dan ketentuan penyelenggara sebelum registrasi. Jadwal publik juga bukan daftar pemain yang sudah menyatakan hadir. Kelayakan DFNC harus diperiksa pada rulebook edisi yang dituju.
+Keanggotaan Main bukan penetapan starter untuk semua event. Pengurus tetap mengonfirmasi tim yang dibela, jadwal, peran, pemain utama/cadangan, dan ketentuan penyelenggara sebelum registrasi. Jadwal publik juga bukan daftar pemain yang sudah menyatakan hadir. Kelayakan DFNC harus diperiksa pada rulebook edisi yang dituju.
 
 Untuk database lama, jalankan **schema.sql saja** sebelum menggunakan field baru. Migrasi mengubah nilai lama `pure` menjadi `alliance`, mempertahankan ID dan data anggota, serta menjaga Main yang sudah dikonfirmasi saat dijalankan ulang. Jangan menjalankan ulang seed hanya untuk upgrade; seed merupakan data awal dan dapat menimpa konten. Petunjuk lengkap ada di `supabase/README.md`.
 

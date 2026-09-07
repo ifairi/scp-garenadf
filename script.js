@@ -219,10 +219,12 @@
     const affiliation = window.SCPRoster.normalize(dossiers[card.dataset.operative]);
     card.dataset.rosterType = affiliation.roster_type;
     card.dataset.clanOrigin = affiliation.clan_origin;
-    const clan = document.createElement('span');
-    clan.className = 'member-clan';
-    clan.textContent = affiliation.clan_origin ? `CLAN / ${affiliation.clan_origin}` : 'CLAN / BELUM DIKONFIRMASI';
-    card.querySelector('.member-card-top').append(clan);
+    if (affiliation.clan_origin) {
+      const clan = document.createElement('span');
+      clan.className = 'member-clan';
+      clan.textContent = `CLAN / ${affiliation.clan_origin}`;
+      card.querySelector('.member-card-top').append(clan);
+    }
   });
 
   const gallery = $('operativeGallery');
@@ -330,9 +332,9 @@
     empty.className = 'roster-pending';
     empty.hidden = true;
     const emptyTitle = document.createElement('h5');
-    emptyTitle.textContent = 'Main Roster sedang disiapkan.';
+    emptyTitle.textContent = 'Main Roster sedang disiapkan';
     const emptyText = document.createElement('p');
-    emptyText.textContent = 'Nama pemain akan muncul setelah lolos seleksi dan sepakat soal waktu membela SCP. Sambil itu, anggota yang sudah gabung tetap ada di The Alliance.';
+    emptyText.textContent = 'Pemain tampil setelah lolos seleksi dan menyepakati waktu membela SCP.';
     const emptyLink = document.createElement('a');
     emptyLink.href = '#rules';
     emptyLink.className = 'text-link';
