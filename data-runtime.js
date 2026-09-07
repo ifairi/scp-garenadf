@@ -20,7 +20,6 @@
     ['Sabtu', 'SATURDAY']
   ];
   const ROLE_GROUPS = new Set(['vehicle', 'engineer', 'recon', 'assault', 'support', 'command', 'other']);
-  const PURE_SCP_FALLBACK = new Set(['SCP-051', 'SCP-022', 'SCP-119']);
 
   function status(state, reason, extra = {}) {
     const value = Object.freeze({ state, reason, remote: state === 'remote', ...extra });
@@ -124,16 +123,16 @@
     const clearanceRaw = boundedText(row.clearance, 'LEVEL I', 100);
     const clearance = /^clearance\s*:/i.test(clearanceRaw) ? clearanceRaw : `CLEARANCE: ${clearanceRaw}`;
     const photoUrl = safeAsset(row.photo_url ?? row.photoUrl);
-    const rosterValue = boundedText(row.roster_type ?? row.rosterType, '', 24).toLocaleLowerCase('en-US');
-    const rosterType = rosterValue === 'pure' || rosterValue === 'alliance'
-      ? rosterValue
-      : (PURE_SCP_FALLBACK.has(code) ? 'pure' : 'alliance');
+    const affiliation = window.SCPRoster.normalize(row);
+    const rosterType = affiliation.roster_type;
     return {
       code,
       name,
       role,
       roleGroups: normalizeRoleGroups(row.role_groups ?? row.role_group, role),
       rosterType,
+      clanOrigin: affiliation.clan_origin,
+      commitmentScope: affiliation.commitment_scope,
       clearance,
       alias,
       unique,
@@ -370,6 +369,8 @@
           role: member.role,
           roleGroups: member.roleGroups.slice(),
           roster_type: member.rosterType,
+          clan_origin: member.clanOrigin,
+          commitment_scope: member.commitmentScope,
           clearance: member.clearance,
           alias: member.alias,
           unique: member.unique,
@@ -395,7 +396,7 @@
       if (heroMemberCount) heroMemberCount.textContent = String(members.length).padStart(2, '0');
       if (teamMemberSummary) teamMemberSummary.textContent = `${members.length} operatives. 4 founders.`;
       if (operativeTotal) operativeTotal.textContent = String(members.length).padStart(2, '0');
-      if (searchStatus) searchStatus.textContent = `Dua roster rail aktif dengan ${members.length} operative. Pilih anggota untuk membuka dossier dan statistik.`;
+      if (searchStatus) searchStatus.textContent = `${members.length} anggota terdaftar. Main Roster diisi setelah pemain lolos seleksi dan sepakat membela SCP.`;
       if (scheduleDataDate && scheduleRows.length) {
         const timestamps = scheduleRows.map(row => new Date(row.updated_at || row.created_at || '')).filter(date => !Number.isNaN(date.getTime()));
         const latest = timestamps.sort((a, b) => b - a)[0];

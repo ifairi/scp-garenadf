@@ -19,6 +19,8 @@ create table if not exists public.members (
   role text not null,
   role_groups text[] not null default array['other']::text[],
   roster_type text not null default 'alliance',
+  clan_origin text not null default '',
+  commitment_scope text not null default '',
   clearance text not null,
   alias text not null,
   unique_text text not null,
@@ -46,7 +48,7 @@ create table if not exists public.members (
       ]::text[]
     ),
   constraint members_roster_type_allowed
-    check (roster_type in ('pure', 'alliance')),
+    check (roster_type in ('main', 'alliance')),
   constraint members_clearance_length
     check (char_length(btrim(clearance)) between 1 and 80),
   constraint members_alias_length
@@ -74,14 +76,25 @@ create table if not exists public.members (
 
 -- Keep this file safe to rerun on projects created before roster_type existed.
 alter table public.members
-  add column if not exists roster_type text not null default 'alliance';
+  add column if not exists roster_type text not null default 'alliance',
+  add column if not exists clan_origin text not null default '',
+  add column if not exists commitment_scope text not null default '';
 
 alter table public.members
-  drop constraint if exists members_roster_type_allowed;
+  drop constraint if exists members_roster_type_allowed,
+  drop constraint if exists members_main_commitment_required,
+  drop constraint if exists members_affiliation_length;
+
+-- Legacy affiliation must never imply confirmed competitive selection.
+update public.members set roster_type = 'alliance' where roster_type = 'pure';
 
 alter table public.members
   add constraint members_roster_type_allowed
-  check (roster_type in ('pure', 'alliance'));
+  check (roster_type in ('main', 'alliance')),
+  add constraint members_main_commitment_required
+  check (roster_type <> 'main' or commitment_scope ~ '[^[:space:]]'),
+  add constraint members_affiliation_length
+  check (char_length(clan_origin) <= 120 and char_length(commitment_scope) <= 240);
 
 create table if not exists public.schedule_entries (
   id uuid primary key default gen_random_uuid(),

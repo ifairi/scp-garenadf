@@ -15,9 +15,9 @@ Di Supabase Dashboard, buka **SQL Editor**.
 1. Buat query baru, salin seluruh isi `schema.sql`, lalu tekan **Run**.
 2. Buat query baru lagi, salin seluruh isi `seed.sql`, lalu tekan **Run**.
 
-Jika database pernah disiapkan dengan versi lama, jalankan kembali `schema.sql` agar kolom `roster_type` ditambahkan secara otomatis, kemudian jalankan `seed.sql` untuk mengisi pembagian roster awal.
+Untuk database versi lama, jalankan **schema.sql saja**. Migrasi menambahkan `clan_origin` dan `commitment_scope`, mengganti status lama `pure` menjadi `alliance`, serta menjaga ID dan data anggota. Main Roster yang sudah dikonfirmasi tetap dipertahankan ketika skema dijalankan ulang. Jangan jalankan seed untuk upgrade.
 
-`seed.sql` memindahkan 12 dossier dan tiga jadwal rutin yang saat ini ada di website. File ini aman dijalankan ulang untuk mengembalikan data awal, tetapi isinya akan menimpa perubahan pada baris yang sama.
+`seed.sql` memindahkan 12 dossier dan tiga jadwal rutin yang saat ini ada di website. Menjalankannya ulang akan mengembalikan isi dossier dan jadwal pada baris yang sama; status roster, clan asal, dan komitmen yang sudah diisi tetap dipertahankan. Semua anggota baru dari seed masuk The Alliance, tanpa menyimpulkan clan asal dari nickname.
 
 Setelah selesai, **Table Editor** akan menampilkan:
 
@@ -72,7 +72,11 @@ Untuk pengujian lokal, salin `.env.example` menjadi `.env.local`, isi dua nilai 
 ### Anggota
 
 - `code` memakai format seperti `SCP-013`.
-- `roster_type = pure` menandai roster inti Pure SCP. `roster_type = alliance` menandai anggota afiliasi yang sudah menjadi bagian dari SCP Alliance.
+- `roster_type = main` menandai SCP Main Roster setelah seleksi dan kesepakatan komitmen. `alliance` adalah keanggotaan The Alliance dan menjadi nilai awal.
+- `clan_origin` adalah nama clan yang dikonfirmasi pemain, maksimum 120 karakter; boleh kosong. Jangan mengambilnya otomatis dari nickname atau riwayat.
+- `commitment_scope` mencatat periode/event yang disepakati, maksimum 240 karakter. Wajib berisi teks untuk Main Roster. Informasi ini tampil di dossier publik; jangan isi kontak pribadi.
+- Susunan utama/cadangan dan ketersediaan setiap event tetap dikonfirmasi melalui pengurus sebelum pendaftaran. Label Main Roster tidak menggantikan konfirmasi tersebut.
+- Aplikasi bisa membaca database lama tanpa kolom baru; untuk menyimpan perubahan admin, jalankan skema terbaru terlebih dahulu.
 - `role_groups` berisi satu atau beberapa kategori: `vehicle`, `engineer`, `recon`, `assault`, `support`, `command`, atau `other`.
 - `track`, `strengths`, dan `stats` adalah array JSON. Bentuk seed dipertahankan agar cocok dengan dossier website saat ini.
 - `sort_order` menentukan urutan kartu. Angka lebih kecil tampil lebih awal.

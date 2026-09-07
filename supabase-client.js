@@ -151,7 +151,7 @@
     return path ? `${url}/storage/v1/object/public/${bucket}/${encodePath(path)}` : '';
   }
   function decorateMember(record) {
-    return { ...record, photo_url: record.photo_url || publicPhotoUrl(record.photo_path) };
+    return { ...record, ...window.SCPRoster.normalize(record), photo_url: record.photo_url || publicPhotoUrl(record.photo_path) };
   }
 
   async function listMembers({ includeDrafts = false } = {}) {
@@ -168,11 +168,15 @@
     return Array.isArray(rows) ? rows : [];
   }
 
-  const memberFields = ['code','name','role','role_groups','roster_type','clearance','alias','unique_text','track','strengths','stats','photo_path','sort_order','published'];
+  const memberFields = ['code','name','role','role_groups','roster_type','clan_origin','commitment_scope','clearance','alias','unique_text','track','strengths','stats','photo_path','sort_order','published'];
   const scheduleFields = ['schedule_kind','operation_type','title','opponent','status','weekday','event_date','start_time','end_time','end_open','details','notes','sort_order','published'];
   const pick = (record, fields) => Object.fromEntries(fields.filter(field => record[field] !== undefined).map(field => [field, record[field]]));
 
   async function save(table, record, fields) {
+    if (table === 'members') {
+      const error = window.SCPRoster.validate(record);
+      if (error) throw new SCPDataError(error, 400);
+    }
     const payload = pick(record, fields);
     const editing = Boolean(record.id);
     const path = editing

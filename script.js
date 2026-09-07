@@ -4,8 +4,8 @@
   catch { /* Static content remains the fallback if remote data is unavailable. */ }
   const $ = id => document.getElementById(id);
   const root = document.documentElement;
-  const order = ['hero', 'about', 'founders', 'objectives', 'scrim'];
-  const labels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal'];
+  const order = ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules'];
+  const labels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal', 'Protokol'];
   const panels = [...document.querySelectorAll('.panel')];
   const navLinks = [...document.querySelectorAll('.nav-link')];
   const menu = $('mainNav');
@@ -79,7 +79,7 @@
     $('prevBtn').disabled = index === 0;
     $('nextBtn').disabled = index === order.length - 1;
     $('prevBtn').setAttribute('aria-label', index ? `Menu sebelumnya: ${labels[index - 1]}` : 'Menu sebelumnya');
-    $('nextBtn').setAttribute('aria-label', index < 4 ? `Menu berikutnya: ${labels[index + 1]}` : 'Menu berikutnya');
+    $('nextBtn').setAttribute('aria-label', index < order.length - 1 ? `Menu berikutnya: ${labels[index + 1]}` : 'Menu berikutnya');
   }
   function render(id, { focus = false, scroll = false, contact = false } = {}) {
     if (!order.includes(id)) id = 'hero';
@@ -162,7 +162,7 @@
   document.addEventListener('focusin', event => {
     if (menuToggle.getAttribute('aria-expanded') === 'true' && !menu.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
   });
-  window.matchMedia('(max-width: 680px)').addEventListener('change', () => closeMenu());
+  window.matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu());
   $('prevBtn').addEventListener('click', () => navigate(order[order.indexOf(desired) - 1]));
   $('nextBtn').addEventListener('click', () => navigate(order[order.indexOf(desired) + 1]));
 
@@ -215,22 +215,25 @@
     const remote = (card?.dataset.roleGroups || '').split(' ').filter(Boolean);
     return remote.length ? remote : (fallbackCategories[id] || []);
   };
-  const pureRosterFallback = new Set(['SCP-051', 'SCP-022', 'SCP-119']);
   memberCards.forEach(card => {
-    if (!['pure', 'alliance'].includes(card.dataset.rosterType)) {
-      card.dataset.rosterType = pureRosterFallback.has(card.dataset.operative) ? 'pure' : 'alliance';
-    }
+    const affiliation = window.SCPRoster.normalize(dossiers[card.dataset.operative]);
+    card.dataset.rosterType = affiliation.roster_type;
+    card.dataset.clanOrigin = affiliation.clan_origin;
+    const clan = document.createElement('span');
+    clan.className = 'member-clan';
+    clan.textContent = affiliation.clan_origin ? `CLAN / ${affiliation.clan_origin}` : 'CLAN / BELUM DIKONFIRMASI';
+    card.querySelector('.member-card-top').append(clan);
   });
 
   const gallery = $('operativeGallery');
   gallery.classList.add('roster-rails');
-  gallery.setAttribute('aria-label', 'Pure Roster dan The Alliance');
+  gallery.setAttribute('aria-label', 'SCP Main Roster dan The Alliance');
   const railDefinitions = [
     {
-      key: 'pure',
-      index: '01 / CORE UNIT',
-      title: 'Pure Roster',
-      note: 'PRIMARY SIGNAL / DRAG + SWIPE',
+      key: 'main',
+      index: '01 / COMPETITIVE UNIT',
+      title: 'SCP Main Roster',
+      note: 'TERSELEKSI / KOMITMEN DISEPAKATI',
       direction: 'rtl',
       directionLabel: 'RIGHT TO LEFT'
     },
@@ -238,7 +241,7 @@
       key: 'alliance',
       index: '02 / AFFILIATED UNIT',
       title: 'The ALLIANCE',
-      note: 'EXTERNAL IDENTITY / DRAG + SWIPE',
+      note: 'LINTAS CLAN / DRAG + SWIPE',
       direction: 'ltr',
       directionLabel: 'LEFT TO RIGHT'
     }
@@ -323,8 +326,22 @@
     bindRosterDrag(motion);
     rosterMotionStates.add(motion);
     section.append(heading, viewport);
+    const empty = document.createElement('div');
+    empty.className = 'roster-pending';
+    empty.hidden = true;
+    const emptyTitle = document.createElement('h5');
+    emptyTitle.textContent = 'Main Roster sedang disiapkan.';
+    const emptyText = document.createElement('p');
+    emptyText.textContent = 'Nama pemain akan muncul setelah lolos seleksi dan sepakat soal waktu membela SCP. Sambil itu, anggota yang sudah gabung tetap ada di The Alliance.';
+    const emptyLink = document.createElement('a');
+    emptyLink.href = '#rules';
+    emptyLink.className = 'text-link';
+    emptyLink.textContent = 'LIHAT CARA SELEKSI';
+    emptyLink.append(makeArrow('ltr'));
+    empty.append(emptyTitle, emptyText, emptyLink);
+    section.append(empty);
     gallery.append(section);
-    railViews[definition.key] = { definition, section, track, count, motion };
+    railViews[definition.key] = { definition, section, track, count, motion, empty };
   }
 
   gallery.replaceChildren();
@@ -605,7 +622,10 @@
       const view = railViews[definition.key];
       const cards = visibleMembers.filter(card => card.dataset.rosterType === definition.key);
       view.motion.cancelPointer?.();
-      view.section.hidden = cards.length === 0;
+      const showPending = definition.key === 'main' && !memberCards.some(card => card.dataset.rosterType === 'main') && !$('memberSearch').value.trim() && $('roleFilter').value === 'all';
+      view.section.hidden = cards.length === 0 && !showPending;
+      view.empty.hidden = !showPending;
+      view.motion.viewport.hidden = cards.length === 0;
       view.count.textContent = String(cards.length).padStart(2, '0');
       if (!cards.length) {
         view.motion.cycleWidth = 0;
@@ -652,7 +672,7 @@
     let count = 0;
     memberCards.forEach(card => {
       const id = card.querySelector('.member-id').textContent.trim();
-      const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || ''));
+      const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || '') + ' ' + card.dataset.clanOrigin);
       const matches = searchable.includes(query) && (role === 'all' || category(id, card).includes(role));
       card.hidden = !matches;
       if (matches) count++;
@@ -661,14 +681,14 @@
     $('emptyState').hidden = count > 0;
     visibleMembers = memberCards.filter(card => !card.hidden);
     renderRosterRails();
-    const pureCount = visibleMembers.filter(card => card.dataset.rosterType === 'pure').length;
-    const allianceCount = count - pureCount;
-    const activeRails = Number(pureCount > 0) + Number(allianceCount > 0);
+    const mainCount = visibleMembers.filter(card => card.dataset.rosterType === 'main').length;
+    const allianceCount = count - mainCount;
+    const activeRails = Number(mainCount > 0) + Number(allianceCount > 0);
     $('operativeToolbar').hidden = count === 0;
     $('operativeCurrent').textContent = String(activeRails).padStart(2, '0');
     $('operativeTotal').textContent = String(count).padStart(2, '0');
-    $('operativeCurrentId').textContent = `${String(pureCount).padStart(2, '0')} PURE / ${String(allianceCount).padStart(2, '0')} ALLIANCE`;
-    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan: ${pureCount} Pure SCP dan ${allianceCount} Alliance. Pilih anggota untuk membuka profil.`;
+    $('operativeCurrentId').textContent = `${String(mainCount).padStart(2, '0')} MAIN / ${String(allianceCount).padStart(2, '0')} ALLIANCE`;
+    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan: ${mainCount} Main Roster dan ${allianceCount} The Alliance. Klik atau tap untuk membuka profil; seret atau usap untuk menggeser.`;
   }
   $('memberSearch').addEventListener('input', filterMembers);
   $('roleFilter').addEventListener('change', filterMembers);
@@ -748,6 +768,10 @@
     $('dsName').textContent = data.name;
     $('dsRole').textContent = data.role;
     $('dsAlias').textContent = data.alias;
+    const affiliation = window.SCPRoster.normalize(data);
+    $('dsRoster').textContent = affiliation.roster_type === 'main' ? 'SCP Main Roster' : 'The Alliance';
+    $('dsClan').textContent = affiliation.clan_origin || 'Belum dikonfirmasi';
+    $('dsCommitment').textContent = affiliation.commitment_scope || 'Belum ada jadwal membela SCP yang disepakati.';
     $('dsUnique').textContent = data.unique;
     const portrait = $('dsPortrait');
     portrait.replaceChildren();

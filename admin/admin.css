@@ -365,7 +365,7 @@ body.admin-page {
 .record-identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .record-code { color: var(--admin-accent); font: 500 8px var(--admin-mono); letter-spacing: .12em; }
 .roster-badge { padding: 3px 6px; border: 1px solid var(--admin-line); color: var(--admin-muted); font: 500 6px var(--admin-mono); letter-spacing: .1em; }
-.roster-badge.is-pure { border-color: rgba(164, 239, 199, .32); color: var(--admin-accent); box-shadow: inset 0 0 10px rgba(164, 239, 199, .04); }
+.roster-badge.is-main { border-color: rgba(164, 239, 199, .32); color: var(--admin-accent); box-shadow: inset 0 0 10px rgba(164, 239, 199, .04); }
 .record-main h3 { margin: 7px 0 5px; overflow: hidden; color: var(--admin-text); font: 700 17px/1.15 var(--display, sans-serif); letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
 .record-main p,
 .record-meta p { margin: 0; overflow: hidden; color: var(--admin-muted); font-size: 10px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }

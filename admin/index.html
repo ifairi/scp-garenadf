@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/admin/admin.css">
   <script src="/site-config.js" defer></script>
+  <script src="/roster-policy.js" defer></script>
   <script src="/supabase-client.js" defer></script>
   <script src="/admin/admin.js" defer></script>
 </head>
@@ -122,7 +123,9 @@
             <label class="field-block"><span>KODE DOSSIER *</span><input name="code" required placeholder="SCP-000" maxlength="10" pattern="SCP-[0-9]{3,6}" title="Gunakan format SCP-013 (3 sampai 6 digit)."></label>
             <label class="field-block"><span>NAMA / NICKNAME *</span><input name="name" required placeholder="[ PLAYER NAME ]" maxlength="100"></label>
             <label class="field-block"><span>PERAN *</span><input name="role" required placeholder="Engineer Recon" maxlength="80"></label>
-            <label class="field-block"><span>JENIS ROSTER *</span><select name="roster_type" required><option value="pure">PURE SCP ROSTER</option><option value="alliance">SCP ALLIANCE</option></select><small>Pure untuk roster inti. Alliance untuk anggota afiliasi SCP.</small></label>
+            <label class="field-block"><span>STATUS SCP *</span><select name="roster_type" required><option value="alliance">THE ALLIANCE</option><option value="main">SCP MAIN ROSTER</option></select><small>Pilih Main setelah pemain lolos seleksi dan setuju kapan akan membela SCP. Clan asal bebas.</small></label>
+            <label class="field-block"><span>CLAN ASAL</span><input name="clan_origin" maxlength="120" placeholder="Nama clan sesuai keterangan pemain"><small>Belum tahu? Kosongkan dulu. Tanyakan ke pemain, jangan tebak dari nickname.</small></label>
+            <label class="field-block"><span>PERIODE / EVENT KOMITMEN</span><input name="commitment_scope" maxlength="240" placeholder="Contoh: periode Oktober 2026, latihan Selasa/Jumat"><small>Wajib untuk Main. Tulis kapan atau di event apa pemain siap membela SCP. Catatan ini tampil di profil publik, jadi jangan isi data pribadi. Pemain utama/cadangan tetap dipilih per event.</small></label>
             <fieldset class="role-picker field-wide"><legend>GRUP PERAN *</legend><label><input type="checkbox" name="role_groups" value="assault"><span>ASSAULT / TACTICAL</span></label><label><input type="checkbox" name="role_groups" value="engineer"><span>ENGINEER</span></label><label><input type="checkbox" name="role_groups" value="recon"><span>RECON</span></label><label><input type="checkbox" name="role_groups" value="vehicle"><span>VEHICLE / TANKER</span></label><label><input type="checkbox" name="role_groups" value="support"><span>SUPPORT</span></label><label><input type="checkbox" name="role_groups" value="command"><span>COMMAND</span></label><label><input type="checkbox" name="role_groups" value="other"><span>LAINNYA</span></label></fieldset>
             <label class="field-block"><span>CLEARANCE *</span><input name="clearance" required placeholder="CLEARANCE: LEVEL VI" maxlength="80"></label>
             <label class="field-block"><span>ALIAS *</span><input name="alias" required placeholder="The Silent Watcher" maxlength="120"></label>

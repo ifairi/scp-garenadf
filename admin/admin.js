@@ -183,7 +183,7 @@
 
   function renderMembers() {
     const query = state.memberQuery.trim().toLocaleLowerCase('id');
-    const records = sorted(state.members).filter(record => !query || [record.code, record.name, record.role, record.alias, record.roster_type, ...(record.role_groups || [])].join(' ').toLocaleLowerCase('id').includes(query));
+    const records = sorted(state.members).filter(record => !query || [record.code, record.name, record.role, record.alias, record.roster_type, record.clan_origin, record.commitment_scope, ...(record.role_groups || [])].join(' ').toLocaleLowerCase('id').includes(query));
     refs.memberList.replaceChildren();
     records.forEach((record, index) => {
       const card = create('article', 'record-card');
@@ -199,7 +199,7 @@
       const identity = create('div', 'record-identity');
       identity.append(
         create('span', 'record-code', record.code || 'SCP-???'),
-        create('span', `roster-badge is-${record.roster_type === 'pure' ? 'pure' : 'alliance'}`, record.roster_type === 'pure' ? 'PURE SCP' : 'ALLIANCE')
+        create('span', `roster-badge is-${window.SCPRoster.normalize(record).roster_type}`, window.SCPRoster.normalize(record).roster_type === 'main' ? 'MAIN ROSTER' : 'THE ALLIANCE')
       );
       main.append(identity, create('h3', '', record.name || 'Tanpa nama'), create('p', '', record.role || 'Peran belum ditentukan'));
 
@@ -312,7 +312,9 @@
     refs.memberTitle.textContent = record ? 'Edit anggota' : 'Tambah anggota';
     const nextOrder = state.members.reduce((max, item) => Math.max(max, Number(item.sort_order) || 0), 0) + 1;
     setField(refs.memberForm, 'sort_order', record?.sort_order ?? nextOrder);
-    setField(refs.memberForm, 'roster_type', record?.roster_type === 'pure' ? 'pure' : 'alliance');
+    const affiliation = window.SCPRoster.normalize(record || {});
+    ['roster_type', 'clan_origin', 'commitment_scope'].forEach(name => setField(refs.memberForm, name, affiliation[name]));
+    syncRosterRequirement();
     setField(refs.memberForm, 'published', '');
     refs.memberForm.elements.published.checked = record ? record.published !== false : true;
     if (record) {
@@ -376,8 +378,15 @@
 
   function clampStat(value) { return Math.min(100, Math.max(0, Number(value) || 0)); }
 
+  function syncRosterRequirement() {
+    const field = refs.memberForm.elements.commitment_scope;
+    field.required = refs.memberForm.elements.roster_type.value === 'main';
+    field.setCustomValidity(field.required && !field.value.trim() ? 'Isi periode atau event yang sudah disepakati.' : '');
+  }
+
   async function submitMember(event) {
     event.preventDefault();
+    syncRosterRequirement();
     if (!refs.memberForm.reportValidity()) return;
     const submit = $('button[type="submit"]', refs.memberForm);
     const message = $('[data-form-message]', refs.memberForm);
@@ -411,7 +420,9 @@
       name: field('name').value.trim(),
       role: field('role').value.trim(),
       role_groups: roleGroups,
-      roster_type: field('roster_type').value === 'pure' ? 'pure' : 'alliance',
+      roster_type: field('roster_type').value === 'main' ? 'main' : 'alliance',
+      clan_origin: field('clan_origin').value.trim(),
+      commitment_scope: field('commitment_scope').value.trim(),
       clearance: field('clearance').value.trim(),
       alias: field('alias').value.trim(),
       unique_text: field('unique_text').value.trim(),
@@ -627,6 +638,8 @@
       refs.photoName.textContent = 'Foto akan dilepas ketika dossier disimpan.';
     });
     refs.memberForm.addEventListener('submit', submitMember);
+    refs.memberForm.elements.roster_type.addEventListener('change', syncRosterRequirement);
+    refs.memberForm.elements.commitment_scope.addEventListener('input', syncRosterRequirement);
     refs.scheduleForm.addEventListener('submit', submitSchedule);
     $$('input[name="schedule_kind"]', refs.scheduleForm).forEach(input => input.addEventListener('change', () => setScheduleMode(input.value)));
     refs.scheduleForm.elements.end_open.addEventListener('change', toggleEndTime);

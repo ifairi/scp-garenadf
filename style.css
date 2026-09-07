@@ -755,7 +755,7 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
 .modal-open .roster-marquee-track,
 .motion-paused .roster-marquee-track { animation-play-state: paused; }
 .panel:not([hidden]) .roster-lane { animation: rosterLaneIn .72s cubic-bezier(.16, 1, .3, 1) both; }
-.panel:not([hidden]) .roster-lane--pure { --lane-intro-x: 24px; }
+.panel:not([hidden]) .roster-lane--main { --lane-intro-x: 24px; }
 .panel:not([hidden]) .roster-lane--alliance { --lane-intro-x: -24px; animation-delay: .11s; }
 @keyframes rosterFlow { to { transform: translate3d(-50%, 0, 0); } }
 @keyframes rosterLaneIn { from { opacity: 0; transform: translateX(var(--lane-intro-x, 18px)); } to { opacity: 1; transform: none; } }

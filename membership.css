@@ -1,0 +1,146 @@
+/* SCP membership and competitive protocol, shared with the existing emerald theme. */
+.roster-principle { display: grid; grid-template-columns: .8fr 1.2fr; gap: 36px; padding: 28px 0; margin-top: 30px; border-block: 1px solid var(--line); }
+.roster-principle h3 { margin-top: 9px; font: 700 clamp(24px, 2.3vw, 32px)/1.16 var(--display); letter-spacing: -.035em; }
+.roster-principle h3 span { color: var(--accent); }
+.roster-principle p:not(.eyebrow) { color: var(--muted); font-size: 15px; line-height: 1.75; max-width: 700px; }
+.roster-principle strong { color: var(--text); }
+.roster-principle .text-link { margin-top: 8px; font-size: 12px; }
+.roster-pending { position: relative; padding: 26px 30px; background: linear-gradient(110deg, #a4efc709, #0b140f77); border: 1px dashed #a4efc73c; border-radius: 16px 3px; }
+.roster-pending h5 { margin: 0 0 8px; font: 700 23px/1.2 var(--display); }
+.roster-pending p { max-width: 690px; font-size: 15px; line-height: 1.7; color: var(--muted); }
+.roster-pending .text-link { font-size: 12px; margin-top: 9px; }
+.roster-lane:has(.roster-pending:not([hidden])) .roster-lane-telemetry span { display: none; }
+.member-grid.roster-rails .member-card-top { flex-wrap: wrap; align-content: start; }
+.member-grid.roster-rails .member-card-top > span:nth-child(2) { display: none; }
+.member-grid.roster-rails .member-clan { flex-basis: 100%; color: #c1cfc5; font-size: 9px; letter-spacing: .5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.dossier-affiliation { margin: 20px 0 0; border-top: 1px solid var(--line); }
+.dossier-affiliation > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.dossier-affiliation dt { color: var(--accent); font: 10px/1.4 var(--mono); letter-spacing: 1px; }
+.dossier-affiliation dd { margin: 5px 0 0; font-size: 14px; line-height: 1.6; color: #b5c6bc; overflow-wrap: anywhere; }
+.event-commitment { display: flex; gap: 24px; align-items: center; border-top: 1px solid var(--line); margin-top: 30px; padding-top: 25px; }
+.event-commitment > p { flex: 1; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.event-commitment strong { color: var(--text); }
+.event-commitment > a { flex: none; font-size: 12px; }
+.rules-panel .scene { height: 690px; }
+.rules-panel .scene img { opacity: .17; }
+.rules-panel .section-content { max-width: 1510px; }
+.rules-heading { margin-bottom: 22px; }
+.rules-heading h2 { max-width: 790px; font-size: clamp(38px, 4.3vw, 66px); }
+.rules-download { display: flex; align-items: flex-start; flex-direction: column; gap: 12px; flex: none; }
+.rules-version { color: var(--accent); font: 12px/1.5 var(--mono); letter-spacing: .8px; }
+.rules-download .button { font-size: 12px; min-height: 50px; }
+.rules-download > p { color: var(--muted); font-size: 13px; max-width: 265px; }
+.rules-lead { font-size: 17px; line-height: 1.75; max-width: 820px; color: #becbc2; }
+.rules-panel .eyebrow { font-size: 12px; letter-spacing: 1.3px; }
+.membership-paths { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 32px; }
+.membership-paths article { position: relative; padding: 27px; border: 1px solid #a4efc737; background: linear-gradient(135deg, #13281cbb, #0c1511dd); border-radius: 20px 3px 20px 3px; }
+.membership-paths article:last-child { border-color: #a4efc76b; }
+.membership-paths h3 { font: 700 28px/1.15 var(--display); letter-spacing: -.6px; margin: 16px 0 14px; }
+.membership-paths p { font-size: 16px; line-height: 1.75; color: #b2c2b7; }
+.protocol-section-title { margin-top: 48px; margin-bottom: 22px; }
+.protocol-section-title h3 { font: 700 clamp(25px, 2.5vw, 36px)/1.2 var(--display); letter-spacing: -.8px; margin-top: 8px; }
+.join-sequence { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 0; padding: 0; border-block: 1px solid var(--line); }
+.join-sequence li { position: relative; padding: 24px 21px 25px; border-right: 1px solid var(--line); }
+.join-sequence li:first-child { padding-left: 0; }
+.join-sequence li:last-child { padding-right: 0; border-right: 0; }
+.join-sequence li > span { display: block; color: var(--accent); font: 500 30px/1.2 var(--mono); }
+.join-sequence h4 { font: 700 18px/1.3 var(--display); margin: 17px 0 10px; }
+.join-sequence p { color: var(--muted); font-size: 15px; line-height: 1.75; }
+.selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.selection-grid article { padding: 21px 0; border-top: 2px solid #a4efc755; }
+.selection-grid article > span { font: 12px/1.5 var(--mono); color: var(--accent); }
+.selection-grid h4 { font: 700 22px/1.25 var(--display); margin: 14px 0 12px; }
+.selection-grid p { color: var(--muted); font-size: 16px; line-height: 1.75; }
+.protocol-rules { border-top: 1px solid #a4efc733; }
+.protocol-rules details, .protocol-faq details { border-bottom: 1px solid var(--line); }
+.protocol-rules summary, .protocol-faq summary { position: relative; cursor: pointer; list-style: none; min-height: 64px; padding: 20px 40px 20px 0; font: 700 19px/1.4 var(--display); }
+.protocol-rules summary::-webkit-details-marker, .protocol-faq summary::-webkit-details-marker { display: none; }
+.protocol-rules summary > span { display: inline-block; min-width: 45px; font: 12px var(--mono); color: var(--accent); vertical-align: 2px; }
+.protocol-rules summary::after, .protocol-faq summary::after { content: ''; position: absolute; right: 5px; top: 27px; width: 8px; height: 8px; border-right: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent); transform: rotate(45deg); transition: transform .2s ease; }
+.protocol-rules details[open] summary::after, .protocol-faq details[open] summary::after { transform: translateY(4px) rotate(225deg); }
+.protocol-rules details[open] summary, .protocol-faq details[open] summary { color: var(--accent); }
+.protocol-rules details > div { padding: 0 45px 24px; max-width: 1030px; }
+.protocol-rules p, .protocol-faq p { color: #b4c3b9; font-size: 16px; line-height: 1.85; }
+.protocol-rules p + p { margin-top: 12px; }
+.protocol-faq { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
+.protocol-faq summary { font-size: 17px; }
+.protocol-faq p { padding: 0 25px 22px 0; }
+.protocol-rules summary:focus-visible, .protocol-faq summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.protocol-join { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 40px; padding: 30px; margin-top: 48px; border: 1px solid #a4efc747; border-radius: 20px 3px; background: #13241a88; }
+.protocol-join h3 { font: 700 29px/1.15 var(--display); margin: 12px 0; letter-spacing: -.6px; max-width: 630px; }
+.protocol-join p:not(.eyebrow) { font-size: 15px; color: var(--muted); line-height: 1.75; max-width: 630px; }
+.protocol-join-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.protocol-join .button, .protocol-join .text-link { font-size: 12px; }
+@media (min-width: 901px) and (max-width: 1240px) {
+  .header-community { display: none; }
+  .header .brand { font-size: 26px; }
+  .nav-link { padding-inline: 9px; font-size: 13px; }
+  .header { gap: 16px; }
+}
+/* Keep six destinations clear of the brand on smaller tablets. */
+@media (max-width: 900px) {
+  .header-community { display: none; }
+  .menu-toggle { display: block; margin-left: auto; flex: none; }
+  .header:not(.js .header) { flex-wrap: wrap; }
+  .nav { flex-wrap: wrap; justify-content: center; gap: 4px; }
+  .js .nav { display: none; position: absolute; top: calc(100% - 1px); left: 12px; right: 12px; width: auto; min-height: 0; padding: 16px; background: #0c150ff5; border: 1px solid var(--frame); border-radius: 0 0 18px 18px; box-shadow: 0 25px 35px #0007; }
+  .js .nav.is-open { display: flex; flex-direction: column; align-items: stretch; }
+  .nav > .protocol-frame { display: none; }
+  .nav-link { padding: 13px; font-size: 13px; min-height: 44px; }
+  .nav-link > span { display: inline-block; width: 26px; }
+  .nav.has-contour-fill .nav-link::before { display: block; }
+  .nav-link:first-of-type::before, .nav-link:last-of-type::before { inset: 0 1px; clip-path: none; }
+}
+@media (max-width: 1050px) {
+  .rules-heading { align-items: flex-start; }
+  .rules-heading h2 { font-size: clamp(36px, 4.5vw, 53px); }
+  .rules-download { margin-top: 16px; }
+  .join-sequence { grid-template-columns: repeat(3, 1fr); }
+  .join-sequence li:nth-child(3) { border-right: 0; }
+  .join-sequence li:nth-child(n+4) { border-top: 1px solid var(--line); }
+  .join-sequence li:nth-child(4) { padding-left: 0; }
+  .protocol-join { grid-template-columns: 1fr; gap: 22px; }
+  .protocol-join-actions { align-items: flex-start; }
+  .event-commitment { flex-wrap: wrap; gap: 12px; }
+  .event-commitment > .eyebrow { flex-basis: 100%; }
+}
+@media (max-width: 800px) {
+  .rules-heading { display: block; }
+  .roster-principle { grid-template-columns: 1fr; gap: 20px; }
+  .membership-paths, .selection-grid, .protocol-faq { grid-template-columns: 1fr; }
+  .selection-grid { gap: 3px; }
+}
+@media (max-width: 680px) {
+  .rules-heading h2 { font-size: clamp(33px, 8.5vw, 48px); letter-spacing: -1px; }
+  .rules-lead { font-size: 16px; }
+  .rules-download { margin: 23px 0; gap: 9px; }
+  .rules-version { font-size: 11px; }
+  .rules-panel .eyebrow { font-size: 11px; }
+  .membership-paths article { padding: 22px; }
+  .membership-paths h3 { font-size: 26px; }
+  .join-sequence { grid-template-columns: 1fr; }
+  .join-sequence li, .join-sequence li:first-child, .join-sequence li:last-child { padding: 22px 0 22px 48px; border-right: 0; border-top: 1px solid var(--line); }
+  .join-sequence li:first-child { border-top: 0; }
+  .join-sequence li > span { position: absolute; left: 0; top: 25px; font-size: 21px; }
+  .join-sequence h4 { margin-top: 0; }
+  .protocol-section-title { margin-top: 35px; }
+  .protocol-rules summary { padding-left: 35px; font-size: 18px; }
+  .protocol-rules summary > span { position: absolute; left: 0; top: 25px; min-width: 0; }
+  .protocol-rules details > div { padding-inline: 0; }
+  .protocol-join { padding: 23px; }
+  .protocol-join h3 { font-size: 26px; }
+  .protocol-join .button { width: 100%; padding-inline: 13px; font-size: 11px; gap: 12px; }
+  .protocol-join-actions { align-items: stretch; }
+  .protocol-join-actions .text-link { font-size: 11px; justify-content: center; }
+  .roster-principle, .roster-pending { padding: 22px 0; }
+  .roster-pending { padding-inline: 20px; }
+  .roster-pending h5 { font-size: 22px; }
+  .event-commitment { display: block; }
+  .event-commitment > p { margin-block: 10px; }
+  .footer-links { flex-wrap: wrap; }
+}
+@media print {
+  .rules-panel .scene, .rules-download, .protocol-join-actions { display: none; }
+  .rules-panel { color: #111; }
+  .rules-panel p { color: #333; }
+}

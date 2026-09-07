@@ -112,7 +112,7 @@
       } else if (surface.classList.contains('header')) {
         const bounds = header.getBoundingClientRect();
         const navBounds = nav.getBoundingClientRect();
-        const desktopNav = matchMedia('(min-width: 681px)').matches && navBounds.width > 0;
+        const desktopNav = matchMedia('(min-width: 901px)').matches && navBounds.width > 0;
         // Both bevels share the same slope. The outer stroke sits 16px left of the nav slope.
         const lineX = desktopNav
           ? y => navBounds.left - bounds.left + 5 + bevelSlope * (y - (navBounds.top - bounds.top + 13)) - 16

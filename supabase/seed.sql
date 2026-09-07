@@ -1,5 +1,7 @@
 -- Current SCP Alliance dossiers and weekly schedule.
--- Safe to run again: members are matched by code and schedules by stable UUID.
+-- Initialization/reset data: matching dossiers and schedules are overwritten.
+-- Confirmed roster_type, clan_origin and commitment_scope are preserved on conflict.
+-- For schema upgrades run schema.sql only; do not rerun seed.sql.
 
 begin;
 
@@ -48,7 +50,7 @@ values
     '[ RenSCP ]',
     'The Squadron',
     array['vehicle']::text[],
-    'pure',
+    'alliance',
     'CLEARANCE: LEVEL VI',
     '"RRQEVOSNOTSAE"',
     'Membaca pola rotasi musuh lebih cepat dari siapa pun dan menyusun ulang strategi squad secara real-time.',
@@ -116,7 +118,7 @@ values
     '[ NOTSJessSCP22 ]',
     'Engineer',
     array['engineer']::text[],
-    'pure',
+    'alliance',
     'CLEARANCE: LEVEL V',
     '"The Vulcan"',
     'Bisa mengontrol Loitering di celah yang sempit.',
@@ -184,7 +186,7 @@ values
     '[ SCP°119 ]',
     'Tactical Mind',
     array['assault']::text[],
-    'pure',
+    'alliance',
     'CLEARANCE: LEVEL VIII',
     '"The Strategist"',
     'Otak taktik tim — merancang draft, mid-round call, dan adaptasi anti-strat yang menentukan kemenangan.',
@@ -217,7 +219,6 @@ set
   name = excluded.name,
   role = excluded.role,
   role_groups = excluded.role_groups,
-  roster_type = excluded.roster_type,
   clearance = excluded.clearance,
   alias = excluded.alias,
   unique_text = excluded.unique_text,
