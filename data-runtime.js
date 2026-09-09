@@ -287,7 +287,9 @@
 
     const headingText = scheduleHeading(entry);
     const heading = create('h3', '', headingText[0]);
-    heading.append(create('span', '', headingText[1]));
+    const headingDate = create('span', '', headingText[1]);
+    if (entry.kind === 'event') headingDate.dataset.localeDate = entry.date.raw;
+    heading.append(headingDate);
 
     const time = create('p', 'schedule-time');
     const endLabel = entry.end && !entry.endOpen ? ` — ${entry.end.label}` : '';

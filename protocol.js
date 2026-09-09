@@ -141,6 +141,7 @@
     document.querySelectorAll('.header, .nav, .brand, .header-community, .panel').forEach(surface => observer.observe(surface));
   }
   window.addEventListener('resize', queueFrames);
+  window.addEventListener('scp:language', queueFrames);
   document.fonts?.ready.then(queueFrames);
   document.fonts?.addEventListener('loadingdone', queueFrames);
 })();

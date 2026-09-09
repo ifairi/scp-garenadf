@@ -165,5 +165,6 @@ assert.equal((seed.match(/'SCP-[0-9]{3,6}'/g) || []).length, 12, 'Seed must cont
 assert.equal((seed.match(/'20000000-0000-4000-8000-[0-9]{12}'/g) || []).length, 3, 'Seed must contain 3 schedule IDs');
 const configSource = await readFile('site-config.js', 'utf8');
 assert(configSource.includes("url: ''") && configSource.includes("publishableKey: ''"), 'Source config must not contain deployed credentials');
+execFileSync(process.execPath, ['scripts/check-i18n.mjs'], { stdio: 'inherit' });
 
 console.log('Passed: 6 public routes/admin assets, syntax, 12 preserved identities, roster validation/write contract, remote dossiers, photo path, RLS schema, WIB weekly/event calendar and UTF-8 folding.');

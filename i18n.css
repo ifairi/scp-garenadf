@@ -1,0 +1,36 @@
+/* Local-language controls share the site's font and emerald stroke. */
+.language-control { display: flex; align-items: center; flex: none; gap: 7px; padding: 0 8px; min-height: 44px; color: var(--accent); border: 1px solid var(--line); border-radius: 7px 2px; }
+.language-control select { width: 105px; min-height: 42px; padding: 6px 0; border: 0; background: transparent; color: var(--text); font: 500 11px/1.5 var(--body); cursor: pointer; }
+.language-control option { background: #101813; color: #eef2ed; }
+.language-control:focus-within { border-color: var(--accent); }
+.language-control svg { flex: none; }
+.track-role::before { content: ' — '; }
+:lang(zh) { --body: 'SCP UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif; --display: var(--body); --mono: var(--body); }
+html:lang(zh) :is(h1,h2,h3,h4,h5,.eyebrow,.text-link,.button,.hero-footnote,.roster-lane-note,.member-category) { letter-spacing: .025em; }
+html:lang(zh) h1 { line-height: 1.08; }
+html:lang(zh) .hero-first-line { font-size: .78em; }
+html:lang(zh) :is(.hero-description,.rules-lead,.protocol-rules p,.protocol-faq p,.selection-grid p,.membership-paths p) { line-height: 1.9; }
+html:lang(zh) .protocol-rules p { max-width: 38em; }
+html:lang(zh) .rules-heading h2 { letter-spacing: .01em; }
+html:lang(zh) .schedule-time > span { display: block; font-size: 10px; line-height: 1.8; white-space: normal; }
+html:lang(en) .schedule-time > span { font-size: 10px; }
+html:lang(zh) .hero-footnote { font-size: 10px; }
+@media (max-width: 1400px) and (min-width: 901px) {
+  .header-community { display: none; }
+  .header { gap: 12px; }
+  .nav-link { padding-inline: 9px; }
+}
+@media (max-width: 900px) {
+  .language-control { margin-left: auto; }
+  .header .menu-toggle { margin-left: 0; }
+}
+@media (max-width: 680px) {
+  .header { gap: 8px; }
+  .header .brand { gap: 8px; }
+  .language-control { padding: 0 5px; }
+  .language-control svg { display: none; }
+  .language-control select { width: 79px; font-size: 10px; }
+  html:lang(zh) .hero-first-line { font-size: .78em; }
+  html:lang(zh) .hero-footnote { font-size: 9px; }
+  html:lang(zh) .rules-heading h2 { font-size: clamp(30px, 8vw, 44px); }
+}

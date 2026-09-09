@@ -5,7 +5,10 @@
   const $ = id => document.getElementById(id);
   const root = document.documentElement;
   const order = ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules'];
-  const labels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal', 'Protokol'];
+  const t = (source, values) => window.SCPI18n?.t(source, values) ?? source;
+  const localize = container => window.SCPI18n?.apply(container);
+  const sourceLabels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal', 'Protokol'];
+  let labels = sourceLabels.map(label => t(label));
   const panels = [...document.querySelectorAll('.panel')];
   const navLinks = [...document.querySelectorAll('.nav-link')];
   const menu = $('mainNav');
@@ -71,15 +74,15 @@
   function closeMenu(returnFocus = false) {
     menu.classList.remove('is-open');
     menuToggle.setAttribute('aria-expanded', 'false');
-    menuToggle.setAttribute('aria-label', 'Buka menu');
+    menuToggle.setAttribute('aria-label', t('Buka menu'));
     if (returnFocus) menuToggle.focus();
   }
   function syncPageButtons(id) {
     const index = order.indexOf(id);
     $('prevBtn').disabled = index === 0;
     $('nextBtn').disabled = index === order.length - 1;
-    $('prevBtn').setAttribute('aria-label', index ? `Menu sebelumnya: ${labels[index - 1]}` : 'Menu sebelumnya');
-    $('nextBtn').setAttribute('aria-label', index < order.length - 1 ? `Menu berikutnya: ${labels[index + 1]}` : 'Menu berikutnya');
+    $('prevBtn').setAttribute('aria-label', index ? t('Menu sebelumnya: {page}', { page: labels[index - 1] }) : t('Menu sebelumnya'));
+    $('nextBtn').setAttribute('aria-label', index < order.length - 1 ? t('Menu berikutnya: {page}', { page: labels[index + 1] }) : t('Menu berikutnya'));
   }
   function render(id, { focus = false, scroll = false, contact = false } = {}) {
     if (!order.includes(id)) id = 'hero';
@@ -106,6 +109,7 @@
       heading.setAttribute('tabindex', '-1');
       heading.focus({ preventScroll: true });
     }
+    localize(document.body);
     if (contact && current === 'scrim') {
       $('scrimContact').scrollIntoView({ block: 'center', behavior: 'instant' });
       $('scrimContactLink').focus({ preventScroll: true });
@@ -153,7 +157,7 @@
     const open = menuToggle.getAttribute('aria-expanded') !== 'true';
     menu.classList.toggle('is-open', open);
     menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+    menuToggle.setAttribute('aria-label', t(open ? 'Tutup menu' : 'Buka menu'));
     if (open && event.detail === 0) navLinks[0].focus();
   });
   document.addEventListener('keydown', event => {
@@ -183,10 +187,10 @@
       queueRailRender();
     }
     const button = $('motionToggle');
-    button.textContent = active ? '◈ EFEK: AKTIF' : '◇ EFEK: NONAKTIF';
+    button.textContent = t(active ? '◈ EFEK: AKTIF' : '◇ EFEK: NONAKTIF');
     button.setAttribute('aria-pressed', String(active));
-    button.setAttribute('aria-label', 'Efek glitch');
-    button.title = motionMedia.matches ? 'Efek dimatikan mengikuti preferensi gerakan perangkat.' : 'Aktifkan atau matikan efek glitch';
+    button.setAttribute('aria-label', t('Efek glitch'));
+    button.title = t(motionMedia.matches ? 'Efek dimatikan mengikuti preferensi gerakan perangkat.' : 'Aktifkan atau matikan efek glitch');
   }
   $('motionToggle').addEventListener('click', () => {
     if (motionMedia.matches) { toast('Efek mengikuti pengaturan kurangi gerakan pada perangkat.'); return; }
@@ -202,7 +206,7 @@
   });
   function toast(message) {
     clearTimeout(toastTimeout);
-    $('toast').textContent = message;
+    $('toast').textContent = t(message);
     $('toast').classList.add('is-visible');
     toastTimeout = setTimeout(() => $('toast').classList.remove('is-visible'), 4000);
   }
@@ -225,6 +229,7 @@
       clan.textContent = `CLAN / ${affiliation.clan_origin}`;
       card.querySelector('.member-card-top').append(clan);
     }
+    localize(card);
   });
 
   const gallery = $('operativeGallery');
@@ -293,7 +298,7 @@
     viewport.className = 'roster-marquee';
     viewport.tabIndex = 0;
     viewport.setAttribute('role', 'region');
-    viewport.setAttribute('aria-label', `${definition.title}. Seret dengan mouse atau usap ke kiri dan kanan, atau gunakan tombol panah. Bergerak otomatis ${definition.directionLabel.toLocaleLowerCase('id')}.`);
+    viewport.setAttribute('aria-label', t('{roster}. Seret dengan mouse, usap layar, atau gunakan tombol panah. Arah otomatis: {direction}.', { roster: t(definition.title), direction: t(definition.directionLabel) }));
     viewport.title = 'Klik atau tap untuk membuka dossier. Tahan lalu geser atau usap untuk melihat roster.';
     const track = document.createElement('div');
     track.className = 'roster-marquee-track';
@@ -629,6 +634,8 @@
       view.empty.hidden = !showPending;
       view.motion.viewport.hidden = cards.length === 0;
       view.count.textContent = String(cards.length).padStart(2, '0');
+      view.motion.viewport.setAttribute('aria-label', t('{roster}. Seret dengan mouse, usap layar, atau gunakan tombol panah. Arah otomatis: {direction}.', { roster: t(definition.title), direction: t(definition.directionLabel) }));
+      localize(view.section);
       if (!cards.length) {
         view.motion.cycleWidth = 0;
         view.motion.track.style.removeProperty('transform');
@@ -648,6 +655,7 @@
       replica.setAttribute('aria-hidden', 'true');
       [...primary.children].forEach(card => replica.append(decorativeClone(card)));
       view.track.replaceChildren(primary, replica);
+      localize(view.track);
       const duration = Math.max(27, cycleCount * 4.5);
       view.motion.duration = duration;
       view.track.style.setProperty('--rail-duration', `${duration}s`);
@@ -674,7 +682,7 @@
     let count = 0;
     memberCards.forEach(card => {
       const id = card.querySelector('.member-id').textContent.trim();
-      const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || '') + ' ' + card.dataset.clanOrigin);
+      const searchable = normalize(card.textContent + ' ' + (dossiers[id]?.alias || '') + ' ' + (dossiers[id]?.role || '') + ' ' + card.dataset.clanOrigin);
       const matches = searchable.includes(query) && (role === 'all' || category(id, card).includes(role));
       card.hidden = !matches;
       if (matches) count++;
@@ -689,8 +697,8 @@
     $('operativeToolbar').hidden = count === 0;
     $('operativeCurrent').textContent = String(activeRails).padStart(2, '0');
     $('operativeTotal').textContent = String(count).padStart(2, '0');
-    $('operativeCurrentId').textContent = `${String(mainCount).padStart(2, '0')} MAIN / ${String(allianceCount).padStart(2, '0')} ALLIANCE`;
-    $('searchStatus').textContent = `${count} dari ${memberCards.length} dossier ditampilkan: ${mainCount} Main Roster dan ${allianceCount} The Alliance. Klik atau tap untuk membuka profil; seret atau usap untuk menggeser.`;
+    $('operativeCurrentId').textContent = t('{main} MAIN / {alliance} ALLIANCE', { main: String(mainCount).padStart(2, '0'), alliance: String(allianceCount).padStart(2, '0') });
+    $('searchStatus').textContent = t('{count} dari {total} dossier ditampilkan: {main} Main Roster dan {alliance} The Alliance. Klik atau tap untuk membuka profil; seret atau usap untuk menggeser.', { count, total: memberCards.length, main: mainCount, alliance: allianceCount });
   }
   $('memberSearch').addEventListener('input', filterMembers);
   $('roleFilter').addEventListener('change', filterMembers);
@@ -772,8 +780,8 @@
     $('dsAlias').textContent = data.alias;
     const affiliation = window.SCPRoster.normalize(data);
     $('dsRoster').textContent = affiliation.roster_type === 'main' ? 'SCP Main Roster' : 'The Alliance';
-    $('dsClan').textContent = affiliation.clan_origin || 'Belum dikonfirmasi';
-    $('dsCommitment').textContent = affiliation.commitment_scope || 'Belum ada jadwal membela SCP yang disepakati.';
+    $('dsClan').textContent = affiliation.clan_origin || t('Belum dikonfirmasi');
+    $('dsCommitment').textContent = affiliation.commitment_scope || t('Belum ada jadwal membela SCP yang disepakati.');
     $('dsUnique').textContent = data.unique;
     const portrait = $('dsPortrait');
     portrait.replaceChildren();
@@ -788,7 +796,8 @@
     for (const track of data.track || []) {
       const item = document.createElement('li');
       appendText(item, 'strong', track.clan);
-      item.append(document.createTextNode(' — ' + track.role));
+      const role = appendText(item, 'span', track.role);
+      role.className = 'track-role';
       appendText(item, 'small', track.year);
       $('dsTrack').append(item);
     }
@@ -805,6 +814,7 @@
       const fill = document.createElement('span'); fill.className = 'stat-meter-fill'; fill.style.width = `${value}%`; meter.append(fill); stat.append(meter);
       $('dsStats').append(stat);
     }
+    localize(dossier);
     dossier.showModal();
     document.body.classList.add('modal-open');
     dossier.scrollTop = 0;
@@ -861,33 +871,33 @@
     });
   });
 
-  const dateFormatter = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' });
+  const formatDate = date => window.SCPI18n?.formatDate(date) || new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
   function updateDates() {
     document.querySelectorAll('.next-date').forEach(node => {
       const next = node.dataset.date
         ? new Date(`${node.dataset.date}T${(node.dataset.time || '00:00').slice(0, 5)}:00+07:00`)
         : SCPSchedule.nextOccurrence(Number(node.dataset.weekday), Number(node.dataset.hour), new Date(), Number(node.dataset.minute || 0));
-      node.textContent = `${node.dataset.date ? 'TANGGAL' : 'BERIKUTNYA'} / ${dateFormatter.format(next)}`;
+      node.textContent = `${t(node.dataset.date ? 'TANGGAL' : 'BERIKUTNYA')} / ${formatDate(next)}`;
     });
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) updateDates(); });
   window.addEventListener('hashchange', updateDates);
   $('calendarDownload').addEventListener('click', () => {
-    const file = new Blob([SCPSchedule.calendar()], { type: 'text/calendar;charset=utf-8' });
+    const file = new Blob([SCPSchedule.calendar(new Date(), t)], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(file);
     const link = document.createElement('a'); link.href = url; link.download = 'scp-jadwal-rutin.ics';
     document.body.append(link); link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast('Kalender diunduh. Konfirmasi jadwal melalui Discord.');
   });
-  const template = 'PENGAJUAN SCRIM — SCP ALLIANCE\n\nNama clan:\nMode permainan:\nTanggal:\nWaktu (WIB):\nFormat pertandingan:\nKontak PIC:\nCatatan tambahan:';
+  const template = () => ['PENGAJUAN SCRIM — SCP ALLIANCE', '', 'Nama clan:', 'Mode permainan:', 'Tanggal:', 'Waktu (WIB):', 'Format pertandingan:', 'Kontak PIC:', 'Catatan tambahan:'].map(line => t(line)).join('\n');
   $('copyTemplate').addEventListener('click', async () => {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(template);
+      await navigator.clipboard.writeText(template());
       toast('Format pengajuan disalin. Lengkapi lalu kirim di Discord.');
     } catch {
-      $('copyText').value = template;
+      $('copyText').value = template();
       $('copyDialog').showModal();
       document.body.classList.add('modal-open');
       $('copyText').focus(); $('copyText').select();
@@ -895,6 +905,26 @@
   });
   $('copyClose').addEventListener('click', () => $('copyDialog').close());
   $('copyDialog').addEventListener('close', () => { document.body.classList.remove('modal-open'); if (current === 'scrim' && !root.classList.contains('is-routing')) $('copyTemplate').focus({ preventScroll: true }); });
+  window.addEventListener('scp:language', () => {
+    window.SCPMotion.finish();
+    labels = sourceLabels.map(label => t(label));
+    document.title = `${labels[order.indexOf(current)]} — S.C.P Alliance`;
+    $('wipeLabel').textContent = labels[order.indexOf(current)].toUpperCase();
+    syncPageButtons(desired);
+    menuToggle.setAttribute('aria-label', t(menuToggle.getAttribute('aria-expanded') === 'true' ? 'Tutup menu' : 'Buka menu'));
+    memberCards.forEach(localize);
+    if (dossier.open) {
+      const affiliation = window.SCPRoster.normalize(dossiers[$('dsFileId').textContent]);
+      $('dsClan').textContent = affiliation.clan_origin || t('Belum dikonfirmasi');
+      $('dsCommitment').textContent = affiliation.commitment_scope || t('Belum ada jadwal membela SCP yang disepakati.');
+    }
+    $('teamMemberSummary').textContent = t('{count} operatives. 4 founders.', { count: memberCards.length });
+    filterMembers();
+    updateDates();
+    syncMotion();
+    if ($('copyDialog').open) $('copyText').value = template();
+  });
+  $('teamMemberSummary').textContent = t('{count} operatives. 4 founders.', { count: memberCards.length });
   syncMotion();
   updateDates();
   render(location.hash.slice(1));

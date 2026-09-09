@@ -81,17 +81,17 @@
     }
     parts.push(chunk); return parts.join('\r\n');
   }
-  function calendar(now = new Date()) {
+  function calendar(now = new Date(), translate = (value, values = {}) => String(value || '').replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match)) {
     const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SCP Alliance//Operations//ID','CALSCALE:GREGORIAN','X-WR-CALNAME:SCP Alliance — Operation Schedule','X-WR-TIMEZONE:Asia/Jakarta'];
     for (const event of events.filter(item => item.published !== false)) {
       const start = eventStart(event, now);
       if (!start) continue;
       const end = eventEnd(event, start);
-      const description = [event.details, event.opponent ? `Lawan: ${event.opponent}` : '', event.notes, `Status: ${event.status}`].filter(Boolean).join('\n');
+      const description = [translate(event.details), event.opponent ? translate('Lawan: {opponent}', { opponent: event.opponent }) : '', translate(event.notes), translate('Status: {status}', { status: translate(event.status) })].filter(Boolean).join('\n');
       lines.push('BEGIN:VEVENT', `UID:scp-${escapeText(event.id)}@scp-alliance.invalid`, `DTSTAMP:${stamp(now)}`, `DTSTART:${stamp(start)}`);
       if (end) lines.push(`DTEND:${stamp(end)}`);
       if (event.schedule_kind === 'weekly') lines.push(`RRULE:FREQ=WEEKLY;BYDAY=${dayCodes[Number(event.weekday)] || 'SU'}`);
-      lines.push(`SUMMARY:${escapeText(event.title)}`, `DESCRIPTION:${escapeText(description)}`, 'LOCATION:Discord SCP Alliance', 'URL:https://discord.gg/y8GR3HhK48', `STATUS:${calendarStatus(event.status)}`, 'END:VEVENT');
+      lines.push(`SUMMARY:${escapeText(translate(event.title))}`, `DESCRIPTION:${escapeText(description)}`, 'LOCATION:Discord SCP Alliance', 'URL:https://discord.gg/y8GR3HhK48', `STATUS:${calendarStatus(event.status)}`, 'END:VEVENT');
     }
     lines.push('END:VCALENDAR');
     return lines.map(fold).join('\r\n') + '\r\n';

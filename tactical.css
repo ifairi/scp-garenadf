@@ -1,0 +1,144 @@
+/* Delta Force-inspired field interface, adapted for the independent SCP alliance.
+   Original CSS: no publisher scripts, fonts, tracking, or game-download UI. */
+:root {
+  --signal: #79efb0;
+  --tactical-line: #99d9b438;
+  --tactical-surface: #0d1712;
+}
+
+/* Small instrument marks stay inside the existing contoured shell. */
+.hero-topline { padding-bottom: 16px; border-bottom: 1px solid #b6e2c51c; }
+.hero-topline > span:first-child { color: #d5e8dc; }
+.hero-topline > span:last-child { color: #a7bdb0; }
+.field-label { position: relative; padding: 0; background: none; border: 0; }
+.field-label::before, .field-label::after { content: none; }
+.field-label strong { font-size: 19px; }
+.hero-bottom { border-block: 1px solid var(--tactical-line); background: #08120ed9; }
+.intel-cell { position: relative; }
+.intel-cell::before {
+  content: ''; position: absolute; inset: -1px auto auto 0;
+  width: 34px; height: 2px; background: var(--signal); opacity: .6;
+  transform-origin: left center; transition: transform .22s ease, opacity .22s ease;
+  pointer-events: none;
+}
+.intel-cell:not(:first-child)::before { left: 30px; }
+.intel-symbol { display: grid; place-items: center; }
+.intel-symbol svg { display: block; width: 32px; height: 32px; }
+
+/* A brighter action surface, with a separate arrow compartment. */
+.button-primary { background: var(--signal); border-color: var(--signal); color: #071d11; }
+.button-primary > :is(span, i):last-child { padding-left: 15px; border-left: 1px solid #153a2340; }
+.button-primary > .ui-arrow:last-child { padding-left: 0; border-left: 0; }
+.button-primary:hover { background: #b3ffd1; }
+.button-ghost { background: #0a140fc9; border-color: #9ab7a65c; }
+.button-ghost:hover { background: #1a3426; }
+.text-link { text-underline-offset: 5px; }
+
+/* Section numbers are decorative and never replace translated headings. */
+.inner-panel .section-content::before {
+  content: ''; position: absolute; top: 18px; left: var(--gutter); right: var(--gutter);
+  height: 20px; background: url('assets/df/technical-divider.png') center / 100% 100% no-repeat;
+  opacity: .55; pointer-events: none;
+}
+.section-heading > div:first-child { isolation: isolate; }
+.section-code {
+  position: absolute; z-index: -1; inset: -34px auto auto -4px;
+  font: 700 clamp(100px, 10vw, 150px)/1 var(--display); letter-spacing: -.07em;
+  color: transparent; -webkit-text-stroke: 1px #b9e5cc18;
+  pointer-events: none; user-select: none;
+}
+.inner-panel .section-heading .eyebrow { display: flex; align-items: center; gap: 10px; }
+.inner-panel .section-heading .eyebrow::before {
+  flex: none; width: 7px; height: 7px; margin: 0;
+  background: var(--signal); box-shadow: 0 0 0 4px #8debaf12;
+}
+.section-heading > div:first-child::after {
+  width: 104px; height: 2px;
+  background: linear-gradient(90deg, var(--signal) 0 72%, transparent 72% 78%, var(--signal) 78% 85%, transparent 85% 91%, var(--signal) 91%);
+}
+.rules-heading > .rules-download::after { content: none; }
+
+/* Surface divisions echo the reference's operator and equipment panels. */
+.story-stack { border: 1px solid var(--tactical-line); background: #0b1611b8; padding-inline: 25px; }
+.story-card:last-child { border-bottom: 0; }
+.story-card::after { right: -28px; width: 5px; height: 5px; }
+.story-card:last-child::after { content: none; }
+.card-index { color: #b1e5c7; }
+.founder-card { position: relative; border-radius: 3px; border-color: var(--tactical-line); background: linear-gradient(135deg, #193124b8, #0a1510e8); }
+.founder-card::after { content: ''; position: absolute; right: 10px; top: 10px; width: 7px; height: 7px; border-top: 1px solid #a4efc770; border-right: 1px solid #a4efc770; pointer-events: none; }
+.member-grid.roster-rails .member-card { border-radius: 4px 4px 18px 4px; box-shadow: none; border-color: #acd6bd38; }
+.member-grid.roster-rails .member-gridlines { border-color: #b4eace20; }
+.member-grid.roster-rails .member-id { color: var(--signal); }
+.member-grid.roster-rails .member-open b { border-radius: 3px; color: var(--signal); border: 1px solid #97e8b86b; background: #10261ae8; transition: background .22s, color .22s; }
+.member-grid.roster-rails .member-open:hover b { transform: none; background: var(--signal); color: #081d10; }
+.member-grid.roster-rails .member-art { transition-duration: .35s; }
+.member-grid.roster-rails .member-card-bottom { border-top-color: #b9e5cc38; }
+.member-grid.roster-rails .member-photo { border-radius: 2px; }
+.member-grid.roster-rails .member-category { color: #c0e3ce; }
+.member-grid.roster-rails .member-access { border-radius: 0; }
+.roster-lane::before { box-shadow: none; }
+.dossier { border-top: 2px solid var(--signal); border-radius: 3px; }
+.dossier-topbar { background: #0d1a13; }
+.dossier-stats { border-radius: 2px; border-color: var(--tactical-line); }
+.stat-meter { border-radius: 0; }
+.stat-meter-fill { background: linear-gradient(90deg, #428564, var(--signal)); }
+
+.mission-number { color: var(--signal); font-size: 34px; }
+.mission-row { background: linear-gradient(90deg, #8be9b208, transparent 54%); }
+.mission-row > .mission-number { border-left: 2px solid #85d6a458; padding-left: 12px; }
+.schedule-card {
+  position: relative; border-radius: 3px; border-color: var(--tactical-line);
+  background: linear-gradient(135deg, #193125eb, #0a1510f2);
+}
+.schedule-card::before {
+  content: ''; position: absolute; top: -1px; left: 20px; width: 54px; height: 3px;
+  background: var(--signal); pointer-events: none;
+}
+.schedule-card::after {
+  content: ''; position: absolute; right: 10px; bottom: 10px; width: 13px; height: 13px;
+  border-right: 1px solid #a4efc788; border-bottom: 1px solid #a4efc788; pointer-events: none;
+}
+.schedule-card h3 { font-weight: 700; }
+.schedule-card .schedule-time { color: #dbf9e7; font-variant-numeric: tabular-nums; }
+.schedule-card .badge { border-radius: 1px; }
+.schedule-card .next-date { border-top: 1px dashed #a4efc738; padding-top: 16px; font-size: 11px; }
+.scrim-contact, .protocol-join { border-radius: 3px; background-color: var(--tactical-surface); }
+.membership-paths > article { border-radius: 3px; }
+.protocol-rules details[open] { background: linear-gradient(90deg, #8be9b208, transparent 80%); }
+.protocol-rules details[open] summary::before { content: ''; position: absolute; inset: 23px auto auto -12px; width: 2px; height: 20px; background: var(--signal); }
+
+@media (hover: hover) and (pointer: fine) {
+  a.intel-cell:hover::before { opacity: 1; transform: scaleX(1.8); }
+  .member-grid.roster-rails .member-card:hover { box-shadow: inset 0 0 0 1px #a4efc726; border-color: var(--signal); }
+  .member-grid.roster-rails .member-card:hover .member-art { transform: scale(1.025); }
+  .member-grid.roster-rails .member-card:hover .member-open b { transform: none; background: var(--signal); color: #081d10; }
+  .text-link:hover { text-decoration: underline; }
+}
+@media (max-width: 900px) {
+  .story-stack { padding-inline: 20px; }
+  .story-card::after { right: -23px; }
+}
+@media (max-width: 680px) {
+  .hero-topline { padding-bottom: 12px; }
+  .intel-cell:not(:first-child)::before { left: 18px; }
+  .button-primary > :is(span, i):last-child { padding-left: 10px; }
+  .button-primary > .ui-arrow:last-child { padding-left: 0; }
+  .section-code { top: -22px; font-size: 102px; }
+  .inner-panel .section-heading .eyebrow { gap: 9px; }
+  .story-stack { padding-inline: 18px; }
+  .story-card::after { right: -21px; }
+  .mission-row > .mission-number { padding-left: 5px; font-size: 24px; }
+  .schedule-card .next-date { margin-top: 20px; padding-top: 13px; }
+  .protocol-rules details[open] summary::before { left: -9px; }
+}
+.motion-off :is(.intel-cell, .member-card, .member-open, .member-art),
+.motion-off :is(.intel-cell, .member-card, .member-open, .member-art)::before { transition: none; }
+.motion-off .member-grid.roster-rails :is(.member-card, .member-art, .member-open b) { transition: none; }
+.motion-off .member-grid.roster-rails .member-card:hover .member-art { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .member-grid.roster-rails .member-card:hover .member-art { transform: none; }
+}
+@media print {
+  .section-code, .field-label, .inner-panel .section-content::before { display: none; }
+  .story-stack, .schedule-card, .founder-card, .protocol-join { background: white; }
+}

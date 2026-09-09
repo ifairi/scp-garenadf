@@ -68,6 +68,26 @@ Untuk database lama, jalankan **schema.sql saja** sebelum menggunakan field baru
 
 Unggah sumber terbaru: `index.html`, seluruh file `.js` dan `.css` aplikasi di root, `package.json`, `vercel.json`, folder `assets/` (termasuk `fonts/` dan `docs/`), `admin/`, dan `scripts/`. Sertakan `supabase/` dan README untuk persiapan database. Pertahankan `delta_force_logo.png` dan `og.png`. Jangan mengunggah `.env`, `qa/`, atau `node_modules/`. Folder `dist/` tidak diperlukan pada integrasi GitHub–Vercel karena dibuat oleh build. Website tetap berjalan tanpa akun Supabase; panel admin baru dapat menyimpan setelah setup selesai.
 
+## Bahasa
+
+Website publik memiliki pilihan **Indonesia**, **English**, dan **简体中文** (Mandarin dengan aksara sederhana). Pilihan berada di header, tersimpan pada perangkat, dan dapat dibagikan melalui `?lang=en#rules` atau `?lang=zh-CN#rules`. Bahasa awal tetap Indonesia. Pergantian bahasa mempertahankan halaman aktif dan pengaturan efek.
+
+`i18n-data.js` menyimpan pasangan teks Indonesia, Inggris, dan Mandarin; `i18n.js` menerapkannya pada teks tanpa mengganti elemen interaktif. `i18n.css` menata kontrol bahasa dan menyediakan font sistem yang mendukung Mandarin sebagai pelengkap font SCP. Tidak ada layanan terjemahan atau font eksternal yang dipanggil.
+
+Seluruh menu publik, aturan, profil bawaan, pencarian, pesan antarmuka, dan template scrim tersedia dalam tiga bahasa. Nama/nickname, alias, clan, ID dan angka statistik tetap asli. Semua jadwal tetap **WIB / UTC+7**, termasuk ekspor kalender; hanya bahasa tanggal dan keterangannya yang berubah. SCP disebut berbasis di Indonesia, tanpa mengklaim sebagai organisasi global.
+
+Panel admin dan PDF unduhan masih berbahasa Indonesia. Tombol PDF menjelaskan bahasa dokumen pada tampilan Inggris dan Mandarin. Teks baru yang ditulis lewat admin ditampilkan sesuai bahasa penulisnya kecuali padanannya ditambahkan ke kamus; tidak ada terjemahan otomatis untuk data yang belum ditinjau.
+
+Untuk update GitHub ini, sertakan file baru `i18n.js`, `i18n-data.js`, `i18n.css`, beserta perubahan `index.html`, `script.js`, `protocol.js`, `schedule.js`, `data-runtime.js`, `scripts/build.mjs`, `scripts/check.mjs`, `scripts/check-i18n.mjs`, dan README. Kamus disertakan dalam build statis, sehingga fitur tetap berjalan tanpa Supabase.
+
+## Detail taktis Delta Force
+
+`tactical.css` mengadaptasi panel gelap, aksen hijau, garis instrumen, dan respons hover dari referensi resmi [Delta Force](https://df.qq.com/cp/a20240906main/index.html). Bingkai header, foto komunitas, font P-Med/P-Bold, pilihan bahasa, dan interaksi roster tetap dipertahankan. Nomor bagian yang tipis bersifat dekoratif; ikon pada ringkasan Beranda memakai vektor.
+
+Satu aset resmi berukuran 2,166 byte disimpan lokal di `assets/df/technical-divider.png`; sumbernya dicatat di `assets/df/README.md`. Website tidak memanggil server Tencent untuk memuat aset ini. Tidak ditambahkan video latar, framework, pelacak, atau skrip dari referensi. Efek hover kartu menggunakan transform kecil selama 350 ms dan tetap menghormati pengaturan efek serta reduced motion.
+
+Untuk update visual ini, unggah `index.html`, `tactical.css`, `scripts/build.mjs`, folder `assets/df/`, dan `README.md`. Pertahankan struktur folder; Vercel membangun ulang `dist/` secara otomatis.
+
 ## Perilaku
 
 Tautan `#hero`, `#about`, `#founders`, `#objectives`, `#scrim`, dan `#rules` dapat dibagikan langsung. Navigasi mendukung tombol Back/Forward browser dan highlight emerald pada menu aktif. Intro muncul saat pemuatan dokumen, bisa dilewati dengan Escape, dan memiliki batas 3,2 detik jika aset lambat. Profil memakai dialog native dengan fokus keyboard dan Escape; lima statistik tampil lebih dahulu, dengan animasi bar dan glitch ketika dibuka. Preferensi efek tersimpan lokal, sedangkan reduced motion perangkat selalu dihormati. Tanpa JavaScript, semua menu tetap dapat dibaca; intro dan fitur interaktif tambahan disembunyikan.
