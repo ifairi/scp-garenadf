@@ -973,6 +973,12 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
   letter-spacing: .8px;
   white-space: nowrap;
 }
+.clan-node--logo { flex-direction: column; justify-content: center; gap: 10px; padding-block: 16px; border-color: #a4efc747; }
+.clan-node__logo { display: block; width: 96px; height: 92px; max-width: 100%; object-fit: contain; flex: none; }
+/* Compensate for FD's transparent margins while keeping card labels aligned. */
+.clan-node__logo--fd { transform: translateY(-6%) scale(1.35); }
+.clan-node--logo .clan-node__copy { text-align: center; gap: 3px; }
+.clan-node--logo .clan-node__copy strong { font-size: 12px; color: var(--text); white-space: normal; overflow-wrap: anywhere; }
 @keyframes clanRegistryScan {
   0%, 12% { opacity: 0; transform: translateX(-110%); }
   22% { opacity: .7; }
@@ -998,6 +1004,8 @@ main :is(h1, h2)[tabindex='-1']:focus { outline: none; }
   .clan-network__status { margin-top: 9px; }
   .clan-network__list { grid-auto-columns: 151px; }
   .clan-node { min-height: 82px; padding: 11px; gap: 10px; }
+  .clan-node--logo { padding-block: 14px; gap: 8px; }
+  .clan-node__logo { width: 82px; height: 78px; }
   .clan-node__mark { width: 40px; height: 40px; }
   .clan-node__mark::before { inset: 10px; }
   .clan-node__mark i { top: 6px; height: 28px; }

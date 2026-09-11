@@ -601,9 +601,9 @@ window.SCP_TRANSLATIONS = [
     "通过 SCP 成员建立联系的战队，标志将在获得战队代表许可后展示"
   ],
   [
-    "04 SLOTS READY",
-    "04 SLOTS READY",
-    "04 个展示位"
+    "CLAN TERHUBUNG",
+    "CONNECTED CLANS",
+    "关联战队"
   ],
   [
     "Registry clan terafiliasi",
