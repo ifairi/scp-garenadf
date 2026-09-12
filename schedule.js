@@ -6,7 +6,7 @@
   const dayCodes = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
   const fallbackEvents = [
     { id: 'training', schedule_kind: 'weekly', operation_type: 'TRAINING', title: 'SCP — Latihan internal divisi', status: 'Terjadwal', weekday: 5, start_time: '20:00', end_time: '22:00', end_open: false, details: 'Latihan internal divisi', notes: 'Koordinasi & evaluasi tim', published: true, sort_order: 1 },
-    { id: 'saturday', schedule_kind: 'weekly', operation_type: 'SCRIM MATCH', title: 'SCP — Scrim Sabtu', status: 'Terjadwal', weekday: 6, start_time: '20:00', end_time: null, end_open: true, details: 'SERA ESPORT', notes: 'Terbuka untuk tantangan clan', published: true, sort_order: 2 },
+    { id: 'saturday', schedule_kind: 'weekly', operation_type: 'SCRIM MATCH', title: 'SCP — Scrim Sabtu', status: 'Mencari lawan', weekday: 6, start_time: '19:00', end_time: null, end_open: true, details: 'Lawan belum ditentukan', notes: 'Terbuka untuk tantangan clan', published: true, sort_order: 2 },
     { id: 'sunday', schedule_kind: 'weekly', operation_type: 'SCRIM MATCH', title: 'SCP — Scrim Minggu', status: 'Mencari lawan', weekday: 0, start_time: '15:00', end_time: '18:00', end_open: false, details: 'Lawan belum ditentukan', notes: 'Terbuka untuk tantangan clan', published: true, sort_order: 3 }
   ];
   let events = fallbackEvents.map(normalizeEvent);
