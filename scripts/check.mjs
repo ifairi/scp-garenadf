@@ -46,7 +46,11 @@ for (const [id, member] of Object.entries(context.window.SCP_DOSSIERS)) {
   for (const [, score] of member.stats) assert(score >= 0 && score <= 100);
 }
 assert.equal((html.match(/class="founder-card /g) || []).length, 4);
-assert(html.includes('2026-07-17'), 'Preserve actual schedule update date');
+const scheduleDateTag = html.match(/<time\b(?=[^>]*\bid="scheduleDataDate")[^>]*>/)?.[0];
+const scheduleUpdated = scheduleDateTag?.match(/\bdatetime="(\d{4}-\d{2}-\d{2})"/)?.[1];
+const scheduleUpdatedTime = Date.parse(`${scheduleUpdated}T00:00:00Z`);
+assert(Number.isFinite(scheduleUpdatedTime) && new Date(scheduleUpdatedTime).toISOString().slice(0, 10) === scheduleUpdated,
+  'Schedule update date must be a valid YYYY-MM-DD date on #scheduleDataDate');
 vm.runInContext(await readFile('schedule.js', 'utf8'), context);
 const { nextOccurrence, calendar } = context.SCPSchedule;
 const cases = [
@@ -62,13 +66,17 @@ for (const [day, hour, now, expected] of cases) assert.equal(nextOccurrence(day,
 const ics = calendar(new Date('2026-09-04T10:00:00Z'));
 assert(ics.endsWith('END:VCALENDAR\r\n'));
 assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, 3);
-assert.equal((ics.match(/RRULE:FREQ=WEEKLY/g) || []).length, 3);
+assert.equal((ics.match(/RRULE:FREQ=WEEKLY/g) || []).length, 2);
 assert.equal((ics.match(/DTEND:/g) || []).length, 2, 'Saturday finish must remain unspecified');
 assert(ics.includes('DTSTART:20260904T130000Z'));
 assert(ics.includes('DTEND:20260904T150000Z'));
-assert(ics.includes('DTSTART:20260905T120000Z'));
+assert(ics.includes('DTSTART:20260919T130000Z'));
 assert(ics.includes('DTSTART:20260906T080000Z'));
 for (const line of ics.split('\r\n')) assert(Buffer.byteLength(line, 'utf8') <= 75, 'Calendar line folding');
+const scrimEvent = calendar(new Date('2026-09-20T00:00:00Z')).replace(/\r\n /g, '').split('BEGIN:VEVENT').find(event => event.includes('SUMMARY:SCP vs SERA'));
+assert(scrimEvent?.includes('DTSTART:20260919T130000Z'), 'The first scrim keeps its fixed date after September 19');
+assert(!/RRULE:|DTEND:/.test(scrimEvent), 'The first scrim has no recurrence or invented finish time');
+for (const detail of ['19.30 WIB', 'Best of 3', 'TRESHOLD', 'AFTERSHOCK', 'Fault', 'Cracked', 'SCP (Attacker)', 'SERA (Defender)', 'STATUS:CONFIRMED']) assert(scrimEvent.includes(detail), `First scrim calendar preserves ${detail}`);
 context.SCPSchedule.setEvents([{
   id: 'event-check', schedule_kind: 'event', operation_type: 'tournament', title: 'Operation Check',
   status: 'cancelled', event_date: '2026-09-09', start_time: '23:30', end_time: '01:00',
