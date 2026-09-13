@@ -102,6 +102,32 @@
 .schedule-card .schedule-time { color: #dbf9e7; font-variant-numeric: tabular-nums; }
 .schedule-card .badge { border-radius: 1px; }
 .schedule-card .next-date { border-top: 1px dashed #a4efc738; padding-top: 16px; font-size: 11px; }
+.schedule-grid { align-items: start; }
+.schedule-card--featured { border-color: #a4efc770; background: linear-gradient(135deg, #254b37f2, #0d1a13f5); }
+.schedule-card--featured::before { width: 84px; }
+.schedule-card--featured h3 { font-size: clamp(25px, 2.3vw, 34px); letter-spacing: -.7px; }
+.schedule-card--featured h3 em { font: 500 .52em var(--body); color: var(--muted); vertical-align: middle; }
+.match-date { margin-top: 9px; color: var(--accent); font-size: 11px; line-height: 1.7; }
+.match-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px 0 20px; }
+.match-times > div > span { color: var(--muted); font-size: 10px; }
+.match-times > div + div { border-left: 1px solid var(--line); padding-left: 14px; }
+.match-times .schedule-time { margin: 4px 0 0; font-size: clamp(20px, 1.8vw, 25px); white-space: nowrap; }
+.match-format { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 17px; font-size: 11px; }
+.match-format strong { color: var(--accent); font: 10px var(--mono); letter-spacing: .5px; }
+.match-brief { margin-top: 17px; border-top: 1px dashed #a4efc738; }
+.match-brief summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: var(--accent); font-size: 11px; cursor: pointer; list-style: none; }
+.match-brief summary::-webkit-details-marker { display: none; }
+.match-brief summary > i { width: 7px; height: 7px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); flex: none; }
+.match-brief[open] summary > i { transform: rotate(225deg); }
+.match-brief dl { margin: 0; padding-bottom: 3px; }
+.match-brief dl > div { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 10px; padding: 12px 0; border-top: 1px solid #a4efc71a; font-size: 11px; }
+.match-brief dt { color: var(--muted); }
+.match-brief dd { margin: 0; overflow-wrap: anywhere; }
+.match-brief dd small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+.match-side { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; }
+.match-side + .match-side { margin-top: 7px; }
+.match-side b { color: var(--accent); }
+.match-side > span { color: var(--muted); }
 .scrim-contact, .protocol-join { border-radius: 3px; background-color: var(--tactical-surface); }
 .membership-paths > article { border-radius: 3px; }
 .protocol-rules details[open] { background: linear-gradient(90deg, #8be9b208, transparent 80%); }

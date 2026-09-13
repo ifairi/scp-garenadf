@@ -1,5 +1,19 @@
 /* Reviewed public-site copy: [Indonesian source, English, Simplified Chinese]. */
 window.SCP_TRANSLATIONS = [
+  ["Persiapan", "Check-in", "赛前准备"],
+  ["Mulai match", "Match start", "比赛开始"],
+  ["Scrim pertama SCP", "SCP's first scrim", "SCP 首场训练赛"],
+  ["Map & sisi awal", "Maps & starting sides", "地图与开局阵营"],
+  ["Map utama", "Main map", "主地图"],
+  ["Map penentu", "Decider map", "决胜地图"],
+  ["Tie breaker", "Tie breaker", "平局时使用"],
+  ["Map banned", "Banned maps", "禁用地图"],
+  ["Sisi awal", "Starting sides", "开局阵营"],
+  ["Attacker", "Attacker", "进攻方"],
+  ["Defender", "Defender", "防守方"],
+  ["Scrim pertama SCP • Best of 3 • Persiapan 19.30 WIB", "SCP's first scrim • Best of 3 • Check-in 19:30 WIB", "SCP 首场训练赛 • 三局两胜 • 19:30 WIB 赛前准备"],
+  ["Map: TRESHOLD • Tie breaker: AFTERSHOCK • Map banned: Fault, Cracked • Sisi awal: SCP (Attacker), SERA (Defender)", "Map: TRESHOLD • Tie breaker: AFTERSHOCK • Banned maps: Fault, Cracked • Starting sides: SCP (Attacker), SERA (Defender)", "地图：TRESHOLD • 决胜地图：AFTERSHOCK • 禁用地图：Fault、Cracked • 开局阵营：SCP（进攻方）、SERA（防守方）"],
+  ["Scrim pertama SCP • Best of 3 • Persiapan 19.30 WIB • Map: TRESHOLD • Tie breaker: AFTERSHOCK • Map banned: Fault, Cracked • Sisi awal: SCP (Attacker), SERA (Defender)", "SCP's first scrim • Best of 3 • Check-in 19:30 WIB • Map: TRESHOLD • Tie breaker: AFTERSHOCK • Banned maps: Fault, Cracked • Starting sides: SCP (Attacker), SERA (Defender)", "SCP 首场训练赛 • 三局两胜 • 19:30 WIB 赛前准备 • 地图：TRESHOLD • 决胜地图：AFTERSHOCK • 禁用地图：Fault、Cracked • 开局阵营：SCP（进攻方）、SERA（防守方）"],
   [
     "Memuat SCP Alliance",
     "Loading SCP Alliance",
