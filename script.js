@@ -4,10 +4,10 @@
   catch { /* Static content remains the fallback if remote data is unavailable. */ }
   const $ = id => document.getElementById(id);
   const root = document.documentElement;
-  const order = ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules'];
+  const order = ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules', 'mapping'];
   const t = (source, values) => window.SCPI18n?.t(source, values) ?? source;
   const localize = container => window.SCPI18n?.apply(container);
-  const sourceLabels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal', 'Protokol'];
+  const sourceLabels = ['Beranda', 'Tentang', 'Tim', 'Tujuan', 'Jadwal', 'Protokol', 'Mapping'];
   let labels = sourceLabels.map(label => t(label));
   const panels = [...document.querySelectorAll('.panel')];
   const navLinks = [...document.querySelectorAll('.nav-link')];
@@ -102,6 +102,10 @@
     syncPageButtons(id);
     document.title = `${labels[index]} — S.C.P Alliance`;
     if (id === 'scrim') updateDates();
+    if (id === 'mapping') {
+      const frame = $('mappingFrame');
+      if (!frame.hasAttribute('src')) frame.src = frame.dataset.src;
+    }
     closeMenu();
     if (scroll) window.scrollTo({ top: 0, behavior: 'instant' });
     if (focus) {

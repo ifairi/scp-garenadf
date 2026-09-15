@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 const html = await readFile('index.html', 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(ids.length, new Set(ids).size, 'HTML IDs must be unique');
-for (const id of ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules']) assert(ids.includes(id));
+for (const id of ['hero', 'about', 'founders', 'objectives', 'scrim', 'rules', 'mapping']) assert(ids.includes(id));
 for (const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
   if (!/^(https?:|data:)/.test(match[1])) await access(match[1]);
 }
@@ -174,5 +174,6 @@ assert.equal((seed.match(/'20000000-0000-4000-8000-[0-9]{12}'/g) || []).length, 
 const configSource = await readFile('site-config.js', 'utf8');
 assert(configSource.includes("url: ''") && configSource.includes("publishableKey: ''"), 'Source config must not contain deployed credentials');
 execFileSync(process.execPath, ['scripts/check-i18n.mjs'], { stdio: 'inherit' });
+execFileSync(process.execPath, ['scripts/check-mapping.mjs'], { stdio: 'inherit' });
 
-console.log('Passed: 6 public routes/admin assets, syntax, 12 preserved identities, roster validation/write contract, remote dossiers, photo path, RLS schema, WIB weekly/event calendar and UTF-8 folding.');
+console.log('Passed: 7 public routes/admin assets, syntax, 12 preserved identities, roster validation/write contract, remote dossiers, photo path, RLS schema, WIB weekly/event calendar and UTF-8 folding.');

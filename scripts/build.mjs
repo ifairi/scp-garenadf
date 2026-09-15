@@ -8,6 +8,7 @@ const publicFiles = ['index.html', 'style.css', 'membership.css', 'tactical.css'
 for (const file of publicFiles) await copyFile(file, path.join(output, file));
 await cp('assets', path.join(output, 'assets'), { recursive: true });
 await cp('admin', path.join(output, 'admin'), { recursive: true });
+await cp('mapping', path.join(output, 'mapping'), { recursive: true });
 try { await stat('og.png'); await copyFile('og.png', path.join(output, 'og.png')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const supabaseUrl = String(process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
 const supabaseKey = String(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();

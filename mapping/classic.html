@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1718">
+  <title>SCP Mapping — Strategy Editor</title>
+  <link rel="stylesheet" href="./editor.css">
+  <script src="./core.js" defer></script>
+  <script src="./editor.js" defer></script>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16"/></symbol>
+    <symbol id="i-select" viewBox="0 0 24 24"><path d="m5 3 14 10-7 1-3 7L5 3Z"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-4-4L5 15l-1 5Z"/></symbol>
+    <symbol id="i-line" viewBox="0 0 24 24"><path d="m5 19 14-14"/><circle cx="5" cy="19" r="1"/><circle cx="19" cy="5" r="1"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m4 20 16-16M9 4h11v11"/></symbol>
+    <symbol id="i-rect" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1"/></symbol>
+    <symbol id="i-ellipse" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="7"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3M12 4v16m-4 0h8"/></symbol>
+    <symbol id="i-marker" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m4 13 9-10 8 8-9 10H9l-5-5a2 2 0 0 1 0-3Zm4-4 8 8m-4 4h9"/></symbol>
+    <symbol id="i-pan" viewBox="0 0 24 24"><path d="M8 12V6a2 2 0 0 1 4 0v6-8a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v9c0 4-3 6-7 6-3 0-5-2-7-5l-3-5c-1-2 1-4 3-2l2 2Z"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M8 4 3 9l5 5M3 9h11a7 7 0 0 1 0 14" transform="translate(0 -2)"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m16 4 5 5-5 5m5-5H10a7 7 0 0 0 0 14" transform="translate(0 -2)"/></symbol>
+    <symbol id="i-delete" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M3 8V4h7l2 3h9v3M3 8h18l-3 13H3V8Z"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 3h13l4 4v14H3V3h1Zm3 0v7h10V3M7 21v-7h10v7"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m6 0h6v-6"/><rect x="7" y="7" width="10" height="10" rx="1"/></symbol>
+    <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m6 0h6v-6"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 3h.01"/></symbol>
+  </defs></svg>
+  <main class="editor" id="editor">
+    <header class="editor-header">
+      <div class="brand"><svg class="icon"><use href="#i-map"/></svg><div><h1>SCP <span>MAPPING</span></h1><p>Plan together. Move with purpose.</p></div></div>
+      <div class="file-actions">
+        <button id="open-strategy" title="Open an editable strategy (.json)"><svg class="icon"><use href="#i-open"/></svg><span>Open</span></button>
+        <button id="save-strategy" disabled title="Download an editable strategy (.json)"><svg class="icon"><use href="#i-save"/></svg><span>Save strategy</span></button>
+        <button id="export-png" class="primary" disabled title="Export the full map and annotations as PNG"><svg class="icon"><use href="#i-download"/></svg><span>Export PNG</span></button>
+      </div>
+    </header>
+    <section class="map-bar" aria-label="Map and strategy">
+      <label class="map-choice"><span class="eyebrow">BATTLEFIELD</span><select id="map-select" aria-label="Choose a battlefield map"><option value="">Choose a map</option></select></label>
+      <button id="upload-map" title="Upload a PNG, JPEG or WebP map"><svg class="icon"><use href="#i-upload"/></svg><span>Upload map</span></button>
+      <div class="map-divider"></div>
+      <label class="strategy-name"><span class="eyebrow">STRATEGY NAME</span><input id="strategy-title" maxlength="100" value="Untitled strategy" aria-label="Strategy name" spellcheck="false"></label>
+      <a id="map-source" target="_blank" rel="noopener noreferrer" hidden>Map source</a>
+      <button id="help" class="icon-button" aria-label="Editor help" title="Editor help"><svg class="icon"><use href="#i-help"/></svg></button>
+    </section>
+    <section class="workspace" aria-label="Strategy workspace">
+      <aside class="tool-rail" aria-label="Drawing tools">
+        <div class="tool-list" role="toolbar" aria-label="Tools" aria-orientation="vertical">
+          <button data-tool="select" aria-label="Select and move (V)" title="Select and move (V)"><svg class="icon"><use href="#i-select"/></svg><span>Select</span></button>
+          <button data-tool="pen" class="active" aria-pressed="true" aria-label="Freehand pen (P)" title="Freehand pen (P)"><svg class="icon"><use href="#i-pen"/></svg><span>Pen</span></button>
+          <button data-tool="line" aria-label="Line (L)" title="Line (L)"><svg class="icon"><use href="#i-line"/></svg><span>Line</span></button>
+          <button data-tool="arrow" aria-label="Arrow (A)" title="Arrow (A)"><svg class="icon"><use href="#i-arrow"/></svg><span>Arrow</span></button>
+          <button data-tool="rect" aria-label="Rectangle (R)" title="Rectangle (R)"><svg class="icon"><use href="#i-rect"/></svg><span>Box</span></button>
+          <button data-tool="ellipse" aria-label="Ellipse (O)" title="Ellipse (O)"><svg class="icon"><use href="#i-ellipse"/></svg><span>Ellipse</span></button>
+          <button data-tool="text" aria-label="Place text (T)" title="Place text (T)"><svg class="icon"><use href="#i-text"/></svg><span>Text</span></button>
+          <button data-tool="marker" aria-label="Squad or objective marker (M)" title="Squad or objective marker (M)"><svg class="icon"><use href="#i-marker"/></svg><span>Marker</span></button>
+          <button data-tool="eraser" aria-label="Erase annotation (E)" title="Erase whole annotations (E)"><svg class="icon"><use href="#i-eraser"/></svg><span>Eraser</span></button>
+          <button data-tool="pan" aria-label="Pan map (H)" title="Pan map (H), or hold Space"><svg class="icon"><use href="#i-pan"/></svg><span>Pan</span></button>
+        </div>
+      </aside>
+      <div class="canvas-column">
+        <div class="properties" role="toolbar" aria-label="Annotation style">
+          <label class="color-control" title="Annotation color"><input id="color" type="color" value="#62f4b5" aria-label="Annotation color"><span>Color</span></label>
+          <div class="swatches" aria-label="Quick colors">
+            <button data-color="#62f4b5" style="--swatch:#62f4b5" aria-label="Mint" title="Mint"></button>
+            <button data-color="#ff617b" style="--swatch:#ff617b" aria-label="Red" title="Red"></button>
+            <button data-color="#ffd166" style="--swatch:#ffd166" aria-label="Yellow" title="Yellow"></button>
+            <button data-color="#69b9ff" style="--swatch:#69b9ff" aria-label="Blue" title="Blue"></button>
+            <button data-color="#ffffff" style="--swatch:#ffffff" aria-label="White" title="White"></button>
+          </div>
+          <label class="stroke-control">Stroke <input id="stroke-width" type="range" min="1" max="24" value="5" aria-label="Stroke width in map pixels"><output id="stroke-value" for="stroke-width">5</output></label>
+          <label id="text-options" class="conditional" hidden>Text <input id="annotation-text" maxlength="160" value="Hold this position" aria-label="Annotation text"></label>
+          <label id="font-options" class="conditional" hidden>Size <input id="font-size" type="number" min="12" max="160" value="32" aria-label="Text or marker size"></label>
+          <label id="marker-options" class="conditional" hidden><select id="marker-kind" aria-label="Marker type"><option value="squad">Squad</option><option value="objective">Objective</option></select><input id="marker-label" maxlength="24" value="ALPHA" aria-label="Marker label"></label>
+          <div class="history-actions">
+            <button id="undo" class="icon-button" disabled title="Undo (Ctrl / Cmd + Z)" aria-label="Undo"><svg class="icon"><use href="#i-undo"/></svg></button>
+            <button id="redo" class="icon-button" disabled title="Redo (Ctrl / Cmd + Shift + Z)" aria-label="Redo"><svg class="icon"><use href="#i-redo"/></svg></button>
+            <button id="delete-selected" class="icon-button" disabled title="Delete selected annotation" aria-label="Delete selected annotation"><svg class="icon"><use href="#i-delete"/></svg></button>
+            <button id="clear" class="quiet" disabled title="Clear all annotations">Clear</button>
+          </div>
+        </div>
+        <div class="stage" id="stage">
+          <canvas id="canvas" tabindex="0" aria-label="Strategy drawing canvas. Choose a tool, then draw on the map. Use Pan or two fingers to move the map."></canvas>
+          <div class="empty-state" id="empty-state"><div class="empty-map"><svg class="icon"><use href="#i-map"/></svg></div><span class="eyebrow">YOUR NEXT MOVE STARTS HERE</span><h2>Choose your battlefield</h2><p>Select a map above or upload your own map image.<br>Draw routes, mark objectives, and build your squad’s plan.</p><button id="empty-upload" class="primary"><svg class="icon"><use href="#i-upload"/></svg>Upload a map</button><small>PNG, JPEG or WebP · up to 16 MB</small></div>
+          <div id="loading" class="loading" hidden role="status">Loading map…</div>
+          <div class="view-controls" aria-label="Map view">
+            <button id="zoom-out" aria-label="Zoom out" title="Zoom out" disabled>−</button><output id="zoom-value" aria-label="Current zoom">100%</output><button id="zoom-in" aria-label="Zoom in" title="Zoom in" disabled>+</button>
+            <button id="fit" aria-label="Fit map to view" title="Fit map (F)" disabled><svg class="icon"><use href="#i-fit"/></svg></button>
+            <button id="fullscreen" aria-label="Toggle fullscreen" title="Toggle fullscreen"><svg class="icon"><use href="#i-fullscreen"/></svg></button>
+          </div>
+        </div>
+        <footer class="status-bar"><span id="status" role="status" aria-live="polite">Choose a map to start.</span><span id="save-status">Drafts stay on this device</span></footer>
+      </div>
+    </section>
+  </main>
+  <input id="map-file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+  <input id="strategy-file" type="file" accept=".json,application/json" hidden>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>Make the next move clear.</h2><button id="close-help" aria-label="Close help">Close</button></div><p>Choose a battlefield or upload your own map. Select a tool and draw directly on the map.</p><ul><li><strong>Select:</strong> click an annotation to move it, change its color or size, or delete it.</li><li><strong>Text & markers:</strong> edit the label in the toolbar, then click the map to place it.</li><li><strong>Eraser:</strong> drag across an annotation to remove the whole annotation.</li><li><strong>Navigate:</strong> use Pan, hold Space and drag, or drag with two fingers. Pinch or use the mouse wheel to zoom.</li><li><strong>Undo / redo:</strong> Ctrl or Cmd + Z / Shift + Z. Delete removes your selection. Escape cancels the current stroke.</li><li><strong>Save strategy:</strong> download an editable file including the map. Open it here to continue. Export PNG creates an image at the map’s original size.</li></ul><p class="help-note">Your latest strategy is saved in this browser when storage is available. Download a strategy file to keep a separate copy or share it with your squad.</p></dialog>
+</body>
+</html>

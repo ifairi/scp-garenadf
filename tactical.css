@@ -129,6 +129,19 @@
 .match-side b { color: var(--accent); }
 .match-side > span { color: var(--muted); }
 .scrim-contact, .protocol-join { border-radius: 3px; background-color: var(--tactical-surface); }
+.mapping-panel .section-content { padding-top: 36px; }
+.mapping-heading { align-items: center; margin-bottom: 24px; gap: 16px; }
+.mapping-heading h2 { font-size: clamp(28px, 3.2vw, 46px); }
+.mapping-heading .text-link { flex: none; font-size: 10px; }
+.mapping-frame { display: block; width: 100%; height: clamp(620px, 78vh, 1000px); border: 1px solid var(--line); border-radius: 8px 2px; background: #0b120f; }
+@media (max-width: 680px) {
+  .mapping-panel .section-content { padding-inline: 10px; padding-top: 24px; }
+  .mapping-heading { padding-inline: 10px; align-items: flex-start; flex-direction: column; }
+  .mapping-frame { height: max(660px, 85svh); }
+}
+@media (max-width: 900px) {
+  .js .nav { max-height: calc(100svh - 105px); overflow-y: auto; overscroll-behavior: contain; }
+}
 .membership-paths > article { border-radius: 3px; }
 .protocol-rules details[open] { background: linear-gradient(90deg, #8be9b208, transparent 80%); }
 .protocol-rules details[open] summary::before { content: ''; position: absolute; inset: 23px auto auto -12px; width: 2px; height: 20px; background: var(--signal); }

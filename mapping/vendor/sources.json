@@ -1,0 +1,177 @@
+[
+  {
+    "path": "leaflet.css",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/leaflet.css",
+    "bytes": 14806
+  },
+  {
+    "path": "css/L.Control.Zoomslider.css",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/css/L.Control.Zoomslider.css",
+    "bytes": 2912
+  },
+  {
+    "path": "js/lib/leaflet.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/leaflet.js",
+    "bytes": 141937
+  },
+  {
+    "path": "js/lib/L.Control.Zoomslider.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/L.Control.Zoomslider.js",
+    "bytes": 6756
+  },
+  {
+    "path": "main.css",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/main.css",
+    "bytes": 1845468
+  },
+  {
+    "path": "js/lib/jquery-1.11.3.min.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/jquery-1.11.3.min.js",
+    "bytes": 96003
+  },
+  {
+    "path": "js/lib/daba_floor.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/daba_floor.js",
+    "bytes": 133641
+  },
+  {
+    "path": "js/lib/cgxg_floor.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/cgxg_floor.js",
+    "bytes": 112900
+  },
+  {
+    "path": "js/lib/bks_floor.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/bks_floor.js",
+    "bytes": 76557
+  },
+  {
+    "path": "js/lib/cxjy_floor.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/cxjy_floor.js",
+    "bytes": 206405
+  },
+  {
+    "path": "js/lib/map_article.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_article.js",
+    "bytes": 845060
+  },
+  {
+    "path": "js/lib/map_cgxg.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_cgxg.js",
+    "bytes": 1279292
+  },
+  {
+    "path": "js/lib/map_htjd.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_htjd.js",
+    "bytes": 555444
+  },
+  {
+    "path": "js/lib/map_bks.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_bks.js",
+    "bytes": 461588
+  },
+  {
+    "path": "js/lib/map_cxjy.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_cxjy.js",
+    "bytes": 278919
+  },
+  {
+    "path": "js/lib/map_gc.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_gc.js",
+    "bytes": 255033
+  },
+  {
+    "path": "js/lib/map_jq.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_jq.js",
+    "bytes": 264121
+  },
+  {
+    "path": "js/lib/map_pc.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_pc.js",
+    "bytes": 546597
+  },
+  {
+    "path": "js/lib/map_ljd.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_ljd.js",
+    "bytes": 295382
+  },
+  {
+    "path": "js/lib/map_qhz.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_qhz.js",
+    "bytes": 400012
+  },
+  {
+    "path": "js/lib/map_df.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_df.js",
+    "bytes": 236245
+  },
+  {
+    "path": "js/lib/map_dg.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_dg.js",
+    "bytes": 478984
+  },
+  {
+    "path": "js/lib/map_hdz.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_hdz.js",
+    "bytes": 505472
+  },
+  {
+    "path": "js/lib/map_jzt.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_jzt.js",
+    "bytes": 355657
+  },
+  {
+    "path": "js/lib/map_dc.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_dc.js",
+    "bytes": 447377
+  },
+  {
+    "path": "js/lib/map_yz.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_yz.js",
+    "bytes": 235510
+  },
+  {
+    "path": "js/lib/map_wmsyh.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_wmsyh.js",
+    "bytes": 276576
+  },
+  {
+    "path": "js/lib/az3_floor.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/az3_floor.js",
+    "bytes": 255601
+  },
+  {
+    "path": "js/lib/map_az3.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_az3.js",
+    "bytes": 977533
+  },
+  {
+    "path": "js/lib/map_dsc.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_dsc.js",
+    "bytes": 350028
+  },
+  {
+    "path": "js/lib/map_dsc2.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_dsc2.js",
+    "bytes": 377318
+  },
+  {
+    "path": "js/lib/map_mgjcq.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/map_mgjcq.js",
+    "bytes": 275379
+  },
+  {
+    "path": "js/lib/swiper-bundle.min.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/swiper-bundle.min.js",
+    "bytes": 148932
+  },
+  {
+    "path": "js/lib/main.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/main.js",
+    "bytes": 176482
+  },
+  {
+    "path": "main.js",
+    "url": "https://game.gtimg.cn/images/dfm/cp/a20240729directory/main.js",
+    "bytes": 2679
+  }
+]
