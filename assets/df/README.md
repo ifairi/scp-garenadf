@@ -2,7 +2,7 @@
 
 - Local file: `technical-divider.png` (unmodified, 3840 × 54, 2,166 bytes)
 - Original: https://game.gtimg.cn/images/dfm/cp/a20240906main/p3_line.png
-- Source page: https://df.qq.com/cp/a20240906main/index.html
+- Source page: official Delta Force website (September 2024 campaign).
 - Used as a subtle decorative divider above SCP's inner-page headings.
 - Retrieved 9 September 2026 from the public official Delta Force website at the site owner's request.
 

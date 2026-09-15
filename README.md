@@ -82,7 +82,7 @@ Untuk update GitHub ini, sertakan file baru `i18n.js`, `i18n-data.js`, `i18n.css
 
 ## Detail taktis Delta Force
 
-`tactical.css` mengadaptasi panel gelap, aksen hijau, garis instrumen, dan respons hover dari referensi resmi [Delta Force](https://df.qq.com/cp/a20240906main/index.html). Bingkai header, foto komunitas, font P-Med/P-Bold, pilihan bahasa, dan interaksi roster tetap dipertahankan. Nomor bagian yang tipis bersifat dekoratif; ikon pada ringkasan Beranda memakai vektor.
+`tactical.css` mengadaptasi panel gelap, aksen hijau, garis instrumen, dan respons hover dari referensi resmi Delta Force. Bingkai header, foto komunitas, font P-Med/P-Bold, pilihan bahasa, dan interaksi roster tetap dipertahankan. Nomor bagian yang tipis bersifat dekoratif; ikon pada ringkasan Beranda memakai vektor.
 
 Satu aset resmi berukuran 2,166 byte disimpan lokal di `assets/df/technical-divider.png`; sumbernya dicatat di `assets/df/README.md`. Website tidak memanggil server Tencent untuk memuat aset ini. Tidak ditambahkan video latar, framework, pelacak, atau skrip dari referensi. Efek hover kartu menggunakan transform kecil selama 350 ms dan tetap menghormati pengaturan efek serta reduced motion.
 

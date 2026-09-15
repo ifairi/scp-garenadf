@@ -1,6 +1,6 @@
 # Original Delta Force map tool
 
-Source: https://df.qq.com/cp/a20240729directory/index.html
+Source: official Delta Force map tool by Tencent.
 Retrieved: 15 September 2026. Exact resource URLs are listed in `sources.json`.
 
 This folder contains the original Leaflet engine, map configuration, sectors,

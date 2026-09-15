@@ -1,6 +1,6 @@
 # Delta Force map backgrounds
 
-Source: [official Delta Force map tool](https://df.qq.com/cp/a20240729directory/index.html), retrieved 14 September 2026.
+Source: official Delta Force map tool, retrieved 14 September 2026.
 
 | Map | Official configuration | Background directory | Size |
 | --- | --- | --- | --- |
